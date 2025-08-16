@@ -1,1 +1,0 @@
-self.__REACT_LOADABLE_MANIFEST='{"app\\\\page.tsx -> @/components/EmailDashboard":{"id":8605,"files":["static/chunks/605.c1f72a59abccfa68.js"]}}';

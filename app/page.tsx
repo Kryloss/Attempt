@@ -18,10 +18,10 @@ const isBuildTime = () => {
 const EmailDashboard = dynamic(() => import('@/components/EmailDashboard'), {
     ssr: false,
     loading: () => (
-        <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-            <h2 className="text-2xl font-bold text-gray-800 mb-6">Email Dashboard</h2>
+        <div className="card p-6 mb-6">
+            <h2 className="text-2xl font-bold text-purple-800 mb-6">Email Dashboard</h2>
             <div className="flex justify-center items-center p-8">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
             </div>
         </div>
     )
@@ -50,18 +50,27 @@ export default function Home() {
     // Don't render anything during SSR/build time
     if (!isClient || isBuildTime()) {
         return (
-            <main className="min-h-screen p-4">
-                <div className="max-w-6xl mx-auto">
-                    <div className="text-center mb-8">
-                        <h1 className="text-4xl font-bold text-gray-900 mb-2">
-                            Email Confirmation
-                        </h1>
-                        <p className="text-gray-600">
-                            Enter your email to receive a confirmation message
-                        </p>
+            <main className="min-h-screen p-4 flex items-center justify-center relative overflow-hidden">
+                {/* Enhanced background decorative elements */}
+                <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                    <div className="absolute top-20 left-10 w-32 h-32 bg-purple-200 rounded-full opacity-20 animate-float"></div>
+                    <div className="absolute bottom-20 right-10 w-24 h-24 bg-purple-300 rounded-full opacity-30 animate-float float-delay-2"></div>
+                    <div className="absolute top-1/2 left-1/4 w-16 h-16 bg-purple-400 rounded-full opacity-25 animate-float float-delay-3"></div>
+                    <div className="absolute top-1/3 right-1/4 w-20 h-20 bg-purple-100 rounded-full opacity-40 animate-float float-delay-1"></div>
+                    <div className="absolute bottom-1/3 left-1/3 w-12 h-12 bg-purple-300 rounded-full opacity-35 animate-float float-delay-4"></div>
+                </div>
+
+                <div className="text-center relative z-10">
+                    <div className="icon-container mx-auto mb-6 animate-float glow-purple">
+                        <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
                     </div>
+                    <h1 className="text-5xl font-bold text-purple-800 mb-4 font-display gradient-text">
+                        gymNote
+                    </h1>
                     <div className="flex justify-center items-center p-8">
-                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
                     </div>
                 </div>
             </main>
@@ -69,44 +78,44 @@ export default function Home() {
     }
 
     return (
-        <main className="min-h-screen p-4">
-            <div className="max-w-6xl mx-auto">
-                <div className="text-center mb-8">
-                    <h1 className="text-4xl font-bold text-gray-900 mb-2">
-                        Email Confirmation
+        <main className="min-h-screen p-4 flex items-center justify-center relative overflow-hidden">
+            {/* Enhanced background decorative elements */}
+            <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                <div className="absolute top-20 left-10 w-32 h-32 bg-purple-200 rounded-full opacity-20 animate-float"></div>
+                <div className="absolute bottom-20 right-10 w-24 h-24 bg-purple-300 rounded-full opacity-30 animate-float float-delay-2"></div>
+                <div className="absolute top-1/2 left-1/4 w-16 h-16 bg-purple-400 rounded-full opacity-25 animate-float float-delay-3"></div>
+                <div className="absolute top-1/3 right-1/4 w-20 h-20 bg-purple-100 rounded-full opacity-40 animate-float float-delay-1"></div>
+                <div className="absolute bottom-1/3 left-1/3 w-12 h-12 bg-purple-300 rounded-full opacity-35 animate-float float-delay-4"></div>
+                <div className="absolute top-1/4 left-1/2 w-8 h-8 bg-purple-200 rounded-full opacity-30 animate-float float-delay-5"></div>
+                <div className="absolute bottom-1/4 right-1/3 w-16 h-16 bg-purple-100 rounded-full opacity-25 animate-float float-delay-6"></div>
+            </div>
+
+            <div className="max-w-md mx-auto w-full relative z-10">
+                {/* Header with gymNote branding */}
+                <div className="text-center mb-12">
+                    <div className="icon-container mx-auto mb-6 animate-float glow-purple">
+                        <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
+                    <h1 className="text-5xl font-bold text-purple-800 mb-4 font-display gradient-text">
+                        gymNote
                     </h1>
-                    <p className="text-gray-600">
-                        Enter your email to receive a confirmation message
-                    </p>
+                    <div className="w-24 h-1 bg-gradient-to-r from-purple-400 to-purple-600 mx-auto rounded-full animate-pulse-slow"></div>
                 </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                    <div className="lg:order-2">
-                        <div className="bg-white rounded-2xl shadow-xl p-8">
-                            {!isSuccess ? (
-                                <EmailForm onSuccess={handleSuccess} />
-                            ) : (
-                                <SuccessMessage email={email} onReset={handleReset} />
-                            )}
-                        </div>
-                    </div>
-
-                    <div className="lg:order-1">
-                        <Suspense fallback={
-                            <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-                                <h2 className="text-2xl font-bold text-gray-800 mb-6">Email Dashboard</h2>
-                                <div className="flex justify-center items-center p-8">
-                                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-                                </div>
-                            </div>
-                        }>
-                            <EmailDashboard />
-                        </Suspense>
-                    </div>
+                {/* Main content card */}
+                <div className="card p-8 animate-glow card-hover">
+                    {!isSuccess ? (
+                        <EmailForm onSuccess={handleSuccess} />
+                    ) : (
+                        <SuccessMessage email={email} onReset={handleReset} />
+                    )}
                 </div>
 
-                <div className="text-center mt-8 text-sm text-gray-500">
-                    <p>Powered by <a href="https://resend.com" target="_blank" rel="noopener noreferrer" className="text-primary-600 hover:underline">Resend</a></p>
+                {/* Footer */}
+                <div className="text-center mt-8 text-sm text-purple-600">
+                    <p>Powered by <a href="https://resend.com" target="_blank" rel="noopener noreferrer" className="text-purple-700 hover:text-purple-800 underline font-medium hover:glow-purple">Resend</a></p>
                 </div>
             </div>
         </main>

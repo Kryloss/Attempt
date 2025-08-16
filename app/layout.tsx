@@ -5,8 +5,13 @@ import './globals.css'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-    title: 'Email Confirmation - Resend',
-    description: 'Send confirmation emails using Resend',
+    title: 'gymNote - Email Confirmation',
+    description: 'Send confirmation emails using gymNote',
+    icons: {
+        icon: '/favicon.svg',
+        shortcut: '/favicon.svg',
+        apple: '/favicon.svg',
+    },
 }
 
 export default function RootLayout({
@@ -17,9 +22,7 @@ export default function RootLayout({
     return (
         <html lang="en">
             <body className={inter.className}>
-                <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-                    {children}
-                </div>
+                {children}
             </body>
         </html>
     )
