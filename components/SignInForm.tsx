@@ -6,9 +6,10 @@ import { User, AuthFormData } from '@/types/auth'
 interface SignInFormProps {
     onSuccess: (user: User) => void
     onSwitchToSignUp: () => void
+    onSwitchToForgotPassword: () => void
 }
 
-export default function SignInForm({ onSuccess, onSwitchToSignUp }: SignInFormProps) {
+export default function SignInForm({ onSuccess, onSwitchToSignUp, onSwitchToForgotPassword }: SignInFormProps) {
     const [formData, setFormData] = useState<AuthFormData>({
         emailOrUsername: '',
         password: ''
@@ -93,6 +94,15 @@ export default function SignInForm({ onSuccess, onSwitchToSignUp }: SignInFormPr
                         className="w-full px-3 py-2 border border-purple-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                         placeholder="Enter password"
                     />
+                    <div className="mt-2 text-right">
+                        <button
+                            type="button"
+                            onClick={() => onSwitchToForgotPassword()}
+                            className="text-sm text-purple-600 hover:underline focus:outline-none"
+                        >
+                            Forgot Password?
+                        </button>
+                    </div>
                 </div>
 
                 <button

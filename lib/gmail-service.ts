@@ -192,4 +192,48 @@ export class GmailEmailService {
 
         return this.sendEmail(email, 'Welcome to Our Platform!', html, text);
     }
+
+    // Send verification code email for password reset
+    async sendVerificationCodeEmail(email: string, code: string) {
+        const html = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+        <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; border-radius: 10px; text-align: center; margin-bottom: 30px;">
+          <h1 style="color: white; margin: 0; font-size: 28px;">Password Reset Code</h1>
+        </div>
+        
+        <div style="background: #f8f9fa; padding: 30px; border-radius: 10px; margin-bottom: 30px;">
+          <h2 style="color: #333; margin-top: 0;">Your Verification Code</h2>
+          <p style="color: #666; line-height: 1.6; font-size: 16px;">
+            You requested to reset your password. Use the verification code below to proceed:
+          </p>
+          <div style="text-align: center; margin: 30px 0;">
+            <div style="background: #667eea; color: white; padding: 20px; border-radius: 8px; font-size: 32px; font-weight: bold; letter-spacing: 8px; display: inline-block; min-width: 200px;">
+              ${code}
+            </div>
+          </div>
+          <p style="color: #666; line-height: 1.6; font-size: 14px;">
+            This code will expire in 15 minutes.<br>
+            If you didn't request this reset, please ignore this email.
+          </p>
+        </div>
+        
+        <div style="text-align: center; margin-top: 30px; color: #999; font-size: 12px;">
+          <p>© 2024 Your Company. All rights reserved.</p>
+        </div>
+      </div>
+    `;
+
+        const text = `
+      Password Reset Code
+      
+      Your Verification Code: ${code}
+      
+      This code will expire in 15 minutes.
+      If you didn't request this reset, please ignore this email.
+      
+      © 2024 Your Company. All rights reserved.
+    `;
+
+        return this.sendEmail(email, 'Password Reset Verification Code', html, text);
+    }
 }

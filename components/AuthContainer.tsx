@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import SignInForm from './SignInForm'
 import SignUpForm from './SignUpForm'
+import ForgotPasswordForm from './ForgotPasswordForm'
 import { User } from '@/types/auth'
 
 interface AuthContainerProps {
@@ -10,27 +11,36 @@ interface AuthContainerProps {
 }
 
 export default function AuthContainer({ onSuccess }: AuthContainerProps) {
-    const [isSignUp, setIsSignUp] = useState(false)
+    const [authMode, setAuthMode] = useState<'signin' | 'signup' | 'forgot-password'>('signin')
 
     const handleSwitchToSignUp = () => {
-        setIsSignUp(true)
+        setAuthMode('signup')
     }
 
     const handleSwitchToSignIn = () => {
-        setIsSignUp(false)
+        setAuthMode('signin')
+    }
+
+    const handleSwitchToForgotPassword = () => {
+        setAuthMode('forgot-password')
     }
 
     return (
         <div className="w-full">
-            {isSignUp ? (
+            {authMode === 'signup' ? (
                 <SignUpForm
                     onSuccess={onSuccess}
                     onSwitchToSignIn={handleSwitchToSignIn}
+                />
+            ) : authMode === 'forgot-password' ? (
+                <ForgotPasswordForm
+                    onBackToSignIn={handleSwitchToSignIn}
                 />
             ) : (
                 <SignInForm
                     onSuccess={onSuccess}
                     onSwitchToSignUp={handleSwitchToSignUp}
+                    onSwitchToForgotPassword={handleSwitchToForgotPassword}
                 />
             )}
         </div>
