@@ -34,10 +34,10 @@ export async function getTotalEmailCount() {
     return count;
 }
 
-export async function createUser(email: string, name: string) {
+export async function createUser(username: string, email: string, password: string) {
     await dbConnect();
 
-    const user = new User({ email, name });
+    const user = new User({ username, email, password });
     await user.save();
 
     return user;
@@ -50,9 +50,39 @@ export async function findUserByEmail(email: string) {
     return user;
 }
 
+export async function findUserByUsername(username: string) {
+    await dbConnect();
+
+    const user = await User.findOne({ username });
+    return user;
+}
+
 export async function getAllUsers() {
     await dbConnect();
 
     const users = await User.find({}).sort({ createdAt: -1 });
     return users;
+}
+
+export async function authenticateUser(emailOrUsername: string, password: string) {
+    await dbConnect();
+
+    // Try to find user by email or username
+    const user = await User.findOne({
+        $or: [
+            { email: emailOrUsername.toLowerCase() },
+            { username: emailOrUsername }
+        ]
+    });
+
+    if (!user) {
+        return null;
+    }
+
+    const isPasswordValid = await user.comparePassword(password);
+    if (!isPasswordValid) {
+        return null;
+    }
+
+    return user;
 }

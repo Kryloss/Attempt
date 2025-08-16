@@ -2,8 +2,8 @@
 
 import { useState, Suspense, useEffect } from 'react'
 import dynamic from 'next/dynamic'
-import EmailForm from '@/components/EmailForm'
-import SuccessMessage from '@/components/SuccessMessage'
+import AuthContainer from '@/components/AuthContainer'
+import { User } from '@/types/auth'
 
 // Build-time safety check
 const isBuildTime = () => {
@@ -28,8 +28,8 @@ const EmailDashboard = dynamic(() => import('@/components/EmailDashboard'), {
 })
 
 export default function Home() {
-    const [isSuccess, setIsSuccess] = useState(false)
-    const [email, setEmail] = useState('')
+    const [isAuthenticated, setIsAuthenticated] = useState(false)
+    const [user, setUser] = useState<User | null>(null)
     const [isClient, setIsClient] = useState(false)
 
     useEffect(() => {
@@ -37,14 +37,14 @@ export default function Home() {
         setIsClient(true)
     }, [])
 
-    const handleSuccess = (userEmail: string) => {
-        setEmail(userEmail)
-        setIsSuccess(true)
+    const handleAuthSuccess = (userData: User) => {
+        setUser(userData)
+        setIsAuthenticated(true)
     }
 
-    const handleReset = () => {
-        setIsSuccess(false)
-        setEmail('')
+    const handleSignOut = () => {
+        setIsAuthenticated(false)
+        setUser(null)
     }
 
     // Don't render anything during SSR/build time
@@ -106,16 +106,22 @@ export default function Home() {
 
                 {/* Main content card */}
                 <div className="card p-8 animate-glow card-hover">
-                    {!isSuccess ? (
-                        <EmailForm onSuccess={handleSuccess} />
+                    {!isAuthenticated ? (
+                        <AuthContainer onSuccess={handleAuthSuccess} />
                     ) : (
-                        <SuccessMessage email={email} onReset={handleReset} />
+                        <div className="text-center">
+                            <div className="mb-6">
+                                <h2 className="text-2xl font-bold text-purple-800 mb-2">Welcome, {user?.username}!</h2>
+                                <p className="text-purple-600">You are now signed in to gymNote</p>
+                            </div>
+                            <button
+                                onClick={handleSignOut}
+                                className="bg-purple-600 text-white py-2 px-6 rounded-lg hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-colors"
+                            >
+                                Sign Out
+                            </button>
+                        </div>
                     )}
-                </div>
-
-                {/* Footer */}
-                <div className="text-center mt-8 text-sm text-purple-600">
-                    <p>Email delivery via Gmail SMTP</p>
                 </div>
             </div>
         </main>
