@@ -13,19 +13,47 @@ interface EmailData {
     totalEmails: number;
 }
 
+// Build-time safety check
+const isBuildTime = () => {
+    return (
+        process.env.NODE_ENV === 'production' &&
+        typeof window === 'undefined' &&
+        (process.env.VERCEL_ENV === 'production' || process.env.NEXT_PHASE === 'phase-production-build')
+    );
+};
+
 export default function EmailDashboard() {
     const [emailData, setEmailData] = useState<EmailData | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [isClient, setIsClient] = useState(false);
 
     useEffect(() => {
-        fetchEmailData();
+        // Ensure this component only runs on the client side
+        setIsClient(true);
+
+        // Add a small delay to ensure we're fully on the client side
+        const timer = setTimeout(() => {
+            fetchEmailData();
+        }, 100);
+
+        return () => clearTimeout(timer);
     }, []);
 
     const fetchEmailData = async () => {
+        // Only fetch data if we're on the client side and not in build time
+        if (!isClient || isBuildTime()) return;
+
         try {
             setLoading(true);
+            setError(null);
+
             const response = await fetch('/api/emails');
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
             const result = await response.json();
 
             if (result.success) {
@@ -34,36 +62,62 @@ export default function EmailDashboard() {
                 setError(result.message || 'Failed to fetch email data');
             }
         } catch (err) {
-            setError('Error fetching email data');
+            console.error('Error fetching email data:', err);
+            setError('Error fetching email data. Please try again later.');
         } finally {
             setLoading(false);
         }
     };
 
+    // Don't render anything during SSR/build time
+    if (!isClient || isBuildTime()) {
+        return (
+            <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+                <h2 className="text-2xl font-bold text-gray-800 mb-6">Email Dashboard</h2>
+                <div className="flex justify-center items-center p-8">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                </div>
+            </div>
+        );
+    }
+
     if (loading) {
         return (
-            <div className="flex justify-center items-center p-8">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+            <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+                <h2 className="text-2xl font-bold text-gray-800 mb-6">Email Dashboard</h2>
+                <div className="flex justify-center items-center p-8">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                </div>
             </div>
         );
     }
 
     if (error) {
         return (
-            <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
-                <p className="text-red-800">Error: {error}</p>
-                <button
-                    onClick={fetchEmailData}
-                    className="mt-2 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
-                >
-                    Retry
-                </button>
+            <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+                <h2 className="text-2xl font-bold text-gray-800 mb-6">Email Dashboard</h2>
+                <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+                    <p className="text-red-800">Error: {error}</p>
+                    <button
+                        onClick={fetchEmailData}
+                        className="mt-2 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+                    >
+                        Retry
+                    </button>
+                </div>
             </div>
         );
     }
 
     if (!emailData) {
-        return null;
+        return (
+            <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+                <h2 className="text-2xl font-bold text-gray-800 mb-6">Email Dashboard</h2>
+                <div className="text-center text-gray-500 p-8">
+                    No data available
+                </div>
+            </div>
+        );
     }
 
     const sentCount = emailData.stats.find(stat => stat._id === 'sent')?.count || 0;
@@ -107,8 +161,8 @@ export default function EmailDashboard() {
                                     <td className="px-4 py-3 text-sm text-gray-900">{email.email}</td>
                                     <td className="px-4 py-3">
                                         <span className={`px-2 py-1 text-xs font-medium rounded-full ${email.status === 'sent'
-                                                ? 'bg-green-100 text-green-800'
-                                                : 'bg-red-100 text-red-800'
+                                            ? 'bg-green-100 text-green-800'
+                                            : 'bg-red-100 text-red-800'
                                             }`}>
                                             {email.status}
                                         </span>

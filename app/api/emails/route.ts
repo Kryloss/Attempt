@@ -1,16 +1,17 @@
 import { NextResponse } from 'next/server';
+import { isMongoDBConfigured } from '@/lib/config';
 import dbConnect from '@/lib/mongodb';
 import Email from '@/models/Email';
 
 export async function GET() {
     try {
-        // Check if MongoDB URI is configured
-        if (!process.env.MONGODB_URI) {
+        // Check if MongoDB is configured
+        if (!isMongoDBConfigured()) {
             return NextResponse.json(
                 {
                     success: false,
                     message: 'Database not configured',
-                    error: 'MONGODB_URI environment variable is not set',
+                    error: 'MongoDB is not configured for this environment',
                 },
                 { status: 500 }
             );
@@ -43,7 +44,7 @@ export async function GET() {
         });
     } catch (error) {
         console.error('Error fetching emails:', error);
-        
+
         // Check if it's a connection error
         if (error instanceof Error && error.message.includes('authentication failed')) {
             return NextResponse.json(
@@ -55,7 +56,7 @@ export async function GET() {
                 { status: 500 }
             );
         }
-        
+
         if (error instanceof Error && error.message.includes('ECONNREFUSED')) {
             return NextResponse.json(
                 {

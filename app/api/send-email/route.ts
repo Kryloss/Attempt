@@ -1,9 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { Resend } from 'resend'
+import { isMongoDBConfigured, isResendConfigured } from '@/lib/config'
 import dbConnect from '@/lib/mongodb'
 import Email from '@/models/Email'
-
-const resend = new Resend(process.env.RESEND_API_KEY)
 
 export async function POST(request: NextRequest) {
   try {
@@ -26,23 +25,18 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if required environment variables are set
-    if (!process.env.RESEND_API_KEY) {
+    if (!isResendConfigured()) {
       return NextResponse.json(
         { error: 'Email service not configured' },
         { status: 500 }
       )
     }
 
-    if (!process.env.RESEND_DOMAIN) {
-      return NextResponse.json(
-        { error: 'Email domain not configured' },
-        { status: 500 }
-      )
-    }
+    const resend = new Resend(process.env.RESEND_API_KEY)
 
-    // Connect to MongoDB (only if MONGODB_URI is configured)
+    // Connect to MongoDB (only if configured)
     let emailRecord = null;
-    if (process.env.MONGODB_URI) {
+    if (isMongoDBConfigured()) {
       try {
         await dbConnect()
       } catch (dbError) {
@@ -103,7 +97,7 @@ export async function POST(request: NextRequest) {
       console.error('Resend error:', error)
 
       // Store failed email record if database is available
-      if (process.env.MONGODB_URI && emailRecord === null) {
+      if (isMongoDBConfigured() && emailRecord === null) {
         try {
           await Email.create({
             email,
@@ -122,7 +116,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Store successful email record if database is available
-    if (process.env.MONGODB_URI && emailRecord === null) {
+    if (isMongoDBConfigured() && emailRecord === null) {
       try {
         await Email.create({
           email,

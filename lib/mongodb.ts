@@ -1,10 +1,5 @@
 import mongoose from 'mongoose';
-
-const MONGODB_URI = process.env.MONGODB_URI!;
-
-if (!MONGODB_URI) {
-    throw new Error('Please define the MONGODB_URI environment variable inside .env.local');
-}
+import { config, isMongoDBConfigured, shouldAttemptDatabaseOperations } from './config';
 
 /**
  * Global is used here to maintain a cached connection across hot reloads
@@ -18,6 +13,21 @@ if (!cached) {
 }
 
 async function dbConnect() {
+    // Check if MongoDB is configured and we're not in build time
+    if (!isMongoDBConfigured()) {
+        if (config.isBuildTime || config.isVercelBuild) {
+            console.warn('MongoDB connection attempted during build time - skipping');
+            throw new Error('MongoDB connection not available during build time');
+        }
+        throw new Error('MongoDB not configured. Please set MONGODB_URI environment variable.');
+    }
+
+    // Additional safety check for build time
+    if (!shouldAttemptDatabaseOperations()) {
+        console.warn('MongoDB connection attempted during build time - skipping');
+        throw new Error('MongoDB connection not available during build time');
+    }
+
     if (cached.conn) {
         return cached.conn;
     }
@@ -25,13 +35,13 @@ async function dbConnect() {
     if (!cached.promise) {
         const opts = {
             bufferCommands: false,
-            maxPoolSize: parseInt(process.env.MONGODB_MAX_POOL_SIZE || '10'),
-            serverSelectionTimeoutMS: parseInt(process.env.MONGODB_SERVER_SELECTION_TIMEOUT_MS || '5000'),
+            maxPoolSize: config.mongodb.maxPoolSize,
+            serverSelectionTimeoutMS: config.mongodb.serverSelectionTimeoutMS,
             socketTimeoutMS: 45000,
             family: 4,
         };
 
-        cached.promise = mongoose.connect(MONGODB_URI, opts);
+        cached.promise = mongoose.connect(config.mongodb.uri, opts);
     }
 
     try {
