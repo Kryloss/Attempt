@@ -5,7 +5,10 @@ export interface IEmail extends Document {
     status: 'sent' | 'failed';
     sentAt: Date;
     resendId?: string;
+    messageId?: string;
     error?: string;
+    service?: 'resend' | 'gmail';
+    emailType?: 'confirmation' | 'verification' | 'password-reset' | 'welcome' | 'bulk' | 'notification';
 }
 
 const EmailSchema: Schema = new Schema({
@@ -29,9 +32,25 @@ const EmailSchema: Schema = new Schema({
         type: String,
         required: false,
     },
+    messageId: {
+        type: String,
+        required: false,
+    },
     error: {
         type: String,
         required: false,
+    },
+    service: {
+        type: String,
+        enum: ['resend', 'gmail'],
+        required: false,
+        default: 'resend',
+    },
+    emailType: {
+        type: String,
+        enum: ['confirmation', 'verification', 'password-reset', 'welcome', 'bulk', 'notification'],
+        required: false,
+        default: 'confirmation',
     },
 }, {
     timestamps: true,

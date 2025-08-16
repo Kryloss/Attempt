@@ -112,6 +112,8 @@ export async function POST(request: NextRequest) {
             email,
             status: 'failed',
             error: error.message || 'Unknown error',
+            service: 'resend',
+            emailType: 'confirmation',
           })
         } catch (dbError) {
           console.error('Failed to store email record:', dbError)
@@ -131,6 +133,8 @@ export async function POST(request: NextRequest) {
           email,
           status: 'sent',
           resendId: data?.id,
+          service: 'resend',
+          emailType: 'confirmation',
         })
       } catch (dbError) {
         console.error('Failed to store email record:', dbError)
