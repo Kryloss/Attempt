@@ -6,9 +6,10 @@ import { User, AuthFormData } from '@/types/auth'
 interface SignUpFormProps {
     onSuccess: (user: User) => void
     onSwitchToSignIn: () => void
+    onGuestMode: () => void
 }
 
-export default function SignUpForm({ onSuccess, onSwitchToSignIn }: SignUpFormProps) {
+export default function SignUpForm({ onSuccess, onSwitchToSignIn, onGuestMode }: SignUpFormProps) {
     const [formData, setFormData] = useState<AuthFormData>({
         username: '',
         email: '',
@@ -151,6 +152,15 @@ export default function SignUpForm({ onSuccess, onSwitchToSignIn }: SignUpFormPr
                         Sign In
                     </button>
                 </p>
+
+                <div className="mt-4 pt-4 border-t border-purple-200">
+                    <button
+                        onClick={onGuestMode}
+                        className="w-full bg-gray-100 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors border border-gray-300"
+                    >
+                        Proceed as Guest
+                    </button>
+                </div>
             </div>
         </div>
     )

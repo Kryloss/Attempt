@@ -7,9 +7,10 @@ interface SignInFormProps {
     onSuccess: (user: User) => void
     onSwitchToSignUp: () => void
     onSwitchToForgotPassword: () => void
+    onGuestMode: () => void
 }
 
-export default function SignInForm({ onSuccess, onSwitchToSignUp, onSwitchToForgotPassword }: SignInFormProps) {
+export default function SignInForm({ onSuccess, onSwitchToSignUp, onSwitchToForgotPassword, onGuestMode }: SignInFormProps) {
     const [formData, setFormData] = useState<AuthFormData>({
         emailOrUsername: '',
         password: ''
@@ -124,6 +125,15 @@ export default function SignInForm({ onSuccess, onSwitchToSignUp, onSwitchToForg
                         Sign Up
                     </button>
                 </p>
+
+                <div className="mt-4 pt-4 border-t border-purple-200">
+                    <button
+                        onClick={onGuestMode}
+                        className="w-full bg-gray-100 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors border border-gray-300"
+                    >
+                        Proceed as Guest
+                    </button>
+                </div>
             </div>
         </div>
     )

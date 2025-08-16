@@ -1,9 +1,11 @@
 export interface User {
     _id: string;
+    id?: string; // Alternative ID field for compatibility
     username: string;
     email: string;
     createdAt: string;
     updatedAt: string;
+    guest?: boolean; // Optional flag to indicate guest user
 }
 
 export interface AuthFormData {

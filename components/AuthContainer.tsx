@@ -25,12 +25,25 @@ export default function AuthContainer({ onSuccess }: AuthContainerProps) {
         setAuthMode('forgot-password')
     }
 
+    const handleGuestMode = () => {
+        const guestUser: User = {
+            _id: 'guest',
+            username: 'Guest User',
+            email: 'guest@example.com',
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+            guest: true
+        }
+        onSuccess(guestUser)
+    }
+
     return (
         <div className="w-full">
             {authMode === 'signup' ? (
                 <SignUpForm
                     onSuccess={onSuccess}
                     onSwitchToSignIn={handleSwitchToSignIn}
+                    onGuestMode={handleGuestMode}
                 />
             ) : authMode === 'forgot-password' ? (
                 <ForgotPasswordForm
@@ -41,6 +54,7 @@ export default function AuthContainer({ onSuccess }: AuthContainerProps) {
                     onSuccess={onSuccess}
                     onSwitchToSignUp={handleSwitchToSignUp}
                     onSwitchToForgotPassword={handleSwitchToForgotPassword}
+                    onGuestMode={handleGuestMode}
                 />
             )}
         </div>

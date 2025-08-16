@@ -3,6 +3,7 @@
 import { useState, Suspense, useEffect } from 'react'
 import dynamic from 'next/dynamic'
 import AuthContainer from '@/components/AuthContainer'
+import TrainingDashboard from '@/components/TrainingDashboard'
 import { User } from '@/types/auth'
 
 // Build-time safety check
@@ -78,7 +79,7 @@ export default function Home() {
     }
 
     return (
-        <main className="min-h-screen p-4 flex items-center justify-center relative overflow-hidden">
+        <main className="min-h-screen relative overflow-hidden">
             {/* Enhanced background decorative elements */}
             <div className="absolute inset-0 overflow-hidden pointer-events-none">
                 <div className="absolute top-20 left-10 w-32 h-32 bg-purple-200 rounded-full opacity-20 animate-float"></div>
@@ -90,40 +91,20 @@ export default function Home() {
                 <div className="absolute bottom-1/4 right-1/3 w-16 h-16 bg-purple-100 rounded-full opacity-25 animate-float float-delay-6"></div>
             </div>
 
-            <div className="max-w-md mx-auto w-full relative z-10">
-                {/* Header with gymNote branding */}
-                <div className="text-center mb-12">
-                    <div className="icon-container mx-auto mb-6 animate-float glow-purple">
-                        <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                    </div>
-                    <h1 className="text-5xl font-bold text-purple-800 mb-4 font-display gradient-text">
-                        gymNote
-                    </h1>
-                    <div className="w-24 h-1 bg-gradient-to-r from-purple-400 to-purple-600 mx-auto rounded-full animate-pulse-slow"></div>
-                </div>
-
-                {/* Main content card */}
-                <div className="card p-8 animate-glow card-hover">
-                    {!isAuthenticated ? (
-                        <AuthContainer onSuccess={handleAuthSuccess} />
-                    ) : (
-                        <div className="text-center">
-                            <div className="mb-6">
-                                <h2 className="text-2xl font-bold text-purple-800 mb-2">Welcome, {user?.username}!</h2>
-                                <p className="text-purple-600">You are now signed in to gymNote</p>
-                            </div>
-                            <button
-                                onClick={handleSignOut}
-                                className="bg-purple-600 text-white py-2 px-6 rounded-lg hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-colors"
-                            >
-                                Sign Out
-                            </button>
+            {!isAuthenticated ? (
+                // Centered auth container
+                <div className="flex items-center justify-center min-h-screen">
+                    <div className="max-w-md mx-auto w-full relative z-10">
+                        {/* Main content card */}
+                        <div className="card p-8 animate-glow card-hover">
+                            <AuthContainer onSuccess={handleAuthSuccess} />
                         </div>
-                    )}
+                    </div>
                 </div>
-            </div>
+            ) : user ? (
+                // Full screen training dashboard
+                <TrainingDashboard user={user} onSignOut={handleSignOut} />
+            ) : null}
         </main>
     )
 }
