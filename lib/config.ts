@@ -6,7 +6,7 @@ const isBuildTime = () => {
     return (
         process.env.NODE_ENV === 'production' &&
         typeof window === 'undefined' &&
-        (process.env.VERCEL_ENV === 'production' || process.env.NEXT_PHASE === 'phase-production-build')
+        process.env.NEXT_PHASE === 'phase-production-build'
     );
 };
 
@@ -29,7 +29,7 @@ export const config = {
     isServerSide: typeof window === 'undefined',
     isClientSide: typeof window !== 'undefined',
     isVercel: process.env.VERCEL === '1',
-    isVercelBuild: process.env.VERCEL_ENV === 'production' && process.env.NEXT_PHASE === 'phase-production-build',
+    isVercelBuild: process.env.NEXT_PHASE === 'phase-production-build',
 };
 
 // Helper function to check if MongoDB is configured

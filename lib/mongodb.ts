@@ -13,17 +13,13 @@ if (!cached) {
 }
 
 async function dbConnect() {
-    // Check if MongoDB is configured and we're not in build time
+    // Check if MongoDB is configured
     if (!isMongoDBConfigured()) {
-        if (config.isBuildTime || config.isVercelBuild) {
-            console.warn('MongoDB connection attempted during build time - skipping');
-            throw new Error('MongoDB connection not available during build time');
-        }
         throw new Error('MongoDB not configured. Please set MONGODB_URI environment variable.');
     }
 
-    // Additional safety check for build time
-    if (!shouldAttemptDatabaseOperations()) {
+    // Only block during actual build time, not during Vercel runtime
+    if (process.env.NEXT_PHASE === 'phase-production-build') {
         console.warn('MongoDB connection attempted during build time - skipping');
         throw new Error('MongoDB connection not available during build time');
     }
@@ -57,7 +53,8 @@ async function dbConnect() {
             maxPoolSize: opts.maxPoolSize,
             serverSelectionTimeoutMS: opts.serverSelectionTimeoutMS,
             socketTimeoutMS: opts.socketTimeoutMS,
-            connectTimeoutMS: opts.connectTimeoutMS
+            connectTimeoutMS: opts.connectTimeoutMS,
+            NEXT_PHASE: process.env.NEXT_PHASE
         });
 
         cached.promise = mongoose.connect(config.mongodb.uri, opts);
