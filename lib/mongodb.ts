@@ -45,7 +45,6 @@ async function dbConnect() {
             keepAliveInitialDelay: 300000,
             // Retry options
             retryWrites: true,
-            w: 'majority',
             // Connection pooling
             maxIdleTimeMS: 30000,
             // SSL options for Atlas
