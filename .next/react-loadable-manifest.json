@@ -1,8 +1,8 @@
 {
   "app\\page.tsx -> @/components/EmailDashboard": {
-    "id": "app\\page.tsx -> @/components/EmailDashboard",
+    "id": 8605,
     "files": [
-      "static/chunks/_app-pages-browser_components_EmailDashboard_tsx.js"
+      "static/chunks/605.c1f72a59abccfa68.js"
     ]
   }
 }

@@ -31,22 +31,12 @@ export const config = {
 
 // Helper function to check if MongoDB is configured
 export const isMongoDBConfigured = () => {
-    // During build time, always return false to prevent MongoDB operations
-    if (config.isBuildTime || config.isVercelBuild) {
-        return false;
-    }
-
     // Check if we have a valid MongoDB URI
     return !!config.mongodb.uri && config.mongodb.uri.trim() !== '';
 };
 
 // Helper function to check if Resend is configured
 export const isResendConfigured = () => {
-    // During build time, always return false to prevent Resend operations
-    if (config.isBuildTime || config.isVercelBuild) {
-        return false;
-    }
-
     // Check if we have valid Resend configuration
     return !!(config.resend.apiKey && config.resend.domain &&
         config.resend.apiKey.trim() !== '' && config.resend.domain.trim() !== '');
@@ -65,4 +55,21 @@ export const shouldAttemptEmailOperations = () => {
 // Helper function to check if we're in a safe environment for database operations
 export const isSafeForDatabaseOperations = () => {
     return !config.isBuildTime && !config.isVercelBuild && config.isClientSide;
+};
+
+// Debug function to help troubleshoot environment variables
+export const debugEnvironment = () => {
+    return {
+        NODE_ENV: process.env.NODE_ENV,
+        VERCEL: process.env.VERCEL,
+        VERCEL_ENV: process.env.VERCEL_ENV,
+        NEXT_PHASE: process.env.NEXT_PHASE,
+        MONGODB_URI: config.mongodb.uri ? 'SET' : 'NOT SET',
+        RESEND_API_KEY: config.resend.apiKey ? 'SET' : 'NOT SET',
+        RESEND_DOMAIN: config.resend.domain ? 'SET' : 'NOT SET',
+        isBuildTime: config.isBuildTime,
+        isVercelBuild: config.isVercelBuild,
+        isMongoDBConfigured: isMongoDBConfigured(),
+        isResendConfigured: isResendConfigured(),
+    };
 };

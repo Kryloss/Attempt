@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { Resend } from 'resend'
-import { isMongoDBConfigured, isResendConfigured } from '@/lib/config'
+import { isMongoDBConfigured, isResendConfigured, debugEnvironment } from '@/lib/config'
 import dbConnect from '@/lib/mongodb'
 import Email from '@/models/Email'
 
@@ -24,10 +24,19 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Debug environment variables
+    const envDebug = debugEnvironment();
+    console.log('Environment debug info:', envDebug);
+
     // Check if required environment variables are set
     if (!isResendConfigured()) {
+      console.error('Resend not configured. Environment debug:', envDebug);
       return NextResponse.json(
-        { error: 'Email service not configured' },
+        { 
+          error: 'Email service not configured',
+          debug: envDebug,
+          message: 'Please check RESEND_API_KEY and RESEND_DOMAIN environment variables'
+        },
         { status: 500 }
       )
     }
