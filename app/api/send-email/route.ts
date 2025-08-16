@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { Resend } from 'resend'
+import dbConnect from '@/lib/mongodb'
+import Email from '@/models/Email'
 
 const resend = new Resend(process.env.RESEND_API_KEY)
 
@@ -22,6 +24,9 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       )
     }
+
+    // Connect to MongoDB
+    await dbConnect()
 
     // Send email using Resend
     const { data, error } = await resend.emails.send({
@@ -73,11 +78,26 @@ export async function POST(request: NextRequest) {
 
     if (error) {
       console.error('Resend error:', error)
+
+      // Store failed email record
+      await Email.create({
+        email,
+        status: 'failed',
+        error: error.message || 'Unknown error',
+      })
+
       return NextResponse.json(
         { error: 'Failed to send email' },
         { status: 500 }
       )
     }
+
+    // Store successful email record
+    await Email.create({
+      email,
+      status: 'sent',
+      resendId: data?.id,
+    })
 
     return NextResponse.json(
       { message: 'Email sent successfully', data },
