@@ -4,6 +4,18 @@ import Email from '@/models/Email';
 
 export async function GET() {
     try {
+        // Check if MongoDB URI is configured
+        if (!process.env.MONGODB_URI) {
+            return NextResponse.json(
+                {
+                    success: false,
+                    message: 'Database not configured',
+                    error: 'MONGODB_URI environment variable is not set',
+                },
+                { status: 500 }
+            );
+        }
+
         await dbConnect();
 
         const emails = await Email.find({})
@@ -31,6 +43,30 @@ export async function GET() {
         });
     } catch (error) {
         console.error('Error fetching emails:', error);
+        
+        // Check if it's a connection error
+        if (error instanceof Error && error.message.includes('authentication failed')) {
+            return NextResponse.json(
+                {
+                    success: false,
+                    message: 'Database authentication failed',
+                    error: 'Please check your MongoDB credentials and connection string',
+                },
+                { status: 500 }
+            );
+        }
+        
+        if (error instanceof Error && error.message.includes('ECONNREFUSED')) {
+            return NextResponse.json(
+                {
+                    success: false,
+                    message: 'Database connection refused',
+                    error: 'Please check if MongoDB is running and accessible',
+                },
+                { status: 500 }
+            );
+        }
+
         return NextResponse.json(
             {
                 success: false,

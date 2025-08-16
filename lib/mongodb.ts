@@ -25,6 +25,10 @@ async function dbConnect() {
     if (!cached.promise) {
         const opts = {
             bufferCommands: false,
+            maxPoolSize: parseInt(process.env.MONGODB_MAX_POOL_SIZE || '10'),
+            serverSelectionTimeoutMS: parseInt(process.env.MONGODB_SERVER_SELECTION_TIMEOUT_MS || '5000'),
+            socketTimeoutMS: 45000,
+            family: 4,
         };
 
         cached.promise = mongoose.connect(MONGODB_URI, opts);
@@ -32,8 +36,10 @@ async function dbConnect() {
 
     try {
         cached.conn = await cached.promise;
+        console.log('MongoDB connected successfully');
     } catch (e) {
         cached.promise = null;
+        console.error('MongoDB connection error:', e);
         throw e;
     }
 

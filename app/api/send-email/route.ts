@@ -25,8 +25,31 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Connect to MongoDB
-    await dbConnect()
+    // Check if required environment variables are set
+    if (!process.env.RESEND_API_KEY) {
+      return NextResponse.json(
+        { error: 'Email service not configured' },
+        { status: 500 }
+      )
+    }
+
+    if (!process.env.RESEND_DOMAIN) {
+      return NextResponse.json(
+        { error: 'Email domain not configured' },
+        { status: 500 }
+      )
+    }
+
+    // Connect to MongoDB (only if MONGODB_URI is configured)
+    let emailRecord = null;
+    if (process.env.MONGODB_URI) {
+      try {
+        await dbConnect()
+      } catch (dbError) {
+        console.error('Database connection failed:', dbError)
+        // Continue without database logging if connection fails
+      }
+    }
 
     // Send email using Resend
     const { data, error } = await resend.emails.send({
@@ -79,12 +102,18 @@ export async function POST(request: NextRequest) {
     if (error) {
       console.error('Resend error:', error)
 
-      // Store failed email record
-      await Email.create({
-        email,
-        status: 'failed',
-        error: error.message || 'Unknown error',
-      })
+      // Store failed email record if database is available
+      if (process.env.MONGODB_URI && emailRecord === null) {
+        try {
+          await Email.create({
+            email,
+            status: 'failed',
+            error: error.message || 'Unknown error',
+          })
+        } catch (dbError) {
+          console.error('Failed to store email record:', dbError)
+        }
+      }
 
       return NextResponse.json(
         { error: 'Failed to send email' },
@@ -92,12 +121,18 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Store successful email record
-    await Email.create({
-      email,
-      status: 'sent',
-      resendId: data?.id,
-    })
+    // Store successful email record if database is available
+    if (process.env.MONGODB_URI && emailRecord === null) {
+      try {
+        await Email.create({
+          email,
+          status: 'sent',
+          resendId: data?.id,
+        })
+      } catch (dbError) {
+        console.error('Failed to store email record:', dbError)
+      }
+    }
 
     return NextResponse.json(
       { message: 'Email sent successfully', data },
