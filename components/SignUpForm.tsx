@@ -18,6 +18,7 @@ export default function SignUpForm({ onSuccess, onSwitchToSignIn, onGuestMode }:
     })
     const [isLoading, setIsLoading] = useState(false)
     const [error, setError] = useState('')
+    const [success, setSuccess] = useState(false)
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setFormData({
@@ -47,7 +48,11 @@ export default function SignUpForm({ onSuccess, onSwitchToSignIn, onGuestMode }:
                 throw new Error(data.error || 'Signup failed')
             }
 
-            onSuccess(data.user)
+            setSuccess(true)
+            // Call onSuccess after a short delay to show the success message
+            setTimeout(() => {
+                onSuccess(data.user)
+            }, 2000)
         } catch (err: any) {
             setError(err.message || 'An error occurred during signup')
         } finally {
@@ -65,7 +70,18 @@ export default function SignUpForm({ onSuccess, onSwitchToSignIn, onGuestMode }:
                 </div>
             )}
 
-            <form onSubmit={handleSubmit} className="space-y-4">
+            {success && (
+                <div className="mb-4 p-3 bg-green-100 border border-green-400 text-green-700 rounded-lg text-sm text-center">
+                    <div className="flex items-center justify-center space-x-2">
+                        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                        </svg>
+                        <span>Account created successfully! Check your email for confirmation. Redirecting...</span>
+                    </div>
+                </div>
+            )}
+
+            <form onSubmit={handleSubmit} className="space-y-4" style={{ display: success ? 'none' : 'block' }}>
                 <div>
                     <label htmlFor="username" className="block text-sm font-medium text-purple-700 mb-1">
                         Username

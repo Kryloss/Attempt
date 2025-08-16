@@ -1,57 +1,57 @@
 import nodemailer from 'nodemailer';
 
 export class GmailEmailService {
-    private transporter: nodemailer.Transporter;
+  private transporter: nodemailer.Transporter;
 
-    constructor() {
-        this.transporter = nodemailer.createTransport({
-            service: 'gmail',
-            auth: {
-                user: process.env.GMAIL_USER,
-                pass: process.env.GMAIL_APP_PASSWORD,
-            },
-        });
+  constructor() {
+    this.transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: process.env.GMAIL_USER,
+        pass: process.env.GMAIL_APP_PASSWORD,
+      },
+    });
+  }
+
+  // Send email to single recipient
+  async sendEmail(to: string, subject: string, html: string, text: string) {
+    try {
+      const info = await this.transporter.sendMail({
+        from: process.env.GMAIL_USER,
+        to,
+        subject,
+        html,
+        text,
+      });
+      return { success: true, messageId: info.messageId };
+    } catch (error) {
+      console.error('Email sending failed:', error);
+      return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
     }
+  }
 
-    // Send email to single recipient
-    async sendEmail(to: string, subject: string, html: string, text: string) {
-        try {
-            const info = await this.transporter.sendMail({
-                from: process.env.GMAIL_USER,
-                to,
-                subject,
-                html,
-                text,
-            });
-            return { success: true, messageId: info.messageId };
-        } catch (error) {
-            console.error('Email sending failed:', error);
-            return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
-        }
+  // Send email to multiple recipients
+  async sendBulkEmail(recipients: string[], subject: string, html: string, text: string) {
+    try {
+      const info = await this.transporter.sendMail({
+        from: process.env.GMAIL_USER,
+        to: recipients.join(', '),
+        subject,
+        html,
+        text,
+      });
+      return { success: true, messageId: info.messageId };
+    } catch (error) {
+      console.error('Bulk email sending failed:', error);
+      return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
     }
+  }
 
-    // Send email to multiple recipients
-    async sendBulkEmail(recipients: string[], subject: string, html: string, text: string) {
-        try {
-            const info = await this.transporter.sendMail({
-                from: process.env.GMAIL_USER,
-                to: recipients.join(', '),
-                subject,
-                html,
-                text,
-            });
-            return { success: true, messageId: info.messageId };
-        } catch (error) {
-            console.error('Bulk email sending failed:', error);
-            return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
-        }
-    }
+  // Send verification email (for future account system)
+  async sendVerificationEmail(email: string, token: string) {
+    const verificationUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/verify?token=${token}`;
 
-    // Send verification email (for future account system)
-    async sendVerificationEmail(email: string, token: string) {
-        const verificationUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/verify?token=${token}`;
-
-        const html = `
+    const html = `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
         <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; border-radius: 10px; text-align: center; margin-bottom: 30px;">
           <h1 style="color: white; margin: 0; font-size: 28px;">Verify Your Account</h1>
@@ -80,7 +80,7 @@ export class GmailEmailService {
       </div>
     `;
 
-        const text = `
+    const text = `
       Verify Your Account
       
       Welcome! Please click the link below to verify your email address and activate your account:
@@ -92,14 +92,14 @@ export class GmailEmailService {
       © 2024 Your Company. All rights reserved.
     `;
 
-        return this.sendEmail(email, 'Verify Your Account', html, text);
-    }
+    return this.sendEmail(email, 'Verify Your Account', html, text);
+  }
 
-    // Send password reset email (for future account system)
-    async sendPasswordResetEmail(email: string, token: string) {
-        const resetUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/reset-password?token=${token}`;
+  // Send password reset email (for future account system)
+  async sendPasswordResetEmail(email: string, token: string) {
+    const resetUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/reset-password?token=${token}`;
 
-        const html = `
+    const html = `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
         <div style="background: linear-gradient(135deg, #dc3545 0%, #c82333 100%); padding: 30px; border-radius: 10px; text-align: center; margin-bottom: 30px;">
           <h1 style="color: white; margin: 0; font-size: 28px;">Reset Your Password</h1>
@@ -129,7 +129,7 @@ export class GmailEmailService {
       </div>
     `;
 
-        const text = `
+    const text = `
       Reset Your Password
       
       You requested to reset your password. Click the link below to create a new password:
@@ -142,12 +142,12 @@ export class GmailEmailService {
       © 2024 Your Company. All rights reserved.
     `;
 
-        return this.sendEmail(email, 'Reset Your Password', html, text);
-    }
+    return this.sendEmail(email, 'Reset Your Password', html, text);
+  }
 
-    // Send welcome email (for future account system)
-    async sendWelcomeEmail(email: string, username: string) {
-        const html = `
+  // Send welcome email (for future account system)
+  async sendWelcomeEmail(email: string, username: string) {
+    const html = `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
         <div style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%); padding: 30px; border-radius: 10px; text-align: center; margin-bottom: 30px;">
           <h1 style="color: white; margin: 0; font-size: 28px;">Welcome to Our Platform!</h1>
@@ -175,7 +175,7 @@ export class GmailEmailService {
       </div>
     `;
 
-        const text = `
+    const text = `
       Welcome to Our Platform!
       
       Hello ${username}!
@@ -190,12 +190,12 @@ export class GmailEmailService {
       © 2024 Your Company. All rights reserved.
     `;
 
-        return this.sendEmail(email, 'Welcome to Our Platform!', html, text);
-    }
+    return this.sendEmail(email, 'Welcome to Our Platform!', html, text);
+  }
 
-    // Send verification code email for password reset
-    async sendVerificationCodeEmail(email: string, code: string) {
-        const html = `
+  // Send verification code email for password reset
+  async sendVerificationCodeEmail(email: string, code: string) {
+    const html = `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
         <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; border-radius: 10px; text-align: center; margin-bottom: 30px;">
           <h1 style="color: white; margin: 0; font-size: 28px;">Password Reset Code</h1>
@@ -223,7 +223,7 @@ export class GmailEmailService {
       </div>
     `;
 
-        const text = `
+    const text = `
       Password Reset Code
       
       Your Verification Code: ${code}
@@ -234,6 +234,58 @@ export class GmailEmailService {
       © 2024 Your Company. All rights reserved.
     `;
 
-        return this.sendEmail(email, 'Password Reset Verification Code', html, text);
-    }
+    return this.sendEmail(email, 'Password Reset Verification Code', html, text);
+  }
+
+  // Send account creation success email
+  async sendAccountCreationSuccessEmail(email: string, username: string) {
+    const html = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+        <div style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%); padding: 30px; border-radius: 10px; text-align: center; margin-bottom: 30px;">
+          <h1 style="color: white; margin: 0; font-size: 28px;">Account Created Successfully!</h1>
+        </div>
+        
+        <div style="background: #f8f9fa; padding: 30px; border-radius: 10px; margin-bottom: 30px;">
+          <h2 style="color: #333; margin-top: 0;">Welcome ${username}!</h2>
+          <p style="color: #666; line-height: 1.6; font-size: 16px;">
+            Your account has been successfully created! 🎉
+          </p>
+          <p style="color: #666; line-height: 1.6; font-size: 16px;">
+            You can now sign in to your account and start using all our features.
+          </p>
+          <div style="text-align: center; margin: 30px 0;">
+            <a href="${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}" style="background: #28a745; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; font-size: 16px; font-weight: bold;">
+              Sign In Now
+            </a>
+          </div>
+          <p style="color: #666; line-height: 1.6; font-size: 14px;">
+            If you have any questions or need assistance, please don't hesitate to contact our support team.
+          </p>
+        </div>
+        
+        <div style="text-align: center; margin-top: 30px; color: #999; font-size: 12px;">
+          <p>Thank you for choosing our platform!</p>
+          <p>© 2024 Your Company. All rights reserved.</p>
+        </div>
+      </div>
+    `;
+
+    const text = `
+      Account Created Successfully!
+      
+      Welcome ${username}!
+      
+      Your account has been successfully created! 🎉
+      You can now sign in to your account and start using all our features.
+      
+      Sign in at: ${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}
+      
+      If you have any questions or need assistance, please don't hesitate to contact our support team.
+      
+      Thank you for choosing our platform!
+      © 2024 Your Company. All rights reserved.
+    `;
+
+    return this.sendEmail(email, 'Account Created Successfully! 🎉', html, text);
+  }
 }

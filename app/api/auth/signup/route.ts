@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createUser, findUserByEmail, findUserByUsername } from '@/lib/db-utils';
 import { debugEnvironment } from '@/lib/config';
+import { GmailEmailService } from '@/lib/gmail-service';
 
 export async function POST(request: NextRequest) {
     try {
@@ -63,6 +64,16 @@ export async function POST(request: NextRequest) {
         const user = await createUser(username, email, password);
 
         console.log('User created successfully:', user._id);
+
+        // Send account creation success email
+        try {
+            const emailService = new GmailEmailService();
+            await emailService.sendAccountCreationSuccessEmail(email, username);
+            console.log('Account creation success email sent to:', email);
+        } catch (emailError) {
+            console.error('Failed to send account creation success email:', emailError);
+            // Don't fail the signup process if email fails
+        }
 
         // Return user data (without password)
         const { password: _, ...userWithoutPassword } = user.toObject();
