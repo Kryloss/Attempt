@@ -38,8 +38,28 @@ async function dbConnect() {
             maxPoolSize: config.mongodb.maxPoolSize,
             serverSelectionTimeoutMS: config.mongodb.serverSelectionTimeoutMS,
             socketTimeoutMS: 45000,
+            connectTimeoutMS: 30000,
             family: 4,
+            // Vercel-specific optimizations
+            keepAlive: true,
+            keepAliveInitialDelay: 300000,
+            // Retry options
+            retryWrites: true,
+            w: 'majority',
+            // Connection pooling
+            maxIdleTimeMS: 30000,
+            // SSL options for Atlas
+            ssl: true,
+            sslValidate: true,
         };
+
+        console.log('Attempting MongoDB connection with options:', {
+            uri: config.mongodb.uri ? 'SET' : 'NOT SET',
+            maxPoolSize: opts.maxPoolSize,
+            serverSelectionTimeoutMS: opts.serverSelectionTimeoutMS,
+            socketTimeoutMS: opts.socketTimeoutMS,
+            connectTimeoutMS: opts.connectTimeoutMS
+        });
 
         cached.promise = mongoose.connect(config.mongodb.uri, opts);
     }
@@ -49,7 +69,14 @@ async function dbConnect() {
         console.log('MongoDB connected successfully');
     } catch (e) {
         cached.promise = null;
-        console.error('MongoDB connection error:', e);
+        console.error('MongoDB connection error:', {
+            message: e instanceof Error ? e.message : 'Unknown error',
+            name: e instanceof Error ? e.name : 'Unknown',
+            stack: e instanceof Error ? e.stack : undefined
+        });
+
+        // Reset connection cache on error
+        cached.conn = null;
         throw e;
     }
 

@@ -1,8 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createUser, findUserByEmail, findUserByUsername } from '@/lib/db-utils';
+import { debugEnvironment } from '@/lib/config';
 
 export async function POST(request: NextRequest) {
     try {
+        // Debug environment variables (remove in production)
+        console.log('Environment debug:', debugEnvironment());
+
         const { username, email, password, confirmPassword } = await request.json();
 
         // Validation
@@ -34,6 +38,8 @@ export async function POST(request: NextRequest) {
             );
         }
 
+        console.log('Starting user creation process...');
+
         // Check if user already exists
         const existingUserByEmail = await findUserByEmail(email);
         if (existingUserByEmail) {
@@ -51,8 +57,12 @@ export async function POST(request: NextRequest) {
             );
         }
 
+        console.log('Creating new user...');
+
         // Create new user
         const user = await createUser(username, email, password);
+
+        console.log('User created successfully:', user._id);
 
         // Return user data (without password)
         const { password: _, ...userWithoutPassword } = user.toObject();
@@ -66,9 +76,31 @@ export async function POST(request: NextRequest) {
         );
 
     } catch (error) {
-        console.error('Signup error:', error);
+        console.error('Signup error details:', {
+            message: error instanceof Error ? error.message : 'Unknown error',
+            stack: error instanceof Error ? error.stack : undefined,
+            name: error instanceof Error ? error.name : 'Unknown',
+            environment: debugEnvironment()
+        });
+
+        // Provide more specific error messages
+        if (error instanceof Error) {
+            if (error.message.includes('MongoDB')) {
+                return NextResponse.json(
+                    { error: 'Database connection error. Please try again.' },
+                    { status: 503 }
+                );
+            }
+            if (error.message.includes('timeout')) {
+                return NextResponse.json(
+                    { error: 'Request timeout. Please try again.' },
+                    { status: 408 }
+                );
+            }
+        }
+
         return NextResponse.json(
-            { error: 'Internal server error' },
+            { error: 'Internal server error. Please try again later.' },
             { status: 500 }
         );
     }
