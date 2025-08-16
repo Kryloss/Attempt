@@ -7,11 +7,31 @@
 @layer base {
     html {
         font-family: 'Inter', system-ui, sans-serif;
+        /* Ensure proper mobile scaling */
+        -webkit-text-size-adjust: 100%;
+        -ms-text-size-adjust: 100%;
     }
 
     body {
         background: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 50%, #e9d5ff 100%);
         min-height: 100vh;
+        /* Prevent horizontal scrolling on mobile */
+        overflow-x: hidden;
+    }
+
+    /* Ensure proper touch targets on mobile */
+    button,
+    input,
+    select,
+    textarea {
+        min-height: 44px;
+        /* iOS recommended minimum */
+    }
+
+    /* Improve text rendering on mobile */
+    * {
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
     }
 }
 
@@ -30,6 +50,27 @@
 
     .icon-container {
         @apply flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-400 to-purple-600 text-white shadow-lg;
+    }
+
+    /* Mobile-first responsive utilities */
+    .mobile-container {
+        @apply px-3 sm:px-4 md:px-6;
+    }
+
+    .mobile-text {
+        @apply text-sm sm:text-base md:text-lg;
+    }
+
+    .mobile-heading {
+        @apply text-lg sm:text-xl md:text-2xl;
+    }
+
+    .mobile-padding {
+        @apply p-3 sm:p-4 md:p-6;
+    }
+
+    .mobile-margin {
+        @apply m-2 sm:m-3 md:m-4;
     }
 
     /* Enhanced animations */
@@ -156,5 +197,31 @@
 
     ::-webkit-scrollbar-thumb:hover {
         background: #a855f7;
+    }
+
+    /* Mobile-specific improvements */
+    @media (max-width: 640px) {
+        .mobile-touch-target {
+            min-height: 44px;
+            min-width: 44px;
+        }
+
+        .mobile-text-small {
+            font-size: 0.875rem;
+            line-height: 1.25rem;
+        }
+
+        .mobile-hidden {
+            display: none;
+        }
+    }
+
+    /* Ensure modals are properly positioned on mobile */
+    .modal-mobile {
+        @apply fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-2 sm:p-4;
+    }
+
+    .modal-content-mobile {
+        @apply bg-white rounded-2xl p-4 sm:p-6 w-full max-w-sm sm:max-w-md mx-4 shadow-2xl max-h-[90vh] overflow-y-auto;
     }
 }

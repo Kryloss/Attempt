@@ -267,33 +267,33 @@ export default function TrainingTab({ user }: TrainingTabProps) {
     }
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-4 sm:space-y-6">
             {/* Date Navigation */}
-            <div className="bg-white rounded-2xl p-6 shadow-lg border border-purple-100">
+            <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-lg border border-purple-100">
                 <div className="flex items-center justify-between mb-4">
                     <button
                         onClick={() => navigateDate('prev')}
-                        className="w-10 h-10 bg-purple-100 hover:bg-purple-200 rounded-full flex items-center justify-center transition-colors"
+                        className="w-8 h-8 sm:w-10 sm:h-10 bg-purple-100 hover:bg-purple-200 rounded-full flex items-center justify-center transition-colors flex-shrink-0"
                     >
-                        <svg className="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-4 h-4 sm:w-5 sm:h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                         </svg>
                     </button>
 
-                    <div className="text-center">
-                        <h2 className={`text-xl font-bold ${isToday(currentDate) ? 'text-purple-600' : 'text-purple-800'}`}>
+                    <div className="text-center flex-1 px-2">
+                        <h2 className={`text-lg sm:text-xl font-bold ${isToday(currentDate) ? 'text-purple-600' : 'text-purple-800'}`}>
                             {formatDate(currentDate)}
                         </h2>
                         {isToday(currentDate) && (
-                            <span className="text-sm text-purple-500 font-medium">Today</span>
+                            <span className="text-xs sm:text-sm text-purple-500 font-medium">Today</span>
                         )}
                     </div>
 
                     <button
                         onClick={() => navigateDate('next')}
-                        className="w-10 h-10 bg-purple-100 hover:bg-purple-200 rounded-full flex items-center justify-center transition-colors"
+                        className="w-8 h-8 sm:w-10 sm:h-10 bg-purple-100 hover:bg-purple-200 rounded-full flex items-center justify-center transition-colors flex-shrink-0"
                     >
-                        <svg className="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-4 h-4 sm:w-5 sm:h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                         </svg>
                     </button>
@@ -309,12 +309,12 @@ export default function TrainingTab({ user }: TrainingTabProps) {
                                 onChange={(e) => setTrainingName(e.target.value)}
                                 onBlur={handleTrainingNameSave}
                                 onKeyPress={(e) => e.key === 'Enter' && handleTrainingNameSave()}
-                                className="text-2xl font-bold text-purple-800 bg-transparent border-b-2 border-purple-300 focus:border-purple-500 focus:outline-none text-center"
+                                className="text-lg sm:text-2xl font-bold text-purple-800 bg-transparent border-b-2 border-purple-300 focus:border-purple-500 focus:outline-none text-center w-full max-w-xs"
                                 autoFocus
                             />
                             <button
                                 onClick={handleTrainingNameSave}
-                                className="text-purple-600 hover:text-purple-700"
+                                className="text-purple-600 hover:text-purple-700 flex-shrink-0"
                             >
                                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
@@ -324,7 +324,7 @@ export default function TrainingTab({ user }: TrainingTabProps) {
                     ) : (
                         <button
                             onClick={() => setIsEditingName(true)}
-                            className="text-2xl font-bold text-purple-800 hover:text-purple-600 transition-colors"
+                            className="text-lg sm:text-2xl font-bold text-purple-800 hover:text-purple-600 transition-colors break-words"
                         >
                             {currentTraining?.name || 'Training'}
                         </button>
@@ -334,25 +334,27 @@ export default function TrainingTab({ user }: TrainingTabProps) {
                     {user && !user.guest && (
                         <div className="mt-2 flex items-center justify-center space-x-2">
                             {autoSaveStatus === 'saving' && (
-                                <div className="flex items-center space-x-2 text-sm text-purple-600">
-                                    <div className="w-4 h-4 border-2 border-purple-300 border-t-purple-600 rounded-full animate-spin"></div>
+                                <div className="flex items-center space-x-2 text-xs sm:text-sm text-purple-600">
+                                    <div className="w-3 h-3 sm:w-4 sm:h-4 border-2 border-purple-300 border-t-purple-600 rounded-full animate-spin"></div>
                                     <span>Saving...</span>
                                 </div>
                             )}
                             {autoSaveStatus === 'saved' && (
-                                <div className="flex items-center space-x-2 text-sm text-green-600">
-                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <div className="flex items-center space-x-2 text-xs sm:text-sm text-green-600">
+                                    <svg className="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                                     </svg>
                                     <span>Saved</span>
                                 </div>
                             )}
                             {autoSaveStatus === 'error' && (
-                                <div className="flex items-center space-x-2 text-sm text-red-600">
-                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                    </svg>
-                                    <span>Save failed</span>
+                                <div className="flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-2 text-xs sm:text-sm text-red-600">
+                                    <div className="flex items-center space-x-2">
+                                        <svg className="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
+                                        <span>Save failed</span>
+                                    </div>
                                     <button
                                         onClick={() => handleManualSave()}
                                         className="text-xs bg-red-100 hover:bg-red-200 text-red-700 px-2 py-1 rounded transition-colors"
@@ -372,16 +374,16 @@ export default function TrainingTab({ user }: TrainingTabProps) {
             </div>
 
             {/* Exercises Section */}
-            <div className="bg-white rounded-2xl p-6 shadow-lg border border-purple-100">
-                <div className="flex items-center justify-between mb-6">
-                    <h3 className="text-xl font-bold text-purple-800">Exercises</h3>
+            <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-lg border border-purple-100">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 sm:mb-6 space-y-3 sm:space-y-0">
+                    <h3 className="text-lg sm:text-xl font-bold text-purple-800">Exercises</h3>
                     <button
                         onClick={() => setShowAddExercise(true)}
                         disabled={isLoading}
-                        className="bg-gradient-to-r from-purple-500 to-purple-600 text-white px-6 py-2 rounded-lg hover:from-purple-600 hover:to-purple-700 transition-all duration-200 transform hover:scale-105 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="w-full sm:w-auto bg-gradient-to-r from-purple-500 to-purple-600 text-white px-4 sm:px-6 py-2 sm:py-2 rounded-lg hover:from-purple-600 hover:to-purple-700 transition-all duration-200 transform hover:scale-105 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
                     >
-                        <span className="flex items-center space-x-2">
-                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <span className="flex items-center justify-center sm:justify-start space-x-2">
+                            <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                             </svg>
                             <span>Add Exercise</span>
@@ -390,26 +392,26 @@ export default function TrainingTab({ user }: TrainingTabProps) {
                 </div>
 
                 {isLoading ? (
-                    <div className="text-center py-12">
-                        <div className="w-20 h-20 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <div className="w-8 h-8 border-4 border-purple-300 border-t-purple-600 rounded-full animate-spin"></div>
+                    <div className="text-center py-8 sm:py-12">
+                        <div className="w-16 h-16 sm:w-20 sm:h-20 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <div className="w-6 h-6 sm:w-8 sm:h-8 border-4 border-purple-300 border-t-purple-600 rounded-full animate-spin"></div>
                         </div>
-                        <p className="text-purple-600 text-lg">Loading training data...</p>
+                        <p className="text-purple-600 text-base sm:text-lg">Loading training data...</p>
                     </div>
                 ) : (
                     <>
                         {currentTraining?.exercises.length === 0 ? (
-                            <div className="text-center py-12">
-                                <div className="w-20 h-20 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                                    <svg className="w-10 h-10 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <div className="text-center py-8 sm:py-12">
+                                <div className="w-16 h-16 sm:w-20 sm:h-20 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                    <svg className="w-8 h-8 sm:w-10 sm:h-10 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                                     </svg>
                                 </div>
-                                <p className="text-purple-600 text-lg">No exercises yet</p>
-                                <p className="text-purple-400">Add your first exercise to get started!</p>
+                                <p className="text-purple-600 text-base sm:text-lg">No exercises yet</p>
+                                <p className="text-purple-400 text-sm sm:text-base">Add your first exercise to get started!</p>
                             </div>
                         ) : (
-                            <div className="space-y-4">
+                            <div className="space-y-3 sm:space-y-4">
                                 {currentTraining?.exercises.map((exercise, index) => (
                                     <div
                                         key={exercise.id}

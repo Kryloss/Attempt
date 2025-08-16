@@ -51,7 +51,7 @@ export default function Home() {
     // Don't render anything during SSR/build time
     if (!isClient || isBuildTime()) {
         return (
-            <main className="min-h-screen p-4 flex items-center justify-center relative overflow-hidden">
+            <main className="min-h-screen p-2 sm:p-4 flex items-center justify-center relative overflow-hidden">
                 {/* Enhanced background decorative elements */}
                 <div className="absolute inset-0 overflow-hidden pointer-events-none">
                     <div className="absolute top-20 left-10 w-32 h-32 bg-purple-200 rounded-full opacity-20 animate-float"></div>
@@ -67,7 +67,7 @@ export default function Home() {
                             <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
                     </div>
-                    <h1 className="text-5xl font-bold text-purple-800 mb-4 font-display gradient-text">
+                    <h1 className="text-4xl sm:text-5xl font-bold text-purple-800 mb-4 font-display gradient-text">
                         gymNote
                     </h1>
                     <div className="flex justify-center items-center p-8">
@@ -94,9 +94,9 @@ export default function Home() {
             {!isAuthenticated ? (
                 // Centered auth container
                 <div className="flex items-center justify-center min-h-screen">
-                    <div className="max-w-md mx-auto w-full relative z-10">
+                    <div className="max-w-sm sm:max-w-md mx-auto w-full relative z-10 px-3 sm:px-4">
                         {/* Main content card */}
-                        <div className="card p-8 animate-glow card-hover">
+                        <div className="card p-6 sm:p-8 animate-glow card-hover">
                             <AuthContainer onSuccess={handleAuthSuccess} />
                         </div>
                     </div>

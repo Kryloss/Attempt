@@ -62,7 +62,7 @@ export default function SignUpForm({ onSuccess, onSwitchToSignIn, onGuestMode }:
 
     return (
         <div className="w-full">
-            <h2 className="text-2xl font-bold text-purple-800 mb-6 text-center">Create Account</h2>
+            <h2 className="text-xl sm:text-2xl font-bold text-purple-800 mb-4 sm:mb-6 text-center">Create Account</h2>
 
             {error && (
                 <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg text-sm">
@@ -73,15 +73,15 @@ export default function SignUpForm({ onSuccess, onSwitchToSignIn, onGuestMode }:
             {success && (
                 <div className="mb-4 p-3 bg-green-100 border border-green-400 text-green-700 rounded-lg text-sm text-center">
                     <div className="flex items-center justify-center space-x-2">
-                        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                        <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="currentColor" viewBox="0 0 20 20">
                             <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                         </svg>
-                        <span>Account created successfully! Check your email for confirmation. Redirecting...</span>
+                        <span className="text-xs sm:text-sm">Account created successfully! Check your email for confirmation. Redirecting...</span>
                     </div>
                 </div>
             )}
 
-            <form onSubmit={handleSubmit} className="space-y-4" style={{ display: success ? 'none' : 'block' }}>
+            <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4" style={{ display: success ? 'none' : 'block' }}>
                 <div>
                     <label htmlFor="username" className="block text-sm font-medium text-purple-700 mb-1">
                         Username
@@ -95,7 +95,7 @@ export default function SignUpForm({ onSuccess, onSwitchToSignIn, onGuestMode }:
                         required
                         minLength={3}
                         maxLength={30}
-                        className="w-full px-3 py-2 border border-purple-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                        className="w-full px-3 py-2 border border-purple-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm sm:text-base"
                         placeholder="Enter username"
                     />
                 </div>
@@ -111,7 +111,7 @@ export default function SignUpForm({ onSuccess, onSwitchToSignIn, onGuestMode }:
                         value={formData.email}
                         onChange={handleChange}
                         required
-                        className="w-full px-3 py-2 border border-purple-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                        className="w-full px-3 py-2 border border-purple-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm sm:text-base"
                         placeholder="Enter email"
                     />
                 </div>
@@ -128,7 +128,7 @@ export default function SignUpForm({ onSuccess, onSwitchToSignIn, onGuestMode }:
                         onChange={handleChange}
                         required
                         minLength={6}
-                        className="w-full px-3 py-2 border border-purple-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                        className="w-full px-3 py-2 border border-purple-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm sm:text-base"
                         placeholder="Enter password"
                     />
                 </div>
@@ -144,7 +144,7 @@ export default function SignUpForm({ onSuccess, onSwitchToSignIn, onGuestMode }:
                         value={formData.confirmPassword}
                         onChange={handleChange}
                         required
-                        className="w-full px-3 py-2 border border-purple-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                        className="w-full px-3 py-2 border border-purple-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm sm:text-base"
                         placeholder="Confirm password"
                     />
                 </div>
@@ -152,14 +152,14 @@ export default function SignUpForm({ onSuccess, onSwitchToSignIn, onGuestMode }:
                 <button
                     type="submit"
                     disabled={isLoading}
-                    className="w-full bg-purple-600 text-white py-2 px-4 rounded-lg hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    className="w-full bg-purple-600 text-white py-2 px-4 rounded-lg hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm sm:text-base"
                 >
                     {isLoading ? 'Creating Account...' : 'Sign Up'}
                 </button>
             </form>
 
-            <div className="mt-6 text-center">
-                <p className="text-sm text-purple-600">
+            <div className="mt-4 sm:mt-6 text-center">
+                <p className="text-xs sm:text-sm text-purple-600">
                     Already have an account?{' '}
                     <button
                         onClick={onSwitchToSignIn}
@@ -169,10 +169,10 @@ export default function SignUpForm({ onSuccess, onSwitchToSignIn, onGuestMode }:
                     </button>
                 </p>
 
-                <div className="mt-4 pt-4 border-t border-purple-200">
+                <div className="mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-purple-200">
                     <button
                         onClick={onGuestMode}
-                        className="w-full bg-gray-100 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors border border-gray-300"
+                        className="w-full bg-gray-100 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors border border-gray-300 text-sm sm:text-base"
                     >
                         Proceed as Guest
                     </button>

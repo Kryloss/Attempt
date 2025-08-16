@@ -91,7 +91,7 @@ export default function ForgotPasswordForm({ onBackToSignIn }: ForgotPasswordFor
     if (step === 'code') {
         return (
             <div className="w-full">
-                <h2 className="text-2xl font-bold text-purple-800 mb-6 text-center">Reset Password</h2>
+                <h2 className="text-xl sm:text-2xl font-bold text-purple-800 mb-4 sm:mb-6 text-center">Reset Password</h2>
 
                 {success && (
                     <div className="mb-4 p-3 bg-green-100 border border-green-400 text-green-700 rounded-lg text-sm">
@@ -105,7 +105,7 @@ export default function ForgotPasswordForm({ onBackToSignIn }: ForgotPasswordFor
                     </div>
                 )}
 
-                <form onSubmit={handleResetPassword} className="space-y-4">
+                <form onSubmit={handleResetPassword} className="space-y-3 sm:space-y-4">
                     <div>
                         <label htmlFor="code" className="block text-sm font-medium text-purple-700 mb-1">
                             Verification Code
@@ -117,7 +117,7 @@ export default function ForgotPasswordForm({ onBackToSignIn }: ForgotPasswordFor
                             onChange={(e) => setCode(e.target.value)}
                             required
                             maxLength={6}
-                            className="w-full px-3 py-2 border border-purple-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                            className="w-full px-3 py-2 border border-purple-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm sm:text-base"
                             placeholder="Enter 6-digit code"
                         />
                     </div>
@@ -133,7 +133,7 @@ export default function ForgotPasswordForm({ onBackToSignIn }: ForgotPasswordFor
                             onChange={(e) => setNewPassword(e.target.value)}
                             required
                             minLength={6}
-                            className="w-full px-3 py-2 border border-purple-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                            className="w-full px-3 py-2 border border-purple-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm sm:text-base"
                             placeholder="Enter new password"
                         />
                     </div>
@@ -149,7 +149,7 @@ export default function ForgotPasswordForm({ onBackToSignIn }: ForgotPasswordFor
                             onChange={(e) => setConfirmPassword(e.target.value)}
                             required
                             minLength={6}
-                            className="w-full px-3 py-2 border border-purple-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                            className="w-full px-3 py-2 border border-purple-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm sm:text-base"
                             placeholder="Confirm new password"
                         />
                     </div>
@@ -157,13 +157,13 @@ export default function ForgotPasswordForm({ onBackToSignIn }: ForgotPasswordFor
                     <button
                         type="submit"
                         disabled={isLoading}
-                        className="w-full bg-purple-600 text-white py-2 px-4 rounded-lg hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                        className="w-full bg-purple-600 text-white py-2 px-4 rounded-lg hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm sm:text-base"
                     >
                         {isLoading ? 'Resetting Password...' : 'Reset Password'}
                     </button>
                 </form>
 
-                <div className="mt-6 text-center">
+                <div className="mt-4 sm:mt-6 text-center">
                     <button
                         onClick={() => setStep('email')}
                         className="text-sm text-purple-600 hover:underline focus:outline-none"
@@ -177,9 +177,9 @@ export default function ForgotPasswordForm({ onBackToSignIn }: ForgotPasswordFor
 
     return (
         <div className="w-full">
-            <h2 className="text-2xl font-bold text-purple-800 mb-6 text-center">Forgot Password</h2>
+            <h2 className="text-xl sm:text-2xl font-bold text-purple-800 mb-4 sm:mb-6 text-center">Forgot Password</h2>
 
-            <p className="text-sm text-gray-600 mb-6 text-center">
+            <p className="text-xs sm:text-sm text-gray-600 mb-4 sm:mb-6 text-center">
                 Enter your email address and we'll send you a verification code to reset your password.
             </p>
 
@@ -189,7 +189,7 @@ export default function ForgotPasswordForm({ onBackToSignIn }: ForgotPasswordFor
                 </div>
             )}
 
-            <form onSubmit={handleSendCode} className="space-y-4">
+            <form onSubmit={handleSendCode} className="space-y-3 sm:space-y-4">
                 <div>
                     <label htmlFor="email" className="block text-sm font-medium text-purple-700 mb-1">
                         Email Address
@@ -200,7 +200,7 @@ export default function ForgotPasswordForm({ onBackToSignIn }: ForgotPasswordFor
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         required
-                        className="w-full px-3 py-2 border border-purple-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                        className="w-full px-3 py-2 border border-purple-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm sm:text-base"
                         placeholder="Enter your email address"
                     />
                 </div>
@@ -208,13 +208,13 @@ export default function ForgotPasswordForm({ onBackToSignIn }: ForgotPasswordFor
                 <button
                     type="submit"
                     disabled={isLoading}
-                    className="w-full bg-purple-600 text-white py-2 px-4 rounded-lg hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    className="w-full bg-purple-600 text-white py-2 px-4 rounded-lg hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm sm:text-base"
                 >
                     {isLoading ? 'Sending Code...' : 'Send Verification Code'}
                 </button>
             </form>
 
-            <div className="mt-6 text-center">
+            <div className="mt-4 sm:mt-6 text-center">
                 <button
                     onClick={onBackToSignIn}
                     className="text-sm text-purple-600 hover:underline focus:outline-none"
