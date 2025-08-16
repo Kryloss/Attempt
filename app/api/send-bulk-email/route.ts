@@ -6,6 +6,17 @@ import Email from '@/models/Email'
 
 export async function POST(request: NextRequest) {
     try {
+        // Check if we're in build time
+        if (process.env.NEXT_PHASE === 'phase-production-build') {
+            return NextResponse.json(
+                {
+                    error: 'API not available during build time',
+                    message: 'This endpoint cannot be accessed during the build process',
+                },
+                { status: 503 }
+            );
+        }
+
         const { emails, subject, html, text, emailType } = await request.json()
 
         if (!emails || !Array.isArray(emails) || emails.length === 0) {

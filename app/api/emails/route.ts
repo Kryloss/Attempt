@@ -5,6 +5,18 @@ import Email from '@/models/Email';
 
 export async function GET() {
     try {
+        // Check if we're in build time
+        if (process.env.NEXT_PHASE === 'phase-production-build') {
+            return NextResponse.json(
+                {
+                    success: false,
+                    message: 'API not available during build time',
+                    error: 'This endpoint cannot be accessed during the build process',
+                },
+                { status: 503 }
+            );
+        }
+
         // Check if MongoDB is configured
         if (!isMongoDBConfigured()) {
             return NextResponse.json(

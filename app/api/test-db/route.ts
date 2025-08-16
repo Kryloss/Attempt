@@ -5,6 +5,18 @@ import User from '@/models/User';
 
 export async function GET() {
     try {
+        // Check if we're in build time
+        if (process.env.NEXT_PHASE === 'phase-production-build') {
+            return NextResponse.json(
+                {
+                    success: false,
+                    message: 'API not available during build time',
+                    error: 'This endpoint cannot be accessed during the build process',
+                },
+                { status: 503 }
+            );
+        }
+
         // Check if MongoDB is configured
         if (!isMongoDBConfigured()) {
             return NextResponse.json(
@@ -20,10 +32,11 @@ export async function GET() {
 
         await dbConnect();
 
-        // Test creating a user
+        // Test creating a user with the new model structure
         const testUser = new User({
+            username: 'testuser',
             email: 'test@example.com',
-            name: 'Test User',
+            password: 'testpassword123',
         });
 
         await testUser.save();
@@ -35,7 +48,13 @@ export async function GET() {
             success: true,
             message: 'Database connection successful!',
             userCount: users.length,
-            users: users,
+            users: users.map(user => ({
+                _id: user._id,
+                username: user.username,
+                email: user.email,
+                createdAt: user.createdAt,
+                updatedAt: user.updatedAt
+            })),
         });
     } catch (error) {
         console.error('Database connection error:', error);
@@ -78,12 +97,24 @@ export async function GET() {
 
 export async function POST(request: Request) {
     try {
-        const body = await request.json();
-        const { email, name } = body;
-
-        if (!email || !name) {
+        // Check if we're in build time
+        if (process.env.NEXT_PHASE === 'phase-production-build') {
             return NextResponse.json(
-                { success: false, message: 'Email and name are required' },
+                {
+                    success: false,
+                    message: 'API not available during build time',
+                    error: 'This endpoint cannot be accessed during the build process',
+                },
+                { status: 503 }
+            );
+        }
+
+        const body = await request.json();
+        const { username, email, password } = body;
+
+        if (!username || !email || !password) {
+            return NextResponse.json(
+                { success: false, message: 'Username, email, and password are required' },
                 { status: 400 }
             );
         }
@@ -102,13 +133,19 @@ export async function POST(request: Request) {
 
         await dbConnect();
 
-        const user = new User({ email, name });
+        const user = new User({ username, email, password });
         await user.save();
 
         return NextResponse.json({
             success: true,
             message: 'User created successfully',
-            user: user,
+            user: {
+                _id: user._id,
+                username: user.username,
+                email: user.email,
+                createdAt: user.createdAt,
+                updatedAt: user.updatedAt
+            },
         });
     } catch (error) {
         console.error('Error creating user:', error);
