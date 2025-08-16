@@ -36,16 +36,10 @@ async function dbConnect() {
             socketTimeoutMS: 45000,
             connectTimeoutMS: 30000,
             family: 4,
-            // Vercel-specific optimizations
-            keepAlive: true,
-            keepAliveInitialDelay: 300000,
             // Retry options
             retryWrites: true,
             // Connection pooling
             maxIdleTimeMS: 30000,
-            // SSL options for Atlas
-            ssl: true,
-            sslValidate: true,
         };
 
         console.log('Attempting MongoDB connection with options:', {
