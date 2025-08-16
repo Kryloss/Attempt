@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { GmailEmailService } from '@/lib/gmail-service'
-import { isMongoDBConfigured, isGmailConfigured, debugEnvironment } from '@/lib/config'
+import { isMongoDBConfigured, isGmailConfigured } from '@/lib/config'
 import dbConnect from '@/lib/mongodb'
 import Email from '@/models/Email'
 

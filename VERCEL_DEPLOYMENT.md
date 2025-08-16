@@ -45,7 +45,7 @@ git commit -m "Initial commit: Ready for Vercel deployment"
 ### 2.2 Create GitHub Repository
 1. Go to [GitHub](https://github.com)
 2. Click "New repository"
-3. Name your repository (e.g., `resend-email-confirmation`)
+3. Name your repository (e.g., `email-confirmation`)
 4. Make it public or private as needed
 5. **DO NOT** initialize with README, .gitignore, or license (we already have these)
 
@@ -68,7 +68,8 @@ git push -u origin main
 ### 3.2 Configure Environment Variables
 In Vercel dashboard, add these environment variables:
 - `MONGODB_URI` - Your MongoDB connection string
-- `RESEND_API_KEY` - Your Resend API key
+- `GMAIL_USER` - Your Gmail address
+- `GMAIL_APP_PASSWORD` - Your Gmail app password
 - `NEXT_PUBLIC_APP_URL` - Your Vercel deployment URL
 
 ### 3.3 Deploy

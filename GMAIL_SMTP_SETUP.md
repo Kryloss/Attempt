@@ -127,8 +127,7 @@ await gmailService.sendWelcomeEmail(email, username)
 
 ### **MongoDB Atlas**
 - Email logs are stored in MongoDB Atlas
-- Tracks which service was used (Gmail vs Resend)
-- Monitors email delivery status
+- Tracks email delivery status
 
 ## 🚨 **Troubleshooting**
 
@@ -167,15 +166,10 @@ await gmailService.sendWelcomeEmail(email, username)
 - Delivery success rate
 - Response times
 - Error patterns
-- Service comparison (Gmail vs Resend)
 
 ## 🔄 **Fallback Strategy**
 
-You can use both Gmail SMTP and Resend:
-
-- **Primary**: Gmail SMTP (unlimited free)
-- **Fallback**: Resend (3,000 free/month)
-- **Smart switching**: Automatic fallback if Gmail fails
+Gmail SMTP is configured as the sole email provider in this project. If you need a fallback in the future, you can integrate an alternative service.
 
 ## 📞 **Support**
 

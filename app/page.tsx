@@ -115,7 +115,7 @@ export default function Home() {
 
                 {/* Footer */}
                 <div className="text-center mt-8 text-sm text-purple-600">
-                    <p>Powered by <a href="https://resend.com" target="_blank" rel="noopener noreferrer" className="text-purple-700 hover:text-purple-800 underline font-medium hover:glow-purple">Resend</a></p>
+                    <p>Email delivery via Gmail SMTP</p>
                 </div>
             </div>
         </main>

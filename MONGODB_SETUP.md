@@ -23,14 +23,14 @@ This project has been configured to use MongoDB Atlas as the database backend.
   - Email validation and uniqueness constraints
   
 - **Email Model** (`models/Email.ts`): Tracks email sending history
-  - Fields: email, status, sentAt, resendId, error
+  - Fields: email, status, sentAt, messageId, error, service
   - Status tracking (sent/failed)
   - Error logging for failed emails
 
 ### 4. API Routes
 - **`/api/test-db`**: Test database connection and basic CRUD operations
 - **`/api/emails`**: Retrieve email statistics and history
-- **`/api/send-email`**: Enhanced to store email records in MongoDB
+- **`/api/send-email-gmail`**: Enhanced to store email records in MongoDB
 
 ### 5. Components
 - **EmailDashboard**: Displays email statistics and recent email history
@@ -48,8 +48,8 @@ Make sure you have the following in your `.env.local` file:
 
 ```env
 MONGODB_URI=your_mongodb_atlas_connection_string
-RESEND_API_KEY=your_resend_api_key
-RESEND_DOMAIN=your_resend_domain
+GMAIL_USER=your_email@gmail.com
+GMAIL_APP_PASSWORD=your_16_digit_app_password
 ```
 
 ## MongoDB Atlas Connection String Format

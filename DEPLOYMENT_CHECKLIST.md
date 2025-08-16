@@ -11,7 +11,7 @@
 
 ### Environment Variables
 - [ ] `MONGODB_URI` is ready (MongoDB connection string)
-- [ ] `RESEND_API_KEY` is ready (Resend API key)
+- [ ] `GMAIL_USER` and `GMAIL_APP_PASSWORD` are set (Gmail SMTP)
 - [ ] `NEXT_PUBLIC_APP_URL` will be set to your Vercel URL
 
 ### Git Repository
@@ -59,7 +59,8 @@ npm run build
 ### Step 4: Environment Variables
 In Vercel dashboard, add:
 - `MONGODB_URI` = Your MongoDB connection string
-- `RESEND_API_KEY` = Your Resend API key
+- `GMAIL_USER` = Your Gmail address
+- `GMAIL_APP_PASSWORD` = Your Gmail app password
 - `NEXT_PUBLIC_APP_URL` = Your Vercel URL (after first deploy)
 
 ### Step 5: Deploy
@@ -86,7 +87,7 @@ In Vercel dashboard, add:
 
 ### Environment Variables Test
 - [ ] MongoDB connection established
-- [ ] Resend API key working
+- [ ] Gmail SMTP working
 - [ ] App URL correctly set
 
 ## ❌ Common Issues & Solutions

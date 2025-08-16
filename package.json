@@ -1,7 +1,7 @@
 {
-    "name": "resend-email-confirmation",
+    "name": "email-confirmation",
     "version": "1.0.0",
-    "description": "A website that sends confirmation emails using Resend",
+    "description": "A website that sends confirmation emails using Gmail SMTP",
     "main": "index.js",
     "scripts": {
         "dev": "next dev",
@@ -22,7 +22,6 @@
         "postcss": "^8.4.0",
         "react": "^18.2.0",
         "react-dom": "^18.2.0",
-        "resend": "^2.0.0",
         "tailwindcss": "^3.3.0",
         "typescript": "^5.0.0"
     },
@@ -32,8 +31,9 @@
         "eslint-config-next": "^14.0.0"
     },
     "keywords": [
-        "resend",
         "email",
+        "gmail",
+        "smtp",
         "confirmation",
         "nextjs",
         "react"

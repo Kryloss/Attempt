@@ -1,6 +1,6 @@
-# Email Confirmation Website with Resend
+# Email Confirmation Website (Gmail SMTP)
 
-A modern, responsive website built with Next.js and Resend that allows users to enter their email address and receive a confirmation email.
+A modern, responsive website built with Next.js and Gmail SMTP that allows users to enter their email address and receive a confirmation email.
 
 ## Features
 
@@ -9,13 +9,13 @@ A modern, responsive website built with Next.js and Resend that allows users to 
 - 🚀 Fast API routes with Next.js
 - 📱 Responsive design for all devices
 - ✅ Success/error state management
-- 🔒 Secure email sending with Resend
+- 🔒 Secure email sending with Gmail SMTP
 
 ## Tech Stack
 
 - **Frontend**: Next.js 14, React 18, TypeScript
 - **Styling**: Tailwind CSS
-- **Email Service**: Resend
+- **Email Service**: Gmail SMTP
 - **Deployment**: Vercel (recommended)
 
 ## Prerequisites
@@ -24,7 +24,7 @@ Before you begin, ensure you have:
 
 1. **Node.js** (version 18 or higher)
 2. **npm** or **yarn** package manager
-3. **Resend account** - [Sign up here](https://resend.com)
+3. **Gmail account with App Password**
 
 ## Setup Instructions
 
@@ -44,32 +44,21 @@ yarn install
    cp env.example .env.local
    ```
 
-2. Edit `.env.local` and add your Resend API key:
+2. Edit `.env.local` and add your Gmail credentials:
    ```env
-   RESEND_API_KEY=re_your_actual_api_key_here
+   GMAIL_USER=your_email@gmail.com
+   GMAIL_APP_PASSWORD=your_16_digit_app_password_here
    ```
 
-### 3. Get Your Resend API Key
+### 3. Generate a Gmail App Password
 
-1. Go to [Resend Dashboard](https://resend.com/api-keys)
-2. Create a new API key
-3. Copy the key (starts with `re_`)
-4. Paste it in your `.env.local` file
+1. Enable 2FA on your Google account
+2. Go to App Passwords and create a new app password for Mail
+3. Copy the 16-character password and paste it into `.env.local`
 
-### 4. Configure Sending Domain
+### 4. Configure Email Sender
 
-**Option A: Use Resend's default domain (for testing)**
-- Update the `from` field in `app/api/send-email/route.ts`:
-  ```typescript
-  from: 'onboarding@resend.dev', // Resend's default domain
-  ```
-
-**Option B: Use your own domain (recommended for production)**
-1. Add and verify your domain in [Resend Dashboard](https://resend.com/domains)
-2. Update the `from` field in `app/api/send-email/route.ts`:
-   ```typescript
-   from: 'noreply@yourdomain.com', // Your verified domain
-   ```
+Emails will be sent from your `GMAIL_USER` address via Gmail SMTP.
 
 ### 5. Run the Development Server
 
@@ -85,8 +74,8 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ```
 ├── app/
-│   ├── api/send-email/
-│   │   └── route.ts          # API endpoint for sending emails
+│   ├── api/send-email-gmail/
+│   │   └── route.ts          # API endpoint for sending emails via Gmail SMTP
 │   ├── globals.css           # Global styles with Tailwind
 │   ├── layout.tsx            # Root layout component
 │   └── page.tsx              # Main page component
@@ -103,8 +92,8 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 1. **User Input**: User enters their email address in the form
 2. **Validation**: Email format is validated on both client and server
-3. **API Call**: Form submission triggers a POST request to `/api/send-email`
-4. **Email Sending**: Resend API sends a beautifully formatted confirmation email
+3. **API Call**: Form submission triggers a POST request to `/api/send-email-gmail`
+4. **Email Sending**: Gmail SMTP sends a beautifully formatted confirmation email
 5. **Success State**: User sees a success message with their email address
 6. **Reset**: User can send another email by clicking the reset button
 
@@ -112,7 +101,7 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ### Email Template
 
-Edit the email template in `app/api/send-email/route.ts`:
+Edit the email template in `app/api/send-email-gmail/route.ts`:
 - Modify the HTML content in the `html` field
 - Update the plain text in the `text` field
 - Change the subject line
@@ -142,16 +131,18 @@ Edit the email template in `app/api/send-email/route.ts`:
 ### Environment Variables in Production
 
 Make sure to set these in your production environment:
-- `RESEND_API_KEY`: Your Resend API key
+- `MONGODB_URI`: Your MongoDB connection string (if using email logging)
+- `GMAIL_USER`: Your Gmail address
+- `GMAIL_APP_PASSWORD`: Your Gmail app password
 
 ## Troubleshooting
 
 ### Common Issues
 
 1. **"Failed to send email" error**
-   - Check your Resend API key is correct
-   - Ensure your domain is verified (if using custom domain)
-   - Check Resend dashboard for any account issues
+   - Check your Gmail credentials
+   - Ensure 2FA is enabled and using an App Password
+   - Review server logs for SMTP errors
 
 2. **Emails not received**
    - Check spam/junk folder
@@ -165,7 +156,6 @@ Make sure to set these in your production environment:
 
 ### Getting Help
 
-- [Resend Documentation](https://resend.com/docs)
 - [Next.js Documentation](https://nextjs.org/docs)
 - [Tailwind CSS Documentation](https://tailwindcss.com/docs)
 
