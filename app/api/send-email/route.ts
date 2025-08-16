@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
     if (!isResendConfigured()) {
       console.error('Resend not configured. Environment debug:', envDebug);
       return NextResponse.json(
-        { 
+        {
           error: 'Email service not configured',
           debug: envDebug,
           message: 'Please check RESEND_API_KEY and RESEND_DOMAIN environment variables'
