@@ -157,9 +157,9 @@ export default function ExerciseCard({ exercise, onDelete, onUpdate }: ExerciseC
                 <div className="ml-1 flex flex-col items-end flex-shrink-0">
                     <button
                         onClick={() => setShowDeleteConfirm(true)}
-                        className="perfect-circle circle-sm bg-red-100 hover:bg-red-200 text-red-600 flex items-center justify-center transition-colors opacity-0 group-hover:opacity-100"
+                        className="perfect-circle circle-sm bg-red-100 hover:bg-red-200 text-red-600 flex items-center justify-center transition-colors"
                     >
-                        <svg className="w-2 h-2 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-3 h-3 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1 1v3M4 7h16" />
                         </svg>
                     </button>
@@ -169,18 +169,6 @@ export default function ExerciseCard({ exercise, onDelete, onUpdate }: ExerciseC
             {/* Drag Handle */}
             <div
                 className="mt-0.5 pt-0.5 border-t border-purple-100 flex items-center justify-center touch-manipulation select-none cursor-grab active:cursor-grabbing"
-                onTouchStart={(e) => {
-                    // Don't prevent default to allow drag events to work properly
-                    e.stopPropagation()
-                }}
-                onTouchMove={(e) => {
-                    // Don't prevent default to allow drag events to work properly
-                    e.stopPropagation()
-                }}
-                onTouchEnd={(e) => {
-                    // Don't prevent default to allow drag events to work properly
-                    e.stopPropagation()
-                }}
                 onContextMenu={(e) => e.preventDefault()}
             >
                 <div className="flex space-x-1.5 py-1">

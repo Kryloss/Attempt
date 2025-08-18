@@ -877,7 +877,7 @@ export default function TrainingTab({ user }: TrainingTabProps) {
             {/* Drag Preview Overlay */}
             {isDragging && draggedExercise && (
                 <div className="fixed inset-0 pointer-events-none z-40">
-                    <div className="absolute top-4 right-4 bg-purple-600 text-white px-3 py-2 rounded-lg shadow-lg">
+                    <div className="absolute bottom-20 right-4 bg-purple-600 text-white px-3 py-2 rounded-lg shadow-lg">
                         <div className="text-sm font-medium">Dragging: {draggedExercise.name}</div>
                         <div className="text-xs opacity-75">Drop to reorder</div>
                     </div>

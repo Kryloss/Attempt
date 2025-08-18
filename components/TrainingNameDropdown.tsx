@@ -305,7 +305,7 @@ export default function TrainingNameDropdown({
                                                                 handleDeletePreset(preset.id, preset.name)
                                                             }
                                                         }}
-                                                        className="absolute top-1/2 right-2 transform -translate-y-1/2 perfect-circle bg-red-100 hover:bg-red-200 text-red-600 opacity-0 group-hover:opacity-100 transition-all duration-200 flex items-center justify-center shadow-lg"
+                                                        className="absolute top-1/2 right-2 transform -translate-y-1/2 perfect-circle bg-red-100 hover:bg-red-200 text-red-600 transition-all duration-200 flex items-center justify-center shadow-lg"
                                                         style={{ '--circle-size': '28px' } as React.CSSProperties}
                                                         title={`Delete preset "${preset.name}"`}
                                                     >
