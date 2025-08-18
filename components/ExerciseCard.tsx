@@ -150,17 +150,20 @@ export default function ExerciseCard({ exercise, onDelete, onUpdate }: ExerciseC
                     </div>
 
                     <div className="px-2 flex justify-center">
-                        {renderEditableNotes()}
+                        <div className="w-full max-w-7xl">
+                            {renderEditableNotes()}
+                        </div>
                     </div>
                 </div>
 
                 <div className="ml-1 flex flex-col items-end flex-shrink-0">
                     <button
                         onClick={() => setShowDeleteConfirm(true)}
-                        className="perfect-circle circle-sm bg-red-100 hover:bg-red-200 text-red-600 flex items-center justify-center transition-colors"
+                        className="perfect-circle bg-red-100 hover:bg-red-200 text-red-600 flex items-center justify-center transition-colors"
+                        style={{ '--circle-size': '32px' } as React.CSSProperties}
                     >
-                        <svg className="w-3 h-3 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1 1v3M4 7h16" />
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                         </svg>
                     </button>
                 </div>
@@ -180,8 +183,8 @@ export default function ExerciseCard({ exercise, onDelete, onUpdate }: ExerciseC
 
             {/* Delete Confirmation Modal */}
             {showDeleteConfirm && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-2 sm:p-4">
-                    <div className="bg-white rounded-xl p-4 sm:p-6 w-full max-w-sm mx-4 shadow-2xl">
+                <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-2 sm:p-4">
+                    <div className="bg-white rounded-xl p-4 sm:p-6 w-full max-w-sm shadow-2xl">
                         <h3 className="text-lg font-bold text-purple-800 mb-4">Delete Exercise</h3>
                         <p className="text-purple-600 mb-6 text-sm sm:text-base">
                             Are you sure you want to delete "{exercise.name}"? This action cannot be undone.
