@@ -169,6 +169,14 @@ export default function TrainingTab({ user }: TrainingTabProps) {
         }
     }, [])
 
+    // Cleanup scrolling when drag state changes
+    useEffect(() => {
+        if (!isDragging && !draggedExercise) {
+            // Re-enable scrolling when drag ends
+            document.body.style.overflow = ''
+        }
+    }, [isDragging, draggedExercise])
+
     // Auto-save training data
     useEffect(() => {
         if (currentTraining && user && !user.guest && trainingServiceRef.current) {
@@ -583,6 +591,8 @@ export default function TrainingTab({ user }: TrainingTabProps) {
     // Desktop drag and drop handlers (fallback)
     const handleDragStart = (exercise: Exercise) => {
         setDraggedExercise(exercise)
+        // Disable scrolling while dragging
+        document.body.style.overflow = 'hidden'
     }
 
     const handleDragOver = (e: React.DragEvent, targetIndex: number) => {
@@ -607,6 +617,8 @@ export default function TrainingTab({ user }: TrainingTabProps) {
             }
         }
         setDraggedExercise(null)
+        // Re-enable scrolling after drag ends
+        document.body.style.overflow = ''
     }
 
     const handleManualSave = async () => {

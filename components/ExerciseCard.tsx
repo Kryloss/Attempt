@@ -149,7 +149,7 @@ export default function ExerciseCard({ exercise, onDelete, onUpdate }: ExerciseC
                         {renderEditableValue('weight', exercise.weight || 0, 'Weight', 'kg')}
                     </div>
 
-                    <div className="px-2">
+                    <div className="px-2 flex justify-center">
                         {renderEditableNotes()}
                     </div>
                 </div>
