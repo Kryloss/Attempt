@@ -6,13 +6,14 @@ import { TrainingData, TrainingPresetData } from '@/lib/training-service'
 interface TrainingNameDropdownProps {
     trainingName: string
     onNameChange: (name: string) => void
-    onNameSave: (name: string) => void
+    onNameSave: (name: string) => Promise<void>
     onLoadPreset: (preset: TrainingPresetData) => void
     onLoadTraining: (training: TrainingData) => void
     onSaveAsPreset: () => void
     user?: any
     trainingService?: any
     exercises?: any[]
+    workoutDate?: string // Add the current workout date
 }
 
 export default function TrainingNameDropdown({
@@ -24,7 +25,8 @@ export default function TrainingNameDropdown({
     onSaveAsPreset,
     user,
     trainingService,
-    exercises = []
+    exercises = [],
+    workoutDate
 }: TrainingNameDropdownProps) {
     const [isEditing, setIsEditing] = useState(false)
     const [isDropdownOpen, setIsDropdownOpen] = useState(false)
@@ -37,9 +39,22 @@ export default function TrainingNameDropdown({
 
     // Helper function to check if training should be saved
     const shouldSaveTraining = (name: string, exercises: any[]) => {
-        const isDefaultName = name.startsWith('Workout ') && name.length <= 20
-        const hasExercises = exercises.length > 0
-        return !isDefaultName || hasExercises
+        // Always save if there are exercises
+        if (exercises.length > 0) {
+            return true
+        }
+
+        // For workouts without exercises, save if the name has been customized
+        // (not the default "Workout YYYY-MM-DD" format)
+        const isDefaultName = name.startsWith('Workout ') && /^\d{4}-\d{2}-\d{2}$/.test(name.replace('Workout ', ''))
+
+        // If it's not a default name, it means the user has customized it, so save it
+        if (!isDefaultName) {
+            return true
+        }
+
+        // If it is a default name, don't save it (this prevents saving empty workouts)
+        return false
     }
 
     // Load presets and training history
@@ -151,11 +166,26 @@ export default function TrainingNameDropdown({
         }
     }
 
-    const handleNameSave = () => {
-        if (trainingName.trim()) {
-            onNameSave(trainingName.trim())
-            setIsEditing(false)
+    const handleNameSave = async () => {
+        let nameToSave = trainingName.trim()
+
+        // If name is empty or just whitespace, generate default workout name
+        if (!nameToSave) {
+            if (workoutDate) {
+                // Use the actual workout date instead of current system date
+                nameToSave = `Workout ${workoutDate}`
+            } else {
+                // Fallback to current date if workout date is not provided
+                const today = new Date()
+                const year = today.getFullYear()
+                const month = String(today.getMonth() + 1).padStart(2, '0')
+                const day = String(today.getDate()).padStart(2, '0')
+                nameToSave = `Workout ${year}-${month}-${day}`
+            }
         }
+
+        await onNameSave(nameToSave)
+        setIsEditing(false)
     }
 
     const handleLoadPreset = (preset: TrainingPresetData) => {
@@ -256,6 +286,8 @@ export default function TrainingNameDropdown({
                                 Save Preset
                             </button>
                         </div>
+
+
 
                         {isLoading ? (
                             <div className="text-center py-4">

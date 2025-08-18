@@ -40,6 +40,12 @@ export default function TrainingTab({ user }: TrainingTabProps) {
     const [dropdownRefreshKey, setDropdownRefreshKey] = useState(0)
     const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
 
+    // Date switching delay state
+    const [isDateSwitchBlocked, setIsDateSwitchBlocked] = useState(false)
+    const [dateSwitchDelay, setDateSwitchDelay] = useState(0)
+    const dateSwitchTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+    const dateSwitchStartTimeRef = useRef<number>(0)
+
     // Mobile drag and drop state
     const [isDragging, setIsDragging] = useState(false)
     const [dragStartY, setDragStartY] = useState(0)
@@ -62,9 +68,22 @@ export default function TrainingTab({ user }: TrainingTabProps) {
 
     // Helper function to check if training should be saved
     const shouldSaveTraining = (training: Training) => {
-        const isDefaultName = training.name.startsWith('Workout ') && training.name.length <= 20
-        const hasExercises = training.exercises.length > 0
-        return !isDefaultName || hasExercises
+        // Always save if there are exercises
+        if (training.exercises.length > 0) {
+            return true
+        }
+
+        // For workouts without exercises, save if the name has been customized
+        // (not the default "Workout YYYY-MM-DD" format)
+        const isDefaultName = training.name.startsWith('Workout ') && /^\d{4}-\d{2}-\d{2}$/.test(training.name.replace('Workout ', ''))
+
+        // If it's not a default name, it means the user has customized it, so save it
+        if (!isDefaultName) {
+            return true
+        }
+
+        // If it is a default name, don't save it (this prevents saving empty workouts)
+        return false
     }
 
     // Initialize training service and load data
@@ -163,6 +182,9 @@ export default function TrainingTab({ user }: TrainingTabProps) {
             if (longPressTimeoutRef.current) {
                 clearTimeout(longPressTimeoutRef.current)
             }
+            if (dateSwitchTimeoutRef.current) {
+                clearTimeout(dateSwitchTimeoutRef.current)
+            }
             // Restore body styles
             document.body.style.overflow = ''
             document.body.style.touchAction = ''
@@ -182,37 +204,70 @@ export default function TrainingTab({ user }: TrainingTabProps) {
         if (currentTraining && user && !user.guest && trainingServiceRef.current) {
             // Only auto-save if training should be saved
             if (shouldSaveTraining(currentTraining)) {
-                // Auto-save to database
-                setAutoSaveStatus('saving')
-                trainingServiceRef.current.autoSave({
-                    id: currentTraining.id,
-                    name: currentTraining.name,
-                    exercises: currentTraining.exercises,
-                    date: currentTraining.date
-                }).then(() => {
-                    if (hasUnsavedChanges) {
-                        setAutoSaveStatus('saved')
-                        setTimeout(() => setAutoSaveStatus('idle'), 2000)
-                    } else {
-                        setAutoSaveStatus('idle')
-                    }
+                // Start date switch delay timer
+                if (hasUnsavedChanges) {
+                    setIsDateSwitchBlocked(true)
+                    setDateSwitchDelay(0)
+                    dateSwitchStartTimeRef.current = Date.now()
 
-                    // Trigger dropdown refresh to show updated training names
-                    setDropdownRefreshKey(prev => prev + 1)
-                }).catch((error) => {
-                    console.error('Auto-save error:', error)
-                    setAutoSaveStatus('error')
-                    setTimeout(() => setAutoSaveStatus('idle'), 3000)
-                })
+                    // Update delay every 100ms
+                    const delayInterval = setInterval(() => {
+                        const elapsed = Date.now() - dateSwitchStartTimeRef.current
+                        setDateSwitchDelay(elapsed)
+
+                        // If delay exceeds 3 seconds, show red cross and allow switching
+                        if (elapsed >= 3000) {
+                            setIsDateSwitchBlocked(false)
+                            clearInterval(delayInterval)
+                        }
+                    }, 100)
+
+                    // Auto-save to database
+                    setAutoSaveStatus('saving')
+                    trainingServiceRef.current.autoSave({
+                        id: currentTraining.id,
+                        name: currentTraining.name,
+                        exercises: currentTraining.exercises,
+                        date: currentTraining.date
+                    }).then(() => {
+                        if (hasUnsavedChanges) {
+                            setAutoSaveStatus('saved')
+                            setTimeout(() => setAutoSaveStatus('idle'), 2000)
+                        } else {
+                            setAutoSaveStatus('idle')
+                        }
+
+                        // Clear date switch delay
+                        setIsDateSwitchBlocked(false)
+                        clearInterval(delayInterval)
+
+                        // Trigger dropdown refresh to show updated training names
+                        setDropdownRefreshKey(prev => prev + 1)
+                    }).catch((error) => {
+                        console.error('Auto-save error:', error)
+                        setAutoSaveStatus('error')
+                        setTimeout(() => setAutoSaveStatus('idle'), 3000)
+
+                        // Clear date switch delay on error
+                        setIsDateSwitchBlocked(false)
+                        clearInterval(delayInterval)
+                    })
+                } else {
+                    setAutoSaveStatus('idle')
+                }
             } else {
                 // Don't save trainings with default names and no exercises
                 setAutoSaveStatus('idle')
+                // Clear date switch delay if no changes to save
+                setIsDateSwitchBlocked(false)
             }
         } else if (currentTraining) {
             // Guest mode - only save if training should be saved
             if (shouldSaveTraining(currentTraining)) {
                 localStorage.setItem(`training_${currentTraining.date}`, JSON.stringify(currentTraining))
             }
+            // Clear date switch delay for guest mode
+            setIsDateSwitchBlocked(false)
         }
     }, [currentTraining, user])
 
@@ -281,13 +336,50 @@ export default function TrainingTab({ user }: TrainingTabProps) {
     }, [autoSaveStatus, currentTraining, user])
 
     const navigateDate = (direction: 'prev' | 'next') => {
-        const newDate = new Date(currentDate)
-        if (direction === 'prev') {
-            newDate.setDate(newDate.getDate() - 1)
-        } else {
-            newDate.setDate(newDate.getDate() + 1)
+        // Check if date switching is blocked
+        if (isDateSwitchBlocked) {
+            return
         }
-        setCurrentDate(newDate)
+
+        // If there are unsaved changes, try to save them before navigating
+        if (hasUnsavedChanges && currentTraining && user && !user.guest && trainingServiceRef.current) {
+            // Force save before navigating to ensure changes persist
+            trainingServiceRef.current.saveTraining({
+                id: currentTraining.id,
+                name: currentTraining.name,
+                exercises: currentTraining.exercises,
+                date: currentTraining.date
+            }).then(() => {
+                setHasUnsavedChanges(false)
+                // Now navigate to the new date
+                const newDate = new Date(currentDate)
+                if (direction === 'prev') {
+                    newDate.setDate(newDate.getDate() - 1)
+                } else {
+                    newDate.setDate(newDate.getDate() + 1)
+                }
+                setCurrentDate(newDate)
+            }).catch((error) => {
+                console.error('Error saving before navigation:', error)
+                // Still navigate even if save fails
+                const newDate = new Date(currentDate)
+                if (direction === 'prev') {
+                    newDate.setDate(newDate.getDate() - 1)
+                } else {
+                    newDate.setDate(newDate.getDate() + 1)
+                }
+                setCurrentDate(newDate)
+            })
+        } else {
+            // No unsaved changes, navigate immediately
+            const newDate = new Date(currentDate)
+            if (direction === 'prev') {
+                newDate.setDate(newDate.getDate() - 1)
+            } else {
+                newDate.setDate(newDate.getDate() + 1)
+            }
+            setCurrentDate(newDate)
+        }
     }
 
     const handleTrainingNameChange = (name: string) => {
@@ -296,7 +388,7 @@ export default function TrainingTab({ user }: TrainingTabProps) {
         // This prevents interruption while typing
     }
 
-    const handleTrainingNameSave = (name: string) => {
+    const handleTrainingNameSave = async (name: string) => {
         if (currentTraining) {
             // Update the current training with the new name
             const updatedTraining = {
@@ -312,6 +404,29 @@ export default function TrainingTab({ user }: TrainingTabProps) {
             if (currentTraining.id && currentTraining.id !== Date.now().toString()) {
                 // Keep the existing ID to ensure we're updating, not creating
                 console.log('Updating existing workout:', currentTraining.id, 'with new name:', name)
+            }
+
+            // Force immediate save for name changes to ensure they persist
+            if (user && !user.guest && trainingServiceRef.current) {
+                try {
+                    setAutoSaveStatus('saving')
+                    await trainingServiceRef.current.saveTraining({
+                        id: updatedTraining.id,
+                        name: updatedTraining.name,
+                        exercises: updatedTraining.exercises,
+                        date: updatedTraining.date
+                    })
+                    setAutoSaveStatus('saved')
+                    setTimeout(() => setAutoSaveStatus('idle'), 2000)
+                    setHasUnsavedChanges(false)
+
+                    // Trigger dropdown refresh to show updated training names
+                    setDropdownRefreshKey(prev => prev + 1)
+                } catch (error) {
+                    console.error('Error saving workout name change:', error)
+                    setAutoSaveStatus('error')
+                    setTimeout(() => setAutoSaveStatus('idle'), 3000)
+                }
             }
         }
     }
@@ -648,6 +763,10 @@ export default function TrainingTab({ user }: TrainingTabProps) {
                 setAutoSaveStatus('idle')
             }
 
+            // Clear date switch delay after manual save
+            setIsDateSwitchBlocked(false)
+            setHasUnsavedChanges(false)
+
             // Trigger dropdown refresh to show updated training names
             setDropdownRefreshKey(prev => prev + 1)
         } catch (error) {
@@ -690,11 +809,21 @@ export default function TrainingTab({ user }: TrainingTabProps) {
                 <div className="flex items-center justify-between mb-1">
                     <button
                         onClick={() => navigateDate('prev')}
-                        className="perfect-circle circle-md bg-purple-100 hover:bg-purple-200 flex items-center justify-center transition-colors"
+                        disabled={isDateSwitchBlocked}
+                        className={`perfect-circle circle-md flex items-center justify-center transition-colors ${isDateSwitchBlocked
+                            ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                            : 'bg-purple-100 hover:bg-purple-200 text-purple-600'
+                            }`}
                     >
-                        <svg className="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                        </svg>
+                        {isDateSwitchBlocked && dateSwitchDelay >= 3000 ? (
+                            <svg className="w-4 h-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        ) : (
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                            </svg>
+                        )}
                     </button>
 
                     <div className="text-center flex-1 px-2 relative">
@@ -710,15 +839,44 @@ export default function TrainingTab({ user }: TrainingTabProps) {
                         {isTomorrow(currentDate) && (
                             <span className="absolute top-full left-1/2 transform -translate-x-1/2 text-xs text-purple-500 font-medium">Tomorrow</span>
                         )}
+
+                        {/* Date Switch Delay Indicator */}
+                        {isDateSwitchBlocked && (
+                            <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2">
+                                {dateSwitchDelay < 3000 ? (
+                                    <div className="flex items-center space-x-1 text-xs text-purple-600 font-medium bg-purple-50 px-2 py-1 rounded-full border border-purple-200">
+                                        <div className="w-3 h-3 border-2 border-purple-300 border-t-purple-600 rounded-full animate-spin"></div>
+                                        <span>Saving... ({Math.ceil((3000 - dateSwitchDelay) / 1000)}s)</span>
+                                    </div>
+                                ) : (
+                                    <div className="flex items-center space-x-1 text-xs text-red-600 font-medium bg-red-50 px-2 py-1 rounded-full border border-red-200">
+                                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
+                                        <span>Can switch now</span>
+                                    </div>
+                                )}
+                            </div>
+                        )}
                     </div>
 
                     <button
                         onClick={() => navigateDate('next')}
-                        className="perfect-circle circle-md bg-purple-100 hover:bg-purple-200 flex items-center justify-center transition-colors"
+                        disabled={isDateSwitchBlocked}
+                        className={`perfect-circle circle-md flex items-center justify-center transition-colors ${isDateSwitchBlocked
+                            ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                            : 'bg-purple-100 hover:bg-purple-200 text-purple-600'
+                            }`}
                     >
-                        <svg className="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                        </svg>
+                        {isDateSwitchBlocked && dateSwitchDelay >= 3000 ? (
+                            <svg className="w-4 h-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        ) : (
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                            </svg>
+                        )}
                     </button>
                 </div>
 
@@ -735,6 +893,7 @@ export default function TrainingTab({ user }: TrainingTabProps) {
                         user={user}
                         trainingService={trainingServiceRef.current}
                         exercises={currentTraining?.exercises || []}
+                        workoutDate={currentTraining?.date}
                     />
 
                     {/* Auto-save Status Indicator - Moved to header */}
@@ -751,13 +910,14 @@ export default function TrainingTab({ user }: TrainingTabProps) {
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 sm:mb-6 space-y-3 sm:space-y-0">
                     <h3 className="text-lg sm:text-xl font-bold text-purple-800">Exercises</h3>
                     <div className="flex items-center space-x-3">
+
                         <button
                             onClick={() => setShowAddExercise(true)}
                             disabled={isLoading}
                             className="w-full sm:w-auto bg-gradient-to-r from-purple-500 to-purple-600 text-white px-4 sm:px-6 py-2 sm:py-2 rounded-lg hover:from-purple-600 hover:to-purple-700 transition-all duration-200 transform hover:scale-105 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
                         >
                             <span className="flex items-center justify-center sm:justify-start space-x-2">
-                                <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg className="w-4 h-4 sm:w-5 sm:w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                                 </svg>
                                 <span>Add Exercise</span>
