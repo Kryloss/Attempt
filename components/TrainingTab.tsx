@@ -652,10 +652,37 @@ export default function TrainingTab({ user }: TrainingTabProps) {
                                     <div
                                         key={exercise.id}
                                         draggable
-                                        onDragStart={() => handleDragStart(exercise)}
+                                        onDragStart={(e) => handleDragStart(exercise)}
                                         onDragOver={(e) => handleDragOver(e, index)}
                                         onDrop={(e) => handleDrop(e, index)}
-                                        className="cursor-move"
+                                        onTouchStart={(e) => {
+                                            // Prevent default to avoid conflicts
+                                            e.preventDefault();
+                                            handleDragStart(exercise);
+                                        }}
+                                        onTouchMove={(e) => {
+                                            e.preventDefault();
+                                            // Handle touch move for mobile drag
+                                            const touch = e.touches[0];
+                                            if (touch) {
+                                                const elementBelow = document.elementFromPoint(touch.clientX, touch.clientY);
+                                                if (elementBelow) {
+                                                    const exerciseElement = elementBelow.closest('[data-exercise-index]');
+                                                    if (exerciseElement) {
+                                                        const targetIndex = parseInt(exerciseElement.getAttribute('data-exercise-index') || '0');
+                                                        if (targetIndex !== index) {
+                                                            handleDrop(e as any, targetIndex);
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }}
+                                        onTouchEnd={(e) => {
+                                            e.preventDefault();
+                                            setDraggedExercise(null);
+                                        }}
+                                        data-exercise-index={index}
+                                        className="cursor-move touch-manipulation"
                                     >
                                         <ExerciseCard
                                             exercise={exercise}
