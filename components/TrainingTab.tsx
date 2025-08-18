@@ -475,6 +475,7 @@ export default function TrainingTab({ user }: TrainingTabProps) {
 
     // Mobile-friendly drag and drop handlers
     const handleTouchStart = (e: React.TouchEvent, exercise: Exercise, index: number) => {
+        e.preventDefault()
         const touch = e.touches[0]
         touchStartYRef.current = touch.clientY
         touchStartXRef.current = touch.clientX
@@ -792,10 +793,11 @@ export default function TrainingTab({ user }: TrainingTabProps) {
                                         onTouchMove={handleTouchMove}
                                         onTouchEnd={handleTouchEnd}
                                         onTouchCancel={handleTouchCancel}
+                                        onContextMenu={(e) => e.preventDefault()}
                                         data-exercise-index={index}
-                                        className={`cursor-move touch-manipulation drag-transition ${isDragging && dragStartIndex === index
-                                                ? 'opacity-50 scale-95 shadow-2xl z-50 dragging'
-                                                : ''
+                                        className={`cursor-move touch-manipulation drag-transition select-none ${isDragging && dragStartIndex === index
+                                            ? 'opacity-50 scale-95 shadow-2xl z-50 dragging'
+                                            : ''
                                             } ${dragOverIndex === index && isDragging && dragStartIndex !== index
                                                 ? 'border-2 border-purple-400 border-dashed bg-purple-50'
                                                 : ''
