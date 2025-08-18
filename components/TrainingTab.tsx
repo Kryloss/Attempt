@@ -3,7 +3,8 @@
 import { useState, useEffect, useRef } from 'react'
 import ExerciseCard from './ExerciseCard'
 import AddExerciseModal from './AddExerciseModal'
-import { TrainingService, TrainingData } from '@/lib/training-service'
+import TrainingNameDropdown from './TrainingNameDropdown'
+import { TrainingService, TrainingData, TrainingPresetData } from '@/lib/training-service'
 import { User } from '@/types/auth'
 
 interface Exercise {
@@ -30,13 +31,30 @@ export default function TrainingTab({ user }: TrainingTabProps) {
     const [currentDate, setCurrentDate] = useState(new Date())
     const [currentTraining, setCurrentTraining] = useState<Training | null>(null)
     const [showAddExercise, setShowAddExercise] = useState(false)
-    const [isEditingName, setIsEditingName] = useState(false)
     const [trainingName, setTrainingName] = useState('')
     const [draggedExercise, setDraggedExercise] = useState<Exercise | null>(null)
     const [isLoading, setIsLoading] = useState(false)
     const [autoSaveStatus, setAutoSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle')
+    const [showSavePresetModal, setShowSavePresetModal] = useState(false)
+    const [presetName, setPresetName] = useState('')
+    const [dropdownRefreshKey, setDropdownRefreshKey] = useState(0)
+    const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
+
+    // Set preset name when modal opens
+    useEffect(() => {
+        if (showSavePresetModal && currentTraining) {
+            setPresetName(currentTraining.name)
+        }
+    }, [showSavePresetModal, currentTraining])
 
     const trainingServiceRef = useRef<TrainingService | null>(null)
+
+    // Helper function to check if training should be saved
+    const shouldSaveTraining = (training: Training) => {
+        const isDefaultName = training.name.startsWith('Workout ') && training.name.length <= 20
+        const hasExercises = training.exercises.length > 0
+        return !isDefaultName || hasExercises
+    }
 
     // Initialize training service and load data
     useEffect(() => {
@@ -51,7 +69,11 @@ export default function TrainingTab({ user }: TrainingTabProps) {
     // Initialize training for current date
     useEffect(() => {
         const loadTrainingData = async () => {
-            const dateString = currentDate.toISOString().split('T')[0]
+            // Use timezone-safe date formatting to avoid date shifts
+            const year = currentDate.getFullYear()
+            const month = String(currentDate.getMonth() + 1).padStart(2, '0')
+            const day = String(currentDate.getDate()).padStart(2, '0')
+            const dateString = `${year}-${month}-${day}`
             setIsLoading(true)
 
             try {
@@ -68,16 +90,18 @@ export default function TrainingTab({ user }: TrainingTabProps) {
                         }
                         setCurrentTraining(training)
                         setTrainingName(training.name)
+                        setHasUnsavedChanges(false) // Reset change tracking when loading existing data
                     } else {
-                        // Create new training for this date
+                        // Create new workout for this date
                         const newTraining: Training = {
                             id: Date.now().toString(),
-                            name: `Training ${dateString}`,
+                            name: `Workout ${dateString}`,
                             exercises: [],
                             date: dateString
                         }
                         setCurrentTraining(newTraining)
                         setTrainingName(newTraining.name)
+                        setHasUnsavedChanges(false) // Reset change tracking for new workout
                     }
                 } else {
                     // Guest mode - use localStorage
@@ -86,28 +110,31 @@ export default function TrainingTab({ user }: TrainingTabProps) {
                         const parsed = JSON.parse(existingTraining)
                         setCurrentTraining(parsed)
                         setTrainingName(parsed.name)
+                        setHasUnsavedChanges(false) // Reset change tracking when loading existing data
                     } else {
                         const newTraining: Training = {
                             id: Date.now().toString(),
-                            name: `Training ${dateString}`,
+                            name: `Workout ${dateString}`,
                             exercises: [],
                             date: dateString
                         }
                         setCurrentTraining(newTraining)
                         setTrainingName(newTraining.name)
+                        setHasUnsavedChanges(false) // Reset change tracking for new workout
                     }
                 }
             } catch (error) {
-                console.error('Error loading training data:', error)
-                // Fallback to creating new training
+                console.error('Error loading workout data:', error)
+                // Fallback to creating new workout
                 const newTraining: Training = {
                     id: Date.now().toString(),
-                    name: `Training ${dateString}`,
+                    name: `Workout ${dateString}`,
                     exercises: [],
                     date: dateString
                 }
                 setCurrentTraining(newTraining)
                 setTrainingName(newTraining.name)
+                setHasUnsavedChanges(false) // Reset change tracking for fallback workout
             } finally {
                 setIsLoading(false)
             }
@@ -128,26 +155,105 @@ export default function TrainingTab({ user }: TrainingTabProps) {
     // Auto-save training data
     useEffect(() => {
         if (currentTraining && user && !user.guest && trainingServiceRef.current) {
-            // Auto-save to database
-            setAutoSaveStatus('saving')
-            trainingServiceRef.current.autoSave({
-                id: currentTraining.id,
-                name: currentTraining.name,
-                exercises: currentTraining.exercises,
-                date: currentTraining.date
-            }).then(() => {
-                setAutoSaveStatus('saved')
-                setTimeout(() => setAutoSaveStatus('idle'), 2000)
-            }).catch((error) => {
-                console.error('Auto-save error:', error)
-                setAutoSaveStatus('error')
-                setTimeout(() => setAutoSaveStatus('idle'), 3000)
-            })
+            // Only auto-save if training should be saved
+            if (shouldSaveTraining(currentTraining)) {
+                // Auto-save to database
+                setAutoSaveStatus('saving')
+                trainingServiceRef.current.autoSave({
+                    id: currentTraining.id,
+                    name: currentTraining.name,
+                    exercises: currentTraining.exercises,
+                    date: currentTraining.date
+                }).then(() => {
+                    if (hasUnsavedChanges) {
+                        setAutoSaveStatus('saved')
+                        setTimeout(() => setAutoSaveStatus('idle'), 2000)
+                    } else {
+                        setAutoSaveStatus('idle')
+                    }
+
+                    // Trigger dropdown refresh to show updated training names
+                    setDropdownRefreshKey(prev => prev + 1)
+                }).catch((error) => {
+                    console.error('Auto-save error:', error)
+                    setAutoSaveStatus('error')
+                    setTimeout(() => setAutoSaveStatus('idle'), 3000)
+                })
+            } else {
+                // Don't save trainings with default names and no exercises
+                setAutoSaveStatus('idle')
+            }
         } else if (currentTraining) {
-            // Guest mode - save to localStorage
-            localStorage.setItem(`training_${currentTraining.date}`, JSON.stringify(currentTraining))
+            // Guest mode - only save if training should be saved
+            if (shouldSaveTraining(currentTraining)) {
+                localStorage.setItem(`training_${currentTraining.date}`, JSON.stringify(currentTraining))
+            }
         }
     }, [currentTraining, user])
+
+    // Update header with auto-save status
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            const statusElement = document.getElementById('auto-save-status')
+            if (statusElement && user && !user.guest) {
+                let statusHTML = ''
+
+                if (autoSaveStatus === 'saving') {
+                    statusHTML = `
+                        <div class="flex items-center space-x-2 text-xs sm:text-sm text-purple-600">
+                            <div class="w-3 h-3 sm:w-4 sm:h-4 border-2 border-purple-300 border-t-purple-600 rounded-full animate-spin"></div>
+                            <span>Saving...</span>
+                        </div>
+                    `
+                } else if (autoSaveStatus === 'saved') {
+                    statusHTML = `
+                        <div class="flex items-center space-x-2 text-xs sm:text-sm text-green-600">
+                            <svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            <span>Saved</span>
+                        </div>
+                    `
+                } else if (autoSaveStatus === 'error') {
+                    statusHTML = `
+                        <div class="flex items-center space-x-2 text-xs sm:text-sm text-red-600">
+                            <svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                            <span>Save failed</span>
+                            <button id="retry-save-btn" class="text-xs bg-red-100 hover:bg-red-200 text-red-700 px-2 py-1 rounded transition-colors">
+                                Retry
+                            </button>
+                        </div>
+                    `
+
+                    // Add retry button functionality after a short delay to ensure DOM is updated
+                    setTimeout(() => {
+                        const retryBtn = document.getElementById('retry-save-btn')
+                        if (retryBtn) {
+                            retryBtn.addEventListener('click', handleManualSave)
+                        }
+                    }, 100)
+                } else if (autoSaveStatus === 'idle') {
+                    statusHTML = `
+                        <div class="text-xs ${hasUnsavedChanges ? 'text-green-600' : 'text-gray-400'}">
+                            ✓
+                        </div>
+                    `
+                }
+
+                statusElement.innerHTML = statusHTML
+            } else if (statusElement && user?.guest) {
+                statusElement.innerHTML = `
+                    <div class="text-xs text-yellow-600">
+                        Log in to save changes
+                    </div>
+                `
+            } else if (statusElement) {
+                statusElement.innerHTML = ''
+            }
+        }
+    }, [autoSaveStatus, currentTraining, user])
 
     const navigateDate = (direction: 'prev' | 'next') => {
         const newDate = new Date(currentDate)
@@ -159,13 +265,157 @@ export default function TrainingTab({ user }: TrainingTabProps) {
         setCurrentDate(newDate)
     }
 
-    const handleTrainingNameSave = () => {
-        if (currentTraining && trainingName.trim()) {
-            setCurrentTraining({
+    const handleTrainingNameChange = (name: string) => {
+        setTrainingName(name)
+        // Don't update currentTraining or trigger auto-save during editing
+        // This prevents interruption while typing
+    }
+
+    const handleTrainingNameSave = (name: string) => {
+        if (currentTraining) {
+            // Update the current training with the new name
+            const updatedTraining = {
                 ...currentTraining,
-                name: trainingName.trim()
+                name: name
+            }
+            setCurrentTraining(updatedTraining)
+            setTrainingName(name)
+            setHasUnsavedChanges(true)
+
+            // If this is an existing workout (not a new one), ensure we keep the original ID
+            // This prevents creating duplicate workouts when editing names
+            if (currentTraining.id && currentTraining.id !== Date.now().toString()) {
+                // Keep the existing ID to ensure we're updating, not creating
+                console.log('Updating existing workout:', currentTraining.id, 'with new name:', name)
+            }
+        }
+    }
+
+    const handleLoadPreset = async (preset: TrainingPresetData) => {
+        if (currentTraining) {
+            // Create a new training for the current date with the preset data
+            const updatedTraining = {
+                ...currentTraining,
+                name: preset.name,
+                exercises: [...preset.exercises]
+            }
+
+            setCurrentTraining(updatedTraining)
+            setTrainingName(preset.name)
+
+            // Auto-save the new training to persist it
+            if (user && !user.guest && trainingServiceRef.current) {
+                try {
+                    await trainingServiceRef.current.saveTraining({
+                        id: updatedTraining.id,
+                        name: updatedTraining.name,
+                        exercises: updatedTraining.exercises,
+                        date: updatedTraining.date
+                    })
+
+                    // Trigger dropdown refresh to show updated training names
+                    setDropdownRefreshKey(prev => prev + 1)
+                } catch (error) {
+                    console.error('Error saving training after loading preset:', error)
+                }
+            }
+        }
+    }
+
+    // Load a previous workout and apply it to the current date (like copying a preset)
+    const handleLoadTraining = async (training: TrainingData) => {
+        if (currentTraining) {
+            // Always load the most current version of the training from the database
+            let currentTrainingData = training
+
+            if (user && !user.guest && trainingServiceRef.current) {
+                try {
+                    // Fetch the latest version of this training from the database
+                    const latestTraining = await trainingServiceRef.current.loadTraining(training.date)
+                    if (latestTraining) {
+                        currentTrainingData = latestTraining
+                    }
+                } catch (error) {
+                    console.error('Error loading latest training data:', error)
+                    // Fallback to the training data from history
+                }
+            }
+
+            // IMPORTANT: Apply the previous workout to the CURRENT date (like presets do)
+            // This allows users to copy workouts from other dates to today
+            const updatedTraining = {
+                ...currentTraining, // Keep current date and ID
+                name: currentTrainingData.name,
+                exercises: [...currentTrainingData.exercises]
+            }
+
+            setCurrentTraining(updatedTraining)
+            setTrainingName(currentTrainingData.name)
+
+            // Auto-save the updated training to persist it
+            if (user && !user.guest && trainingServiceRef.current) {
+                try {
+                    await trainingServiceRef.current.saveTraining({
+                        id: updatedTraining.id,
+                        name: updatedTraining.name,
+                        exercises: updatedTraining.exercises,
+                        date: updatedTraining.date
+                    })
+
+                    // Trigger dropdown refresh to show updated training names
+                    setDropdownRefreshKey(prev => prev + 1)
+                } catch (error) {
+                    console.error('Error saving training after loading from history:', error)
+                }
+            }
+        }
+    }
+
+    const handleSaveAsPreset = async () => {
+        if (!currentTraining || !user || user.guest || !trainingServiceRef.current) {
+            return
+        }
+
+        // Only allow saving as preset if training should be saved
+        if (!shouldSaveTraining(currentTraining)) {
+            console.error('Cannot save default training as preset')
+            return
+        }
+
+        try {
+            const newPresetName = presetName || currentTraining.name
+
+            // Save the preset
+            await trainingServiceRef.current.savePreset({
+                name: newPresetName,
+                exercises: currentTraining.exercises
             })
-            setIsEditingName(false)
+
+            // Update the current training name to match the preset name
+            if (newPresetName !== currentTraining.name) {
+                const updatedTraining = {
+                    ...currentTraining,
+                    name: newPresetName
+                }
+                setCurrentTraining(updatedTraining)
+                setTrainingName(newPresetName)
+
+                // Save the updated training to persist the name change
+                await trainingServiceRef.current.saveTraining({
+                    id: updatedTraining.id,
+                    name: updatedTraining.name,
+                    exercises: updatedTraining.exercises,
+                    date: updatedTraining.date
+                })
+
+                // Trigger dropdown refresh to show updated training names
+                setDropdownRefreshKey(prev => prev + 1)
+            }
+
+            setShowSavePresetModal(false)
+            setPresetName('')
+        } catch (error) {
+            console.error('Error saving preset:', error)
         }
     }
 
@@ -179,6 +429,7 @@ export default function TrainingTab({ user }: TrainingTabProps) {
                 ...currentTraining,
                 exercises: [...currentTraining.exercises, newExercise]
             })
+            setHasUnsavedChanges(true)
             setShowAddExercise(false)
         }
     }
@@ -189,6 +440,7 @@ export default function TrainingTab({ user }: TrainingTabProps) {
                 ...currentTraining,
                 exercises: currentTraining.exercises.filter(ex => ex.id !== exerciseId)
             })
+            setHasUnsavedChanges(true)
         }
     }
 
@@ -200,6 +452,7 @@ export default function TrainingTab({ user }: TrainingTabProps) {
                     ex.id === exerciseId ? { ...ex, ...updatedExercise } : ex
                 )
             })
+            setHasUnsavedChanges(true)
         }
     }
 
@@ -225,6 +478,7 @@ export default function TrainingTab({ user }: TrainingTabProps) {
                     ...currentTraining,
                     exercises
                 })
+                setHasUnsavedChanges(true)
             }
         }
         setDraggedExercise(null)
@@ -232,6 +486,13 @@ export default function TrainingTab({ user }: TrainingTabProps) {
 
     const handleManualSave = async () => {
         if (!currentTraining || !user || user.guest || !trainingServiceRef.current) {
+            return
+        }
+
+        // Only save if training should be saved
+        if (!shouldSaveTraining(currentTraining)) {
+            setAutoSaveStatus('error')
+            setTimeout(() => setAutoSaveStatus('idle'), 3000)
             return
         }
 
@@ -243,8 +504,15 @@ export default function TrainingTab({ user }: TrainingTabProps) {
                 exercises: currentTraining.exercises,
                 date: currentTraining.date
             })
-            setAutoSaveStatus('saved')
-            setTimeout(() => setAutoSaveStatus('idle'), 2000)
+            if (hasUnsavedChanges) {
+                setAutoSaveStatus('saved')
+                setTimeout(() => setAutoSaveStatus('idle'), 2000)
+            } else {
+                setAutoSaveStatus('idle')
+            }
+
+            // Trigger dropdown refresh to show updated training names
+            setDropdownRefreshKey(prev => prev + 1)
         } catch (error) {
             console.error('Manual save failed:', error)
             setAutoSaveStatus('error')
@@ -266,11 +534,23 @@ export default function TrainingTab({ user }: TrainingTabProps) {
         return date.toDateString() === today.toDateString()
     }
 
+    const isYesterday = (date: Date) => {
+        const yesterday = new Date()
+        yesterday.setDate(yesterday.getDate() - 1)
+        return date.toDateString() === yesterday.toDateString()
+    }
+
+    const isTomorrow = (date: Date) => {
+        const tomorrow = new Date()
+        tomorrow.setDate(tomorrow.getDate() + 1)
+        return date.toDateString() === tomorrow.toDateString()
+    }
+
     return (
-        <div className="space-y-4 sm:space-y-6">
+        <div className="space-y-2 sm:space-y-3">
             {/* Date Navigation */}
-            <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-lg border border-purple-100">
-                <div className="flex items-center justify-between mb-4">
+            <div className="bg-white rounded-2xl p-2 sm:p-3 shadow-lg border border-purple-100">
+                <div className="flex items-center justify-between mb-1">
                     <button
                         onClick={() => navigateDate('prev')}
                         className="perfect-circle circle-md bg-purple-100 hover:bg-purple-200 flex items-center justify-center transition-colors"
@@ -280,12 +560,18 @@ export default function TrainingTab({ user }: TrainingTabProps) {
                         </svg>
                     </button>
 
-                    <div className="text-center flex-1 px-2">
-                        <h2 className={`text-lg sm:text-xl font-bold ${isToday(currentDate) ? 'text-purple-600' : 'text-purple-800'}`}>
+                    <div className="text-center flex-1 px-2 relative">
+                        <h2 className={`text-sm sm:text-base font-bold ${isToday(currentDate) ? 'text-purple-600/70' : 'text-purple-800/60'}`}>
                             {formatDate(currentDate)}
                         </h2>
                         {isToday(currentDate) && (
-                            <span className="text-xs sm:text-sm text-purple-500 font-medium">Today</span>
+                            <span className="absolute top-full left-1/2 transform -translate-x-1/2 text-xs text-purple-500 font-medium">Today</span>
+                        )}
+                        {isYesterday(currentDate) && (
+                            <span className="absolute top-full left-1/2 transform -translate-x-1/2 text-xs text-purple-500 font-medium">Yesterday</span>
+                        )}
+                        {isTomorrow(currentDate) && (
+                            <span className="absolute top-full left-1/2 transform -translate-x-1/2 text-xs text-purple-500 font-medium">Tomorrow</span>
                         )}
                     </div>
 
@@ -299,75 +585,25 @@ export default function TrainingTab({ user }: TrainingTabProps) {
                     </button>
                 </div>
 
-                {/* Training Name */}
+                {/* Training Name with Dropdown */}
                 <div className="text-center">
-                    {isEditingName ? (
-                        <div className="flex items-center justify-center space-x-2">
-                            <input
-                                type="text"
-                                value={trainingName}
-                                onChange={(e) => setTrainingName(e.target.value)}
-                                onBlur={handleTrainingNameSave}
-                                onKeyPress={(e) => e.key === 'Enter' && handleTrainingNameSave()}
-                                className="text-lg sm:text-2xl font-bold text-purple-800 bg-transparent border-b-2 border-purple-300 focus:border-purple-500 focus:outline-none text-center w-full max-w-xs"
-                                autoFocus
-                            />
-                            <button
-                                onClick={handleTrainingNameSave}
-                                className="text-purple-600 hover:text-purple-700 flex-shrink-0"
-                            >
-                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                                </svg>
-                            </button>
-                        </div>
-                    ) : (
-                        <button
-                            onClick={() => setIsEditingName(true)}
-                            className="text-lg sm:text-2xl font-bold text-purple-800 hover:text-purple-600 transition-colors break-words"
-                        >
-                            {currentTraining?.name || 'Training'}
-                        </button>
-                    )}
+                    <TrainingNameDropdown
+                        key={dropdownRefreshKey}
+                        trainingName={trainingName}
+                        onNameChange={handleTrainingNameChange}
+                        onNameSave={handleTrainingNameSave}
+                        onLoadPreset={handleLoadPreset}
+                        onLoadTraining={handleLoadTraining}
+                        onSaveAsPreset={() => setShowSavePresetModal(true)}
+                        user={user}
+                        trainingService={trainingServiceRef.current}
+                        exercises={currentTraining?.exercises || []}
+                    />
 
-                    {/* Auto-save Status Indicator */}
+                    {/* Auto-save Status Indicator - Moved to header */}
                     {user && !user.guest && (
-                        <div className="mt-2 flex items-center justify-center space-x-2">
-                            {autoSaveStatus === 'saving' && (
-                                <div className="flex items-center space-x-2 text-xs sm:text-sm text-purple-600">
-                                    <div className="w-3 h-3 sm:w-4 sm:h-4 border-2 border-purple-300 border-t-purple-600 rounded-full animate-spin"></div>
-                                    <span>Saving...</span>
-                                </div>
-                            )}
-                            {autoSaveStatus === 'saved' && (
-                                <div className="flex items-center space-x-2 text-xs sm:text-sm text-green-600">
-                                    <svg className="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                                    </svg>
-                                    <span>Saved</span>
-                                </div>
-                            )}
-                            {autoSaveStatus === 'error' && (
-                                <div className="flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-2 text-xs sm:text-sm text-red-600">
-                                    <div className="flex items-center space-x-2">
-                                        <svg className="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                        </svg>
-                                        <span>Save failed</span>
-                                    </div>
-                                    <button
-                                        onClick={() => handleManualSave()}
-                                        className="text-xs bg-red-100 hover:bg-red-200 text-red-700 px-2 py-1 rounded transition-colors"
-                                    >
-                                        Retry
-                                    </button>
-                                </div>
-                            )}
-                            {autoSaveStatus === 'idle' && (
-                                <div className="text-xs text-gray-500">
-                                    Auto-save enabled
-                                </div>
-                            )}
+                        <div className="mt-1 flex items-center justify-center space-x-2">
+                            {/* Status is now displayed in the header */}
                         </div>
                     )}
                 </div>
@@ -396,7 +632,7 @@ export default function TrainingTab({ user }: TrainingTabProps) {
                         <div className="w-16 h-16 sm:w-20 sm:h-20 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
                             <div className="w-6 h-6 sm:w-8 sm:h-8 border-4 border-purple-300 border-t-purple-600 rounded-full animate-spin"></div>
                         </div>
-                        <p className="text-purple-600 text-base sm:text-lg">Loading training data...</p>
+                        <p className="text-purple-600 text-base sm:text-lg">Loading workout data...</p>
                     </div>
                 ) : (
                     <>
@@ -440,6 +676,38 @@ export default function TrainingTab({ user }: TrainingTabProps) {
                     onClose={() => setShowAddExercise(false)}
                     onAdd={handleAddExercise}
                 />
+            )}
+
+            {/* Save as Preset Modal */}
+            {showSavePresetModal && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                    <div className="bg-white rounded-lg p-6 w-full max-w-md">
+                        <h3 className="text-lg font-semibold text-purple-800 mb-4">Save as Preset</h3>
+                        <input
+                            type="text"
+                            value={presetName}
+                            onChange={(e) => setPresetName(e.target.value)}
+                            placeholder="Enter preset name"
+                            className="w-full p-3 border border-purple-300 rounded-lg focus:border-purple-500 focus:outline-none mb-4"
+                            autoFocus
+                        />
+                        <div className="flex space-x-3">
+                            <button
+                                onClick={() => setShowSavePresetModal(false)}
+                                className="flex-1 px-4 py-2 text-purple-600 border border-purple-300 rounded-lg hover:bg-purple-50 transition-colors"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={handleSaveAsPreset}
+                                disabled={!presetName.trim()}
+                                className="flex-1 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                            >
+                                Save
+                            </button>
+                        </div>
+                    </div>
+                </div>
             )}
         </div>
     )

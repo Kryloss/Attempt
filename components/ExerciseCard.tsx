@@ -82,23 +82,23 @@ export default function ExerciseCard({ exercise, onDelete, onUpdate }: ExerciseC
                         onChange={(e) => setEditValue(e.target.value)}
                         onBlur={saveEdit}
                         onKeyDown={handleKeyPress}
-                        className="text-lg sm:text-2xl font-bold text-purple-600 bg-purple-50 border-2 border-purple-300 rounded-lg px-2 py-1 text-center w-16 sm:w-20 focus:outline-none focus:border-purple-500"
+                        className="text-base font-bold text-purple-600 bg-purple-50 border border-purple-300 rounded px-1 py-0.5 text-center w-12 focus:outline-none focus:border-purple-500"
                         autoFocus
                     />
-                    <div className="text-xs sm:text-sm text-purple-500 font-medium">{label}</div>
+                    <div className="text-xs text-purple-500 font-medium">{label}</div>
                 </div>
             )
         }
 
         return (
             <div
-                className="text-center cursor-pointer hover:bg-purple-50 rounded-lg p-2 transition-colors"
+                className="text-center cursor-pointer hover:bg-purple-50 rounded p-1 transition-colors"
                 onClick={() => startEditing(field, value)}
             >
-                <div className="text-lg sm:text-2xl font-bold text-purple-600">
+                <div className="text-base font-bold text-purple-600">
                     {field === 'weight' && value ? `${value}${unit || 'kg'}` : value || '-'}
                 </div>
-                <div className="text-xs sm:text-sm text-purple-500 font-medium">{label}</div>
+                <div className="text-xs text-purple-500 font-medium">{label}</div>
             </div>
         )
     }
@@ -106,14 +106,14 @@ export default function ExerciseCard({ exercise, onDelete, onUpdate }: ExerciseC
     const renderEditableNotes = () => {
         if (editingField === 'notes') {
             return (
-                <div className="bg-purple-50 rounded-lg p-3 border-2 border-purple-300">
+                <div className="bg-purple-50 rounded p-1 border border-purple-300">
                     <textarea
                         value={editValue}
                         onChange={(e) => setEditValue(e.target.value)}
                         onBlur={saveEdit}
                         onKeyDown={handleKeyPress}
-                        className="w-full text-sm text-purple-700 bg-transparent resize-none focus:outline-none"
-                        rows={2}
+                        className="w-full text-xs text-purple-700 bg-transparent resize-none focus:outline-none"
+                        rows={1}
                         placeholder="Add notes..."
                         autoFocus
                     />
@@ -123,53 +123,56 @@ export default function ExerciseCard({ exercise, onDelete, onUpdate }: ExerciseC
 
         return (
             <div
-                className="bg-purple-50 rounded-lg p-3 border border-purple-100 cursor-pointer hover:bg-purple-100 transition-colors"
+                className="bg-purple-50 rounded p-1 border border-purple-100 cursor-pointer hover:bg-purple-100 transition-colors"
                 onClick={() => startEditing('notes', exercise.notes || '')}
             >
                 {exercise.notes ? (
-                    <p className="text-sm text-purple-700">{exercise.notes}</p>
+                    <p className="text-xs text-purple-700">{exercise.notes}</p>
                 ) : (
-                    <p className="text-sm text-purple-400 italic">Tap to add notes...</p>
+                    <p className="text-xs text-purple-400 italic">Tap to add notes...</p>
                 )}
             </div>
         )
     }
 
     return (
-        <div className="bg-white border-2 border-purple-200 rounded-xl p-3 sm:p-4 shadow-md hover:shadow-lg transition-all duration-200 hover:border-purple-300 group">
+        <div className="bg-white border border-purple-200 rounded-lg p-1 shadow-sm hover:shadow-md transition-all duration-200 hover:border-purple-300 group">
             <div className="flex items-start justify-between">
                 <div className="flex-1 min-w-0">
-                    <h4 className="text-base sm:text-lg font-bold text-purple-800 mb-3 break-words">{exercise.name}</h4>
+                    <div className="px-2">
+                        <h4 className="text-xs font-bold text-purple-800 mb-0.5 break-words">{exercise.name}</h4>
+                    </div>
 
-                    <div className="grid grid-cols-3 gap-2 sm:gap-4 mb-3">
+                    <div className="grid grid-cols-3 gap-0.5 mb-0.5">
                         {renderEditableValue('sets', exercise.sets, 'Sets')}
                         {renderEditableValue('reps', exercise.reps, 'Reps')}
                         {renderEditableValue('weight', exercise.weight || 0, 'Weight', 'kg')}
                     </div>
 
-                    {renderEditableNotes()}
+                    <div className="px-2">
+                        {renderEditableNotes()}
+                    </div>
                 </div>
 
-                <div className="ml-2 sm:ml-4 flex flex-col items-end flex-shrink-0">
+                <div className="ml-1 flex flex-col items-end flex-shrink-0">
                     <button
                         onClick={() => setShowDeleteConfirm(true)}
                         className="perfect-circle circle-sm bg-red-100 hover:bg-red-200 text-red-600 flex items-center justify-center transition-colors opacity-0 group-hover:opacity-100"
                     >
-                        <svg className="w-3 h-3 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        <svg className="w-2 h-2 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1 1v3M4 7h16" />
                         </svg>
                     </button>
                 </div>
             </div>
 
             {/* Drag Handle */}
-            <div className="mt-3 pt-3 border-t border-purple-100 flex items-center justify-center">
-                <div className="flex space-x-1">
+            <div className="mt-0.5 pt-0.5 border-t border-purple-100 flex items-center justify-center">
+                <div className="flex space-x-1 py-0.5">
                     <div className="w-1 h-1 bg-purple-300 rounded-full"></div>
                     <div className="w-1 h-1 bg-purple-300 rounded-full"></div>
                     <div className="w-1 h-1 bg-purple-300 rounded-full"></div>
                 </div>
-                <span className="text-xs text-purple-400 ml-2">Drag to reorder</span>
             </div>
 
             {/* Delete Confirmation Modal */}

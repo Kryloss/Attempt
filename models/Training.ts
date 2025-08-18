@@ -18,6 +18,14 @@ export interface ITraining extends Document {
     updatedAt: Date;
 }
 
+export interface ITrainingPreset extends Document {
+    userId: mongoose.Types.ObjectId;
+    name: string;
+    exercises: IExercise[];
+    createdAt: Date;
+    updatedAt: Date;
+}
+
 const ExerciseSchema = new Schema({
     id: {
         type: String,
@@ -71,8 +79,29 @@ const TrainingSchema = new Schema({
     timestamps: true,
 });
 
+const TrainingPresetSchema = new Schema({
+    userId: {
+        type: Schema.Types.ObjectId,
+        ref: 'User',
+        required: true,
+        index: true,
+    },
+    name: {
+        type: String,
+        required: true,
+        trim: true,
+    },
+    exercises: [ExerciseSchema],
+}, {
+    timestamps: true,
+});
+
 // Compound index to ensure unique training per user per date
 TrainingSchema.index({ userId: 1, date: 1 }, { unique: true });
 
+// Index for training presets by user
+TrainingPresetSchema.index({ userId: 1, name: 1 }, { unique: true });
+
 // Prevent multiple model initialization in development
 export default mongoose.models.Training || mongoose.model<ITraining>('Training', TrainingSchema);
+export const TrainingPreset = mongoose.models.TrainingPreset || mongoose.model<ITrainingPreset>('TrainingPreset', TrainingPresetSchema);

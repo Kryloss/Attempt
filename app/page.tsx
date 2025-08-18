@@ -79,7 +79,7 @@ export default function Home() {
     }
 
     return (
-        <main className="min-h-screen relative overflow-hidden">
+        <main className="min-h-screen">
             {/* Enhanced background decorative elements */}
             <div className="absolute inset-0 overflow-hidden pointer-events-none">
                 <div className="absolute top-20 left-10 w-32 h-32 bg-purple-200 rounded-full opacity-20 animate-float"></div>
@@ -116,7 +116,7 @@ export default function Home() {
                     </div>
                 </div>
             ) : user ? (
-                // Full screen training dashboard
+                // Full screen workout dashboard
                 <TrainingDashboard user={user} onSignOut={handleSignOut} />
             ) : null}
         </main>

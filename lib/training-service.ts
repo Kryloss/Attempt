@@ -7,6 +7,12 @@ export interface TrainingData {
     date: string;
 }
 
+export interface TrainingPresetData {
+    id?: string;
+    name: string;
+    exercises: IExercise[];
+}
+
 export class TrainingService {
     private userId: string;
     private autoSaveTimeout: NodeJS.Timeout | null = null;
@@ -103,11 +109,122 @@ export class TrainingService {
         }
     }
 
+    // Save training as preset
+    async savePreset(preset: TrainingPresetData): Promise<void> {
+        try {
+            const response = await fetch('/api/training/save-preset', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-user-id': this.userId,
+                },
+                body: JSON.stringify({
+                    name: preset.name,
+                    exercises: preset.exercises,
+                }),
+            });
+
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.error || 'Failed to save preset');
+            }
+
+            const result = await response.json();
+            if (!result.success) {
+                throw new Error(result.error || 'Failed to save preset');
+            }
+        } catch (error) {
+            console.error('Error saving preset:', error);
+            throw error;
+        }
+    }
+
+    // Load all training presets for user
+    async loadPresets(): Promise<TrainingPresetData[]> {
+        try {
+            const response = await fetch(`/api/training/get-presets?userId=${this.userId}`);
+
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.error || 'Failed to load presets');
+            }
+
+            const result = await response.json();
+            if (!result.success) {
+                throw new Error(result.error || 'Failed to load presets');
+            }
+
+            return result.presets || [];
+        } catch (error) {
+            console.error('Error loading presets:', error);
+            throw error;
+        }
+    }
+
+    // Load training history (previous trainings)
+    async loadTrainingHistory(): Promise<TrainingData[]> {
+        try {
+            const response = await fetch(`/api/training/get-history?userId=${this.userId}`);
+
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.error || 'Failed to load training history');
+            }
+
+            const result = await response.json();
+            if (!result.success) {
+                throw new Error(result.error || 'Failed to load training history');
+            }
+
+            return result.trainings || [];
+        } catch (error) {
+            console.error('Error loading training history:', error);
+            throw error;
+        }
+    }
+
+    // Delete training preset
+    async deletePreset(presetId: string): Promise<void> {
+        try {
+            const response = await fetch('/api/training/delete-preset', {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-user-id': this.userId,
+                },
+                body: JSON.stringify({
+                    presetId: presetId,
+                }),
+            });
+
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.error || 'Failed to delete preset');
+            }
+
+            const result = await response.json();
+            if (!result.success) {
+                throw new Error(result.error || 'Failed to delete preset');
+            }
+        } catch (error) {
+            console.error('Error deleting preset:', error);
+            throw error;
+        }
+    }
+
     // Clear auto-save timeout (useful when component unmounts)
     clearAutoSaveTimeout(): void {
         if (this.autoSaveTimeout) {
             clearTimeout(this.autoSaveTimeout);
             this.autoSaveTimeout = null;
         }
+    }
+
+    // Method to notify that training data has been updated
+    // This can be used by components to refresh their data
+    notifyTrainingUpdate(): void {
+        // This method can be extended to implement a pub/sub system
+        // For now, it's a placeholder for future enhancements
+        console.log('Training data updated - components should refresh their data');
     }
 }
