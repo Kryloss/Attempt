@@ -91,21 +91,21 @@ export default function ForgotPasswordForm({ onBackToSignIn }: ForgotPasswordFor
     if (step === 'code') {
         return (
             <div className="w-full">
-                <h2 className="text-xl sm:text-2xl font-bold text-purple-800 mb-4 sm:mb-6 text-center">Reset Password</h2>
+                <h2 className="text-xl sm:text-2xl font-bold text-purple-800 mb-4 text-center">Reset Password</h2>
 
                 {success && (
-                    <div className="mb-4 p-3 bg-green-100 border border-green-400 text-green-700 rounded-lg text-sm">
+                    <div className="mb-3 p-2 bg-green-100 border border-green-400 text-green-700 rounded-lg text-sm">
                         {success}
                     </div>
                 )}
 
                 {error && (
-                    <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg text-sm">
+                    <div className="mb-3 p-2 bg-red-100 border border-red-400 text-red-700 rounded-lg text-sm">
                         {error}
                     </div>
                 )}
 
-                <form onSubmit={handleResetPassword} className="space-y-3 sm:space-y-4">
+                <form onSubmit={handleResetPassword} className="space-y-3">
                     <div>
                         <label htmlFor="code" className="block text-sm font-medium text-purple-700 mb-1">
                             Verification Code
@@ -163,7 +163,7 @@ export default function ForgotPasswordForm({ onBackToSignIn }: ForgotPasswordFor
                     </button>
                 </form>
 
-                <div className="mt-4 sm:mt-6 text-center">
+                <div className="mt-4 text-center">
                     <button
                         onClick={() => setStep('email')}
                         className="text-sm text-purple-600 hover:underline focus:outline-none"
@@ -177,19 +177,19 @@ export default function ForgotPasswordForm({ onBackToSignIn }: ForgotPasswordFor
 
     return (
         <div className="w-full">
-            <h2 className="text-xl sm:text-2xl font-bold text-purple-800 mb-4 sm:mb-6 text-center">Forgot Password</h2>
+            <h2 className="text-xl sm:text-2xl font-bold text-purple-800 mb-4 text-center">Forgot Password</h2>
 
-            <p className="text-xs sm:text-sm text-gray-600 mb-4 sm:mb-6 text-center">
+            <p className="text-xs sm:text-sm text-gray-600 mb-4 text-center">
                 Enter your email address and we'll send you a verification code to reset your password.
             </p>
 
             {error && (
-                <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg text-sm">
+                <div className="mb-3 p-2 bg-red-100 border border-red-400 text-red-700 rounded-lg text-sm">
                     {error}
                 </div>
             )}
 
-            <form onSubmit={handleSendCode} className="space-y-3 sm:space-y-4">
+            <form onSubmit={handleSendCode} className="space-y-3">
                 <div>
                     <label htmlFor="email" className="block text-sm font-medium text-purple-700 mb-1">
                         Email Address
@@ -214,7 +214,7 @@ export default function ForgotPasswordForm({ onBackToSignIn }: ForgotPasswordFor
                 </button>
             </form>
 
-            <div className="mt-4 sm:mt-6 text-center">
+            <div className="mt-4 text-center">
                 <button
                     onClick={onBackToSignIn}
                     className="text-sm text-purple-600 hover:underline focus:outline-none"

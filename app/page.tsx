@@ -110,7 +110,7 @@ export default function Home() {
                         </div>
 
                         {/* Main content card */}
-                        <div className="card p-6 sm:p-8 animate-glow card-hover">
+                        <div className="card p-4 sm:p-6 animate-glow card-hover">
                             <AuthContainer onSuccess={handleAuthSuccess} />
                         </div>
                     </div>

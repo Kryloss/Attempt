@@ -40,6 +40,17 @@ export default function TrainingTab({ user }: TrainingTabProps) {
     const [dropdownRefreshKey, setDropdownRefreshKey] = useState(0)
     const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
 
+    // Mobile drag and drop state
+    const [isDragging, setIsDragging] = useState(false)
+    const [dragStartY, setDragStartY] = useState(0)
+    const [dragStartIndex, setDragStartIndex] = useState(-1)
+    const [dragOverIndex, setDragOverIndex] = useState(-1)
+    const [touchStartTime, setTouchStartTime] = useState(0)
+    const [isLongPress, setIsLongPress] = useState(false)
+    const longPressTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+    const touchStartYRef = useRef(0)
+    const touchStartXRef = useRef(0)
+
     // Set preset name when modal opens
     useEffect(() => {
         if (showSavePresetModal && currentTraining) {
@@ -143,12 +154,18 @@ export default function TrainingTab({ user }: TrainingTabProps) {
         loadTrainingData()
     }, [currentDate, user])
 
-    // Cleanup auto-save timeout on unmount
+    // Cleanup auto-save timeout and long press timeout on unmount
     useEffect(() => {
         return () => {
             if (trainingServiceRef.current) {
                 trainingServiceRef.current.clearAutoSaveTimeout()
             }
+            if (longPressTimeoutRef.current) {
+                clearTimeout(longPressTimeoutRef.current)
+            }
+            // Restore body styles
+            document.body.style.overflow = ''
+            document.body.style.touchAction = ''
         }
     }, [])
 
@@ -456,6 +473,113 @@ export default function TrainingTab({ user }: TrainingTabProps) {
         }
     }
 
+    // Mobile-friendly drag and drop handlers
+    const handleTouchStart = (e: React.TouchEvent, exercise: Exercise, index: number) => {
+        const touch = e.touches[0]
+        touchStartYRef.current = touch.clientY
+        touchStartXRef.current = touch.clientX
+        setTouchStartTime(Date.now())
+        setDragStartIndex(index)
+
+        // Start long press timer for mobile drag
+        longPressTimeoutRef.current = setTimeout(() => {
+            setIsLongPress(true)
+            setIsDragging(true)
+            setDraggedExercise(exercise)
+            setDragStartY(touch.clientY)
+
+            // Prevent page scrolling during drag
+            document.body.style.overflow = 'hidden'
+            document.body.style.touchAction = 'none'
+
+            // Add haptic feedback for long press
+            if ('vibrate' in navigator) {
+                navigator.vibrate(50)
+            }
+        }, 300) // 300ms delay for long press
+    }
+
+    const handleTouchMove = (e: React.TouchEvent) => {
+        if (!isDragging || !draggedExercise) return
+
+        e.preventDefault() // Prevent page scrolling
+        const touch = e.touches[0]
+        const currentY = touch.clientY
+
+        // Find the element under the touch point
+        const elementBelow = document.elementFromPoint(touch.clientX, touch.clientY)
+        if (elementBelow) {
+            const exerciseElement = elementBelow.closest('[data-exercise-index]')
+            if (exerciseElement) {
+                const targetIndex = parseInt(exerciseElement.getAttribute('data-exercise-index') || '0')
+                if (targetIndex !== dragOverIndex && targetIndex !== dragStartIndex) {
+                    setDragOverIndex(targetIndex)
+                }
+            }
+        }
+
+        // Add haptic feedback on mobile (if supported)
+        if ('vibrate' in navigator && dragOverIndex !== -1) {
+            navigator.vibrate(10)
+        }
+    }
+
+    const handleTouchEnd = (e: React.TouchEvent) => {
+        // Clear long press timer
+        if (longPressTimeoutRef.current) {
+            clearTimeout(longPressTimeoutRef.current)
+            longPressTimeoutRef.current = null
+        }
+
+        // If we were dragging, handle the drop
+        if (isDragging && draggedExercise && currentTraining && dragOverIndex !== -1) {
+            const exercises = [...currentTraining.exercises]
+            const draggedIndex = exercises.findIndex(ex => ex.id === draggedExercise.id)
+
+            if (draggedIndex !== -1 && draggedIndex !== dragOverIndex) {
+                exercises.splice(draggedIndex, 1)
+                exercises.splice(dragOverIndex, 0, draggedExercise)
+
+                setCurrentTraining({
+                    ...currentTraining,
+                    exercises
+                })
+                setHasUnsavedChanges(true)
+            }
+        }
+
+        // Reset drag state
+        setIsDragging(false)
+        setIsLongPress(false)
+        setDraggedExercise(null)
+        setDragStartIndex(-1)
+        setDragOverIndex(-1)
+
+        // Restore page scrolling
+        document.body.style.overflow = ''
+        document.body.style.touchAction = ''
+    }
+
+    const handleTouchCancel = () => {
+        // Clear long press timer
+        if (longPressTimeoutRef.current) {
+            clearTimeout(longPressTimeoutRef.current)
+            longPressTimeoutRef.current = null
+        }
+
+        // Reset drag state
+        setIsDragging(false)
+        setIsLongPress(false)
+        setDraggedExercise(null)
+        setDragStartIndex(-1)
+        setDragOverIndex(-1)
+
+        // Restore page scrolling
+        document.body.style.overflow = ''
+        document.body.style.touchAction = ''
+    }
+
+    // Desktop drag and drop handlers (fallback)
     const handleDragStart = (exercise: Exercise) => {
         setDraggedExercise(exercise)
     }
@@ -613,18 +737,27 @@ export default function TrainingTab({ user }: TrainingTabProps) {
             <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-lg border border-purple-100">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 sm:mb-6 space-y-3 sm:space-y-0">
                     <h3 className="text-lg sm:text-xl font-bold text-purple-800">Exercises</h3>
-                    <button
-                        onClick={() => setShowAddExercise(true)}
-                        disabled={isLoading}
-                        className="w-full sm:w-auto bg-gradient-to-r from-purple-500 to-purple-600 text-white px-4 sm:px-6 py-2 sm:py-2 rounded-lg hover:from-purple-600 hover:to-purple-700 transition-all duration-200 transform hover:scale-105 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
-                    >
-                        <span className="flex items-center justify-center sm:justify-start space-x-2">
-                            <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                            </svg>
-                            <span>Add Exercise</span>
-                        </span>
-                    </button>
+                    <div className="flex items-center space-x-3">
+                        {/* Mobile drag instruction */}
+                        <div className="hidden sm:block text-xs text-purple-500 font-medium">
+                            Drag to reorder
+                        </div>
+                        <div className="sm:hidden text-xs text-purple-500 font-medium">
+                            Long press to drag
+                        </div>
+                        <button
+                            onClick={() => setShowAddExercise(true)}
+                            disabled={isLoading}
+                            className="w-full sm:w-auto bg-gradient-to-r from-purple-500 to-purple-600 text-white px-4 sm:px-6 py-2 sm:py-2 rounded-lg hover:from-purple-600 hover:to-purple-700 transition-all duration-200 transform hover:scale-105 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
+                        >
+                            <span className="flex items-center justify-center sm:justify-start space-x-2">
+                                <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                                </svg>
+                                <span>Add Exercise</span>
+                            </span>
+                        </button>
+                    </div>
                 </div>
 
                 {isLoading ? (
@@ -655,34 +788,25 @@ export default function TrainingTab({ user }: TrainingTabProps) {
                                         onDragStart={(e) => handleDragStart(exercise)}
                                         onDragOver={(e) => handleDragOver(e, index)}
                                         onDrop={(e) => handleDrop(e, index)}
-                                        onTouchStart={(e) => {
-                                            // Prevent default to avoid conflicts
-                                            e.preventDefault();
-                                            handleDragStart(exercise);
-                                        }}
-                                        onTouchMove={(e) => {
-                                            e.preventDefault();
-                                            // Handle touch move for mobile drag
-                                            const touch = e.touches[0];
-                                            if (touch) {
-                                                const elementBelow = document.elementFromPoint(touch.clientX, touch.clientY);
-                                                if (elementBelow) {
-                                                    const exerciseElement = elementBelow.closest('[data-exercise-index]');
-                                                    if (exerciseElement) {
-                                                        const targetIndex = parseInt(exerciseElement.getAttribute('data-exercise-index') || '0');
-                                                        if (targetIndex !== index) {
-                                                            handleDrop(e as any, targetIndex);
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }}
-                                        onTouchEnd={(e) => {
-                                            e.preventDefault();
-                                            setDraggedExercise(null);
-                                        }}
+                                        onTouchStart={(e) => handleTouchStart(e, exercise, index)}
+                                        onTouchMove={handleTouchMove}
+                                        onTouchEnd={handleTouchEnd}
+                                        onTouchCancel={handleTouchCancel}
                                         data-exercise-index={index}
-                                        className="cursor-move touch-manipulation"
+                                        className={`cursor-move touch-manipulation drag-transition ${isDragging && dragStartIndex === index
+                                                ? 'opacity-50 scale-95 shadow-2xl z-50 dragging'
+                                                : ''
+                                            } ${dragOverIndex === index && isDragging && dragStartIndex !== index
+                                                ? 'border-2 border-purple-400 border-dashed bg-purple-50'
+                                                : ''
+                                            } ${isLongPress && dragStartIndex === index && !isDragging
+                                                ? 'ring-2 ring-purple-400 ring-opacity-50'
+                                                : ''
+                                            }`}
+                                        style={{
+                                            transform: isDragging && dragStartIndex === index ? 'rotate(2deg)' : 'none',
+                                            zIndex: isDragging && dragStartIndex === index ? 1000 : 'auto'
+                                        }}
                                     >
                                         <ExerciseCard
                                             exercise={exercise}
@@ -733,6 +857,28 @@ export default function TrainingTab({ user }: TrainingTabProps) {
                                 Save
                             </button>
                         </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Mobile Drag Mode Indicator */}
+            {isLongPress && !isDragging && (
+                <div className="fixed top-20 left-1/2 transform -translate-x-1/2 bg-purple-600 text-white px-4 py-2 rounded-full shadow-lg z-50 animate-pulse">
+                    <div className="flex items-center space-x-2">
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
+                        </svg>
+                        <span className="text-sm font-medium">Drag mode active</span>
+                    </div>
+                </div>
+            )}
+
+            {/* Drag Preview Overlay */}
+            {isDragging && draggedExercise && (
+                <div className="fixed inset-0 pointer-events-none z-40">
+                    <div className="absolute top-4 right-4 bg-purple-600 text-white px-3 py-2 rounded-lg shadow-lg">
+                        <div className="text-sm font-medium">Dragging: {draggedExercise.name}</div>
+                        <div className="text-xs opacity-75">Drop to reorder</div>
                     </div>
                 </div>
             )}

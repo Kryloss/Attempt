@@ -56,15 +56,15 @@ export default function SignInForm({ onSuccess, onSwitchToSignUp, onSwitchToForg
 
     return (
         <div className="w-full">
-            <h2 className="text-2xl font-bold text-purple-800 mb-6 text-center">Sign In</h2>
+            <h2 className="text-xl sm:text-2xl font-bold text-purple-800 mb-4 text-center">Sign In</h2>
 
             {error && (
-                <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg text-sm">
+                <div className="mb-3 p-2 bg-red-100 border border-red-400 text-red-700 rounded-lg text-sm">
                     {error}
                 </div>
             )}
 
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-3">
                 <div>
                     <label htmlFor="emailOrUsername" className="block text-sm font-medium text-purple-700 mb-1">
                         Email or Username
@@ -95,7 +95,7 @@ export default function SignInForm({ onSuccess, onSwitchToSignUp, onSwitchToForg
                         className="w-full px-3 py-2 border border-purple-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                         placeholder="Enter password"
                     />
-                    <div className="mt-2 text-right">
+                    <div className="mt-1 text-right">
                         <button
                             type="button"
                             onClick={() => onSwitchToForgotPassword()}
@@ -115,7 +115,7 @@ export default function SignInForm({ onSuccess, onSwitchToSignUp, onSwitchToForg
                 </button>
             </form>
 
-            <div className="mt-6 text-center">
+            <div className="mt-4 text-center">
                 <p className="text-sm text-purple-600">
                     Don't have an account?{' '}
                     <button
@@ -126,7 +126,7 @@ export default function SignInForm({ onSuccess, onSwitchToSignUp, onSwitchToForg
                     </button>
                 </p>
 
-                <div className="mt-4 pt-4 border-t border-purple-200">
+                <div className="mt-3 pt-3 border-t border-purple-200">
                     <button
                         onClick={onGuestMode}
                         className="w-full bg-gray-100 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors border border-gray-300"
