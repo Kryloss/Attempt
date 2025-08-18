@@ -168,10 +168,20 @@ export default function ExerciseCard({ exercise, onDelete, onUpdate }: ExerciseC
 
             {/* Drag Handle */}
             <div
-                className="mt-0.5 pt-0.5 border-t border-purple-100 flex items-center justify-center touch-manipulation"
-                onTouchStart={(e) => e.stopPropagation()}
-                onTouchMove={(e) => e.stopPropagation()}
-                onTouchEnd={(e) => e.stopPropagation()}
+                className="mt-0.5 pt-0.5 border-t border-purple-100 flex items-center justify-center touch-manipulation select-none"
+                onTouchStart={(e) => {
+                    e.preventDefault()
+                    e.stopPropagation()
+                }}
+                onTouchMove={(e) => {
+                    e.preventDefault()
+                    e.stopPropagation()
+                }}
+                onTouchEnd={(e) => {
+                    e.preventDefault()
+                    e.stopPropagation()
+                }}
+                onContextMenu={(e) => e.preventDefault()}
             >
                 <div className="flex space-x-1 py-0.5">
                     <div className="w-1 h-1 bg-purple-300 rounded-full"></div>
