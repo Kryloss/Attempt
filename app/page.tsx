@@ -63,9 +63,9 @@ export default function Home() {
 
                 <div className="text-center relative z-10">
                     <div className="icon-container mx-auto mb-6 animate-float glow-purple">
-                        <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
+                        <div className="w-16 h-16 bg-purple-600 rounded-full flex items-center justify-center">
+                            <img src="/favicon.svg" alt="gymNote Logo" className="w-10 h-10" />
+                        </div>
                     </div>
                     <h1 className="text-4xl sm:text-5xl font-bold text-purple-800 mb-4 font-display gradient-text">
                         gymNote
@@ -95,6 +95,20 @@ export default function Home() {
                 // Centered auth container
                 <div className="flex items-center justify-center min-h-screen">
                     <div className="max-w-sm sm:max-w-md mx-auto w-full relative z-10 px-3 sm:px-4">
+                        {/* App Name Header */}
+                        <div className="text-center mb-6">
+                            {/* Fitness Logo */}
+                            <div className="flex justify-center mb-4">
+                                <div className="w-16 h-16 bg-purple-600 rounded-full flex items-center justify-center shadow-lg">
+                                    <img src="/favicon.svg" alt="gymNote Logo" className="w-10 h-10" />
+                                </div>
+                            </div>
+                            <h1 className="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-purple-600 to-purple-800 bg-clip-text text-transparent mb-2 leading-tight pb-1">
+                                gymNote
+                            </h1>
+                            <p className="text-gray-600 text-sm">Your personal fitness companion</p>
+                        </div>
+
                         {/* Main content card */}
                         <div className="card p-6 sm:p-8 animate-glow card-hover">
                             <AuthContainer onSuccess={handleAuthSuccess} />

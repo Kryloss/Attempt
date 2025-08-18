@@ -273,9 +273,9 @@ export default function TrainingTab({ user }: TrainingTabProps) {
                 <div className="flex items-center justify-between mb-4">
                     <button
                         onClick={() => navigateDate('prev')}
-                        className="w-8 h-8 sm:w-10 sm:h-10 bg-purple-100 hover:bg-purple-200 rounded-full flex items-center justify-center transition-colors flex-shrink-0"
+                        className="perfect-circle circle-md bg-purple-100 hover:bg-purple-200 flex items-center justify-center transition-colors"
                     >
-                        <svg className="w-4 h-4 sm:w-5 sm:h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                         </svg>
                     </button>
@@ -291,9 +291,9 @@ export default function TrainingTab({ user }: TrainingTabProps) {
 
                     <button
                         onClick={() => navigateDate('next')}
-                        className="w-8 h-8 sm:w-10 sm:h-10 bg-purple-100 hover:bg-purple-200 rounded-full flex items-center justify-center transition-colors flex-shrink-0"
+                        className="perfect-circle circle-md bg-purple-100 hover:bg-purple-200 flex items-center justify-center transition-colors"
                     >
-                        <svg className="w-4 h-4 sm:w-5 sm:h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                         </svg>
                     </button>

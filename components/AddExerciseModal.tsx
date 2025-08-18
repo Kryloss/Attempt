@@ -45,9 +45,9 @@ export default function AddExerciseModal({ onClose, onAdd }: AddExerciseModalPro
                     <h3 className="text-base sm:text-lg font-bold text-purple-800">Add New Exercise</h3>
                     <button
                         onClick={onClose}
-                        className="w-7 h-7 sm:w-8 sm:h-8 bg-purple-100 hover:bg-purple-200 text-purple-600 rounded-full flex items-center justify-center transition-colors flex-shrink-0"
+                        className="perfect-circle circle-md bg-purple-100 hover:bg-purple-200 text-purple-600 flex items-center justify-center transition-colors"
                     >
-                        <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                         </svg>
                     </button>

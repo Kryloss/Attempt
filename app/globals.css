@@ -224,4 +224,110 @@
     .modal-content-mobile {
         @apply bg-white rounded-2xl p-4 sm:p-6 w-full max-w-sm sm:max-w-md mx-4 shadow-2xl max-h-[90vh] overflow-y-auto;
     }
+
+    /* Prevent scaling of circular buttons and icons */
+    .icon-button {
+        @apply flex-shrink-0 transform-none;
+    }
+
+    .icon-button svg {
+        @apply flex-shrink-0;
+    }
+
+    /* Ensure consistent circular button sizes */
+    .circular-button {
+        @apply flex-shrink-0 transform-none;
+        transform: none !important;
+    }
+
+    .circular-button:hover {
+        transform: none !important;
+    }
+
+    /* Prevent any scaling on circular elements */
+    .no-scale {
+        transform: none !important;
+        transform-origin: center !important;
+    }
+
+    .no-scale:hover {
+        transform: none !important;
+    }
+
+    /* Ensure perfect circles - prevent ovals */
+    .perfect-circle {
+        aspect-ratio: 1 / 1 !important;
+        width: var(--circle-size, 32px) !important;
+        height: var(--circle-size, 32px) !important;
+        min-width: var(--circle-size, 32px) !important;
+        min-height: var(--circle-size, 32px) !important;
+        max-width: var(--circle-size, 32px) !important;
+        max-height: var(--circle-size, 32px) !important;
+        border-radius: 50% !important;
+        flex-shrink: 0 !important;
+        flex-grow: 0 !important;
+    }
+
+    /* Circle size variants */
+    .circle-sm {
+        --circle-size: 24px;
+    }
+
+    .circle-md {
+        --circle-size: 32px;
+    }
+
+    .circle-lg {
+        --circle-size: 40px;
+    }
+
+    .circle-xl {
+        --circle-size: 48px;
+    }
+
+    /* Force circular buttons to maintain shape */
+    button[class*="rounded-full"] {
+        aspect-ratio: 1 / 1 !important;
+        flex-shrink: 0 !important;
+        flex-grow: 0 !important;
+    }
+
+    /* Ensure icons inside circles are centered and don't stretch */
+    .perfect-circle svg,
+    button[class*="rounded-full"] svg {
+        width: 60% !important;
+        height: 60% !important;
+        max-width: 60% !important;
+        max-height: 60% !important;
+        flex-shrink: 0 !important;
+    }
+
+    /* Icon size variants for different circle sizes */
+    .circle-sm svg {
+        width: 50% !important;
+        height: 50% !important;
+        max-width: 50% !important;
+        max-height: 50% !important;
+    }
+
+    .circle-md svg {
+        width: 60% !important;
+        height: 60% !important;
+        max-width: 60% !important;
+        max-height: 60% !important;
+    }
+
+    .circle-lg svg {
+        width: 65% !important;
+        height: 65% !important;
+        max-width: 65% !important;
+        max-height: 65% !important;
+    }
+
+    .circle-xl svg {
+        width: 70% !important;
+        height: 70% !important;
+        max-width: 70% !important;
+        max-height: 70% !important;
+    }
 }
