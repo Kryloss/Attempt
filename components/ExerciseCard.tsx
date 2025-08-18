@@ -82,10 +82,10 @@ export default function ExerciseCard({ exercise, onDelete, onUpdate }: ExerciseC
                         onChange={(e) => setEditValue(e.target.value)}
                         onBlur={saveEdit}
                         onKeyDown={handleKeyPress}
-                        className="text-base font-bold text-purple-600 bg-purple-50 border border-purple-300 rounded px-1 py-0.5 text-center w-12 focus:outline-none focus:border-purple-500"
+                        className="text-lg font-bold text-purple-600 bg-purple-50 border border-purple-300 rounded px-1 py-0.5 text-center w-12 focus:outline-none focus:border-purple-500"
                         autoFocus
                     />
-                    <div className="text-xs text-purple-500 font-medium">{label}</div>
+                    <div className="text-sm text-purple-500 font-medium">{label}</div>
                 </div>
             )
         }
@@ -95,10 +95,10 @@ export default function ExerciseCard({ exercise, onDelete, onUpdate }: ExerciseC
                 className="text-center cursor-pointer hover:bg-purple-50 rounded p-1 transition-colors"
                 onClick={() => startEditing(field, value)}
             >
-                <div className="text-base font-bold text-purple-600">
+                <div className="text-lg font-bold text-purple-600">
                     {field === 'weight' && value ? `${value}${unit || 'kg'}` : value || '-'}
                 </div>
-                <div className="text-xs text-purple-500 font-medium">{label}</div>
+                <div className="text-sm text-purple-500 font-medium">{label}</div>
             </div>
         )
     }
@@ -112,7 +112,7 @@ export default function ExerciseCard({ exercise, onDelete, onUpdate }: ExerciseC
                         onChange={(e) => setEditValue(e.target.value)}
                         onBlur={saveEdit}
                         onKeyDown={handleKeyPress}
-                        className="w-full text-xs text-purple-700 bg-transparent resize-none focus:outline-none"
+                        className="w-full text-sm text-purple-700 bg-transparent resize-none focus:outline-none"
                         rows={1}
                         placeholder="Add notes..."
                         autoFocus
@@ -127,9 +127,9 @@ export default function ExerciseCard({ exercise, onDelete, onUpdate }: ExerciseC
                 onClick={() => startEditing('notes', exercise.notes || '')}
             >
                 {exercise.notes ? (
-                    <p className="text-xs text-purple-700">{exercise.notes}</p>
+                    <p className="text-sm text-purple-700">{exercise.notes}</p>
                 ) : (
-                    <p className="text-xs text-purple-400 italic">Tap to add notes...</p>
+                    <p className="text-sm text-purple-400 italic">Tap to add notes...</p>
                 )}
             </div>
         )
@@ -140,7 +140,7 @@ export default function ExerciseCard({ exercise, onDelete, onUpdate }: ExerciseC
             <div className="flex items-start justify-between">
                 <div className="flex-1 min-w-0">
                     <div className="px-2">
-                        <h4 className="text-xs font-bold text-purple-800 mb-0.5 break-words">{exercise.name}</h4>
+                        <h4 className="text-sm font-bold text-purple-800 mb-0.5 break-words">{exercise.name}</h4>
                     </div>
 
                     <div className="grid grid-cols-3 gap-0.5 mb-0.5">
