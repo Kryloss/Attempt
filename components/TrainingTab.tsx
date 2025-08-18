@@ -475,23 +475,23 @@ export default function TrainingTab({ user }: TrainingTabProps) {
 
     // Mobile-friendly drag and drop handlers
     const handleTouchStart = (e: React.TouchEvent, exercise: Exercise, index: number) => {
+        e.preventDefault()
         const touch = e.touches[0]
         touchStartYRef.current = touch.clientY
         touchStartXRef.current = touch.clientX
         setTouchStartTime(Date.now())
         setDragStartIndex(index)
 
+        // Prevent scrolling immediately when touching the exercise
+        document.body.style.overflow = 'hidden'
+        document.body.style.touchAction = 'none'
+
         // Start long press timer for mobile drag
         longPressTimeoutRef.current = setTimeout(() => {
-            e.preventDefault() // Prevent scrolling only after long press
             setIsLongPress(true)
             setIsDragging(true)
             setDraggedExercise(exercise)
             setDragStartY(touch.clientY)
-
-            // Prevent scrolling when drag starts
-            document.body.style.overflow = 'hidden'
-            document.body.style.touchAction = 'none'
 
             // Add haptic feedback for long press
             if ('vibrate' in navigator) {
@@ -786,14 +786,13 @@ export default function TrainingTab({ user }: TrainingTabProps) {
                                         onTouchMove={handleTouchMove}
                                         onTouchEnd={handleTouchEnd}
                                         onTouchCancel={handleTouchCancel}
-                                        onTouchStartCapture={(e) => {
-                                            // Only prevent default if we're already in drag mode
-                                            if (isDragging || isLongPress) {
-                                                e.preventDefault()
-                                            }
-                                        }}
                                         onContextMenu={(e) => e.preventDefault()}
-
+                                        onTouchStartCapture={(e) => {
+                                            // Immediately prevent scrolling when touching the exercise area
+                                            e.preventDefault()
+                                            document.body.style.overflow = 'hidden'
+                                            document.body.style.touchAction = 'none'
+                                        }}
                                         data-exercise-index={index}
                                         className={`cursor-move touch-manipulation drag-transition select-none ${isDragging && dragStartIndex === index
                                             ? 'opacity-50 scale-95 shadow-2xl z-50 dragging'

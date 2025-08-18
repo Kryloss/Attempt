@@ -183,10 +183,10 @@ export default function ExerciseCard({ exercise, onDelete, onUpdate }: ExerciseC
                 }}
                 onContextMenu={(e) => e.preventDefault()}
             >
-                <div className="flex space-x-1 py-0.5">
-                    <div className="w-1 h-1 bg-purple-300 rounded-full"></div>
-                    <div className="w-1 h-1 bg-purple-300 rounded-full"></div>
-                    <div className="w-1 h-1 bg-purple-300 rounded-full"></div>
+                <div className="flex space-x-1.5 py-1">
+                    <div className="w-2 h-2 bg-purple-300 rounded-full"></div>
+                    <div className="w-2 h-2 bg-purple-300 rounded-full"></div>
+                    <div className="w-2 h-2 bg-purple-300 rounded-full"></div>
                 </div>
             </div>
 
