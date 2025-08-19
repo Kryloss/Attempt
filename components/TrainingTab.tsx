@@ -39,12 +39,16 @@ export default function TrainingTab({ user }: TrainingTabProps) {
     const [presetName, setPresetName] = useState('')
     const [dropdownRefreshKey, setDropdownRefreshKey] = useState(0)
     const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
+    const [showCalendar, setShowCalendar] = useState(false)
+    const [calendarMonth, setCalendarMonth] = useState(new Date())
+    const [workoutDates, setWorkoutDates] = useState<Set<string>>(new Set())
 
     // Date switching delay state
     const [isDateSwitchBlocked, setIsDateSwitchBlocked] = useState(false)
     const [dateSwitchDelay, setDateSwitchDelay] = useState(0)
     const dateSwitchTimeoutRef = useRef<NodeJS.Timeout | null>(null)
     const dateSwitchStartTimeRef = useRef<number>(0)
+    const calendarRef = useRef<HTMLDivElement>(null)
 
     // Mobile drag and drop state
     const [isDragging, setIsDragging] = useState(false)
@@ -443,6 +447,9 @@ export default function TrainingTab({ user }: TrainingTabProps) {
             setCurrentTraining(updatedTraining)
             setTrainingName(preset.name)
 
+            // Update workout dates for calendar
+            updateWorkoutDates(currentTraining.date, preset.exercises.length > 0)
+
             // Auto-save the new training to persist it
             if (user && !user.guest && trainingServiceRef.current) {
                 try {
@@ -491,6 +498,9 @@ export default function TrainingTab({ user }: TrainingTabProps) {
 
             setCurrentTraining(updatedTraining)
             setTrainingName(currentTrainingData.name)
+
+            // Update workout dates for calendar
+            updateWorkoutDates(currentTraining.date, currentTrainingData.exercises.length > 0)
 
             // Auto-save the updated training to persist it
             if (user && !user.guest && trainingServiceRef.current) {
@@ -571,16 +581,25 @@ export default function TrainingTab({ user }: TrainingTabProps) {
             })
             setHasUnsavedChanges(true)
             setShowAddExercise(false)
+
+            // Update workout dates for calendar
+            if (currentTraining.exercises.length === 0) {
+                updateWorkoutDates(currentTraining.date, true)
+            }
         }
     }
 
     const handleDeleteExercise = (exerciseId: string) => {
         if (currentTraining) {
+            const newExercises = currentTraining.exercises.filter(ex => ex.id !== exerciseId)
             setCurrentTraining({
                 ...currentTraining,
-                exercises: currentTraining.exercises.filter(ex => ex.id !== exerciseId)
+                exercises: newExercises
             })
             setHasUnsavedChanges(true)
+
+            // Update workout dates for calendar
+            updateWorkoutDates(currentTraining.date, newExercises.length > 0)
         }
     }
 
@@ -802,11 +821,145 @@ export default function TrainingTab({ user }: TrainingTabProps) {
         return date.toDateString() === tomorrow.toDateString()
     }
 
+    const getRelativeDayLabel = () => {
+        if (isYesterday(currentDate)) return 'Yesterday'
+        if (isToday(currentDate)) return 'Today'
+        if (isTomorrow(currentDate)) return 'Tomorrow'
+        return ''
+    }
+
+    const handleDateClick = () => {
+        setShowCalendar(!showCalendar)
+    }
+
+    const handleDateSelect = (date: Date) => {
+        setCurrentDate(date)
+        // Keep calendar open for easier navigation
+    }
+
+    const updateWorkoutDates = (date: string, hasWorkout: boolean) => {
+        setWorkoutDates(prev => {
+            const newSet = new Set(prev)
+            if (hasWorkout) {
+                newSet.add(date)
+            } else {
+                newSet.delete(date)
+            }
+            return newSet
+        })
+    }
+
+    const generateCalendarDays = () => {
+        const year = calendarMonth.getFullYear()
+        const month = calendarMonth.getMonth()
+        const firstDay = new Date(year, month, 1)
+        const lastDay = new Date(year, month + 1, 0)
+        const startDate = new Date(firstDay)
+        startDate.setDate(startDate.getDate() - firstDay.getDay())
+
+        const days = []
+        for (let i = 0; i < 42; i++) {
+            const date = new Date(startDate)
+            date.setDate(startDate.getDate() + i)
+            days.push(date)
+        }
+        return days
+    }
+
+    const getMonthName = (date: Date) => {
+        return date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
+    }
+
+    const isSameDay = (date1: Date, date2: Date) => {
+        return date1.toDateString() === date2.toDateString()
+    }
+
+    const isCurrentMonth = (date: Date) => {
+        return date.getMonth() === calendarMonth.getMonth()
+    }
+
+    const hasWorkoutOnDate = (date: Date) => {
+        const year = date.getFullYear()
+        const month = String(date.getMonth() + 1).padStart(2, '0')
+        const day = String(date.getDate()).padStart(2, '0')
+        const dateString = `${year}-${month}-${day}`
+
+        // Check if this date has workouts
+        return workoutDates.has(dateString)
+    }
+
+    const navigateCalendarMonth = (direction: 'prev' | 'next') => {
+        const newMonth = new Date(calendarMonth)
+        if (direction === 'prev') {
+            newMonth.setMonth(newMonth.getMonth() - 1)
+        } else {
+            newMonth.setMonth(newMonth.getMonth() + 1)
+        }
+        setCalendarMonth(newMonth)
+    }
+
+    // Close calendar when clicking outside
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (calendarRef.current && !calendarRef.current.contains(event.target as Node)) {
+                setShowCalendar(false)
+            }
+        }
+
+        if (showCalendar) {
+            document.addEventListener('mousedown', handleClickOutside)
+        }
+
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside)
+        }
+    }, [showCalendar])
+
+    // Sync calendar month with current date
+    useEffect(() => {
+        setCalendarMonth(currentDate)
+    }, [currentDate])
+
+    // Load workout dates for calendar indicators
+    useEffect(() => {
+        const loadWorkoutDates = async () => {
+            const dates = new Set<string>()
+
+            if (!user || user.guest) {
+                // For guest users, check localStorage
+                for (let i = 0; i < localStorage.length; i++) {
+                    const key = localStorage.key(i)
+                    if (key && key.startsWith('training_')) {
+                        const dateString = key.replace('training_', '')
+                        try {
+                            const training = JSON.parse(localStorage.getItem(key) || '{}')
+                            if (training.exercises && training.exercises.length > 0) {
+                                dates.add(dateString)
+                            }
+                        } catch (e) {
+                            // Skip invalid entries
+                        }
+                    }
+                }
+            } else if (trainingServiceRef.current) {
+                // For logged-in users, we could fetch workout dates from the database
+                // For now, we'll just add the current training date if it has exercises
+                if (currentTraining && currentTraining.exercises.length > 0) {
+                    dates.add(currentTraining.date)
+                }
+            }
+
+            setWorkoutDates(dates)
+        }
+
+        loadWorkoutDates()
+    }, [user, currentTraining])
+
     return (
         <div className="space-y-2 sm:space-y-3">
             {/* Date Navigation */}
-            <div className="bg-white rounded-2xl p-2 sm:p-3 shadow-lg border border-purple-100">
-                <div className="flex items-center justify-between mb-1">
+            <div className="bg-white rounded-2xl p-1 sm:p-2 shadow-lg border border-purple-100">
+                <div className="flex items-center justify-between mb-0">
                     <button
                         onClick={() => navigateDate('prev')}
                         disabled={isDateSwitchBlocked}
@@ -827,17 +980,88 @@ export default function TrainingTab({ user }: TrainingTabProps) {
                     </button>
 
                     <div className="text-center flex-1 px-2 relative">
-                        <h2 className={`text-sm sm:text-base font-bold ${isToday(currentDate) ? 'text-purple-600/70' : 'text-purple-800/60'}`}>
-                            {formatDate(currentDate)}
-                        </h2>
-                        {isToday(currentDate) && (
-                            <span className="absolute top-full left-1/2 transform -translate-x-1/2 text-xs text-purple-500 font-medium">Today</span>
+                        <button
+                            onClick={handleDateClick}
+                            className="hover:bg-purple-50 rounded-lg px-2 py-0.5 transition-colors cursor-pointer group"
+                        >
+                            <div className="flex items-center justify-center space-x-1">
+                                <h2 className={`text-sm sm:text-base font-bold ${isToday(currentDate) ? 'text-purple-600/70' : 'text-purple-800/60'}`}>
+                                    {formatDate(currentDate)}
+                                </h2>
+                                <svg className="w-4 h-4 text-purple-400 group-hover:text-purple-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                </svg>
+                            </div>
+
+                        </button>
+
+                        {getRelativeDayLabel() && (
+                            <div className="absolute left-1/2 -translate-x-1/2 top-full -translate-y-2 text-[10px] sm:text-xs font-medium text-purple-500 pointer-events-none z-20 whitespace-nowrap">
+                                {getRelativeDayLabel()}
+                            </div>
                         )}
-                        {isYesterday(currentDate) && (
-                            <span className="absolute top-full left-1/2 transform -translate-x-1/2 text-xs text-purple-500 font-medium">Yesterday</span>
-                        )}
-                        {isTomorrow(currentDate) && (
-                            <span className="absolute top-full left-1/2 transform -translate-x-1/2 text-xs text-purple-500 font-medium">Tomorrow</span>
+
+                        {/* Calendar Popup */}
+                        {showCalendar && (
+                            <div
+                                ref={calendarRef}
+                                className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 z-50 bg-white rounded-lg shadow-xl border border-purple-200 p-4 min-w-[280px]"
+                            >
+                                <div className="flex items-center justify-center mb-3">
+                                    <div className="flex items-center space-x-2">
+                                        <button
+                                            onClick={() => navigateCalendarMonth('prev')}
+                                            className="p-1 hover:bg-purple-50 rounded transition-colors"
+                                        >
+                                            <svg className="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                                            </svg>
+                                        </button>
+                                        <h3 className="text-sm font-semibold text-purple-800">{getMonthName(calendarMonth)}</h3>
+                                        <button
+                                            onClick={() => navigateCalendarMonth('next')}
+                                            className="p-1 hover:bg-purple-50 rounded transition-colors"
+                                        >
+                                            <svg className="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                {/* Calendar Grid */}
+                                <div className="grid grid-cols-7 gap-1 mb-2">
+                                    {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
+                                        <div key={day} className="text-xs text-center text-gray-500 font-medium py-1">
+                                            {day}
+                                        </div>
+                                    ))}
+                                </div>
+
+                                <div className="grid grid-cols-7 gap-1">
+                                    {generateCalendarDays().map((date, index) => (
+                                        <div key={index} className="relative">
+                                            <button
+                                                onClick={() => handleDateSelect(date)}
+                                                className={`w-8 h-8 text-xs rounded-full transition-colors flex items-center justify-center min-w-[32px] min-h-[32px] max-w-[32px] max-h-[32px] ${isSameDay(date, currentDate)
+                                                    ? 'bg-purple-600 text-white'
+                                                    : isSameDay(date, new Date())
+                                                        ? 'bg-purple-100 text-purple-800 border-2 border-purple-300'
+                                                        : isCurrentMonth(date)
+                                                            ? 'text-gray-800 hover:bg-purple-50'
+                                                            : 'text-gray-400 hover:bg-gray-50'
+                                                    }`}
+                                            >
+                                                {date.getDate()}
+                                            </button>
+                                            {/* Purple dot indicator for dates with workouts */}
+                                            {hasWorkoutOnDate(date) && (
+                                                <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-purple-600 rounded-full shadow-sm border border-white"></div>
+                                            )}
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
                         )}
 
                         {/* Date Switch Delay Indicator */}
@@ -906,18 +1130,18 @@ export default function TrainingTab({ user }: TrainingTabProps) {
             </div>
 
             {/* Exercises Section */}
-            <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-lg border border-purple-100">
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 sm:mb-6 space-y-3 sm:space-y-0">
+            <div className="bg-white rounded-2xl p-2 sm:p-3 shadow-lg border border-purple-100">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-2 sm:mb-3 space-y-2.5 sm:space-y-0">
                     <h3 className="text-lg sm:text-xl font-bold text-purple-800">Exercises</h3>
                     <div className="flex items-center space-x-3">
 
                         <button
                             onClick={() => setShowAddExercise(true)}
                             disabled={isLoading}
-                            className="w-full sm:w-auto bg-gradient-to-r from-purple-500 to-purple-600 text-white px-4 sm:px-6 py-2 sm:py-2 rounded-lg hover:from-purple-600 hover:to-purple-700 transition-all duration-200 transform hover:scale-105 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
+                            className="w-full sm:w-auto bg-gradient-to-r from-purple-500 to-purple-600 text-white px-3 sm:px-4 py-1 sm:py-1 rounded-lg hover:from-purple-600 hover:to-purple-700 transition-all duration-200 transform hover:scale-105 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
                         >
                             <span className="flex items-center justify-center sm:justify-start space-x-2">
-                                <svg className="w-4 h-4 sm:w-5 sm:w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                                 </svg>
                                 <span>Add Exercise</span>
@@ -927,18 +1151,18 @@ export default function TrainingTab({ user }: TrainingTabProps) {
                 </div>
 
                 {isLoading ? (
-                    <div className="text-center py-8 sm:py-12">
-                        <div className="w-16 h-16 sm:w-20 sm:h-20 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <div className="w-6 h-6 sm:w-8 sm:h-8 border-4 border-purple-300 border-t-purple-600 rounded-full animate-spin"></div>
+                    <div className="text-center py-4 sm:py-6">
+                        <div className="w-14 h-14 sm:w-16 sm:h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                            <div className="w-5 h-5 sm:w-6 sm:h-6 border-4 border-purple-300 border-t-purple-600 rounded-full animate-spin"></div>
                         </div>
                         <p className="text-purple-600 text-base sm:text-lg">Loading workout data...</p>
                     </div>
                 ) : (
                     <>
                         {currentTraining?.exercises.length === 0 ? (
-                            <div className="text-center py-8 sm:py-12">
-                                <div className="w-16 h-16 sm:w-20 sm:h-20 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                                    <svg className="w-8 h-8 sm:w-10 sm:h-10 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <div className="text-center py-4 sm:py-6">
+                                <div className="w-14 h-14 sm:w-16 sm:h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                                    <svg className="w-7 h-7 sm:w-9 sm:h-9 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                                     </svg>
                                 </div>
@@ -946,7 +1170,7 @@ export default function TrainingTab({ user }: TrainingTabProps) {
                                 <p className="text-purple-400 text-sm sm:text-base">Add your first exercise to get started!</p>
                             </div>
                         ) : (
-                            <div className="space-y-3 sm:space-y-4">
+                            <div className="space-y-2 sm:space-y-2.5">
                                 {currentTraining?.exercises.map((exercise, index) => (
                                     <div
                                         key={exercise.id}
