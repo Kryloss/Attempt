@@ -8,6 +8,7 @@ import AddMealModal from './AddMealModal'
 import AddFoodModal from './AddFoodModal'
 import EditFoodModal from './EditFoodModal'
 import { User } from '@/types/auth'
+import { useModal } from './ModalContext'
 
 interface Food {
     id: string
@@ -39,6 +40,7 @@ interface NutritionTabProps {
 
 export default function NutritionTab({ user }: NutritionTabProps) {
     const { currentDate } = useDateContext()
+    const { openModal, closeModal } = useModal()
 
     const [currentNutrition, setCurrentNutrition] = useState<NutritionData | null>(null)
     const [meals, setMeals] = useState<Meal[]>([])
@@ -235,6 +237,7 @@ export default function NutritionTab({ user }: NutritionTabProps) {
     const handleEditFood = (food: Food) => {
         setEditingFood(food)
         setShowEditFoodModal(true)
+        openModal('editFood')
     }
 
     const handleSaveEditedFood = (updatedFood: Food) => {
@@ -253,6 +256,7 @@ export default function NutritionTab({ user }: NutritionTabProps) {
 
         setHasUnsavedChanges(true)
         setShowEditFoodModal(false)
+        closeModal('editFood')
         setEditingFood(null)
     }
 
@@ -376,13 +380,19 @@ export default function NutritionTab({ user }: NutritionTabProps) {
             {/* Action Buttons */}
             <div className="flex space-x-3">
                 <button
-                    onClick={() => setShowAddFoodModal(true)}
+                    onClick={() => {
+                        setShowAddFoodModal(true)
+                        openModal('addFood')
+                    }}
                     className="bg-purple-500/90 text-white px-4 py-2 rounded-lg hover:bg-purple-600/90 transition-colors font-medium text-sm flex-1"
                 >
                     Add Food
                 </button>
                 <button
-                    onClick={() => setShowAddMealModal(true)}
+                    onClick={() => {
+                        setShowAddMealModal(true)
+                        openModal('addMeal')
+                    }}
                     className="bg-purple-500/90 text-white px-4 py-2 rounded-lg hover:bg-purple-600/90 transition-colors font-medium text-sm flex-1"
                 >
                     Add Meal
@@ -467,7 +477,10 @@ export default function NutritionTab({ user }: NutritionTabProps) {
                             Start by adding meals to track your daily nutrition and calories.
                         </p>
                         <button
-                            onClick={() => setShowAddMealModal(true)}
+                            onClick={() => {
+                                setShowAddMealModal(true)
+                                openModal('addMeal')
+                            }}
                             className="bg-purple-500 text-white px-6 py-2 rounded-lg hover:bg-purple-600 transition-colors font-medium"
                         >
                             Add Your First Meal
@@ -498,14 +511,28 @@ export default function NutritionTab({ user }: NutritionTabProps) {
             {/* Modals */}
             <AddMealModal
                 isOpen={showAddMealModal}
-                onClose={() => setShowAddMealModal(false)}
-                onAddMeal={handleAddMeal}
+                onClose={() => {
+                    setShowAddMealModal(false)
+                    closeModal('addMeal')
+                }}
+                onAddMeal={(mealData) => {
+                    handleAddMeal(mealData)
+                    setShowAddMealModal(false)
+                    closeModal('addMeal')
+                }}
             />
 
             <AddFoodModal
                 isOpen={showAddFoodModal}
-                onClose={() => setShowAddFoodModal(false)}
-                onAddFood={handleAddFood}
+                onClose={() => {
+                    setShowAddFoodModal(false)
+                    closeModal('addFood')
+                }}
+                onAddFood={(foodData) => {
+                    handleAddFood(foodData)
+                    setShowAddFoodModal(false)
+                    closeModal('addFood')
+                }}
             />
 
             <EditFoodModal
@@ -513,6 +540,7 @@ export default function NutritionTab({ user }: NutritionTabProps) {
                 food={editingFood}
                 onClose={() => {
                     setShowEditFoodModal(false)
+                    closeModal('editFood')
                     setEditingFood(null)
                 }}
                 onSaveFood={handleSaveEditedFood}

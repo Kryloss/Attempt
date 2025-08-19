@@ -7,6 +7,7 @@ import AddExerciseModal from './AddExerciseModal'
 import TrainingNameDropdown from './TrainingNameDropdown'
 import { TrainingService, TrainingData, TrainingPresetData } from '@/lib/training-service'
 import { User } from '@/types/auth'
+import { useModal } from './ModalContext'
 
 interface Exercise {
     id: string
@@ -39,6 +40,8 @@ export default function TrainingTab({ user }: TrainingTabProps) {
         workoutDates,
         setWorkoutDates
     } = useDateContext()
+
+    const { openModal, closeModal } = useModal()
 
     const [currentTraining, setCurrentTraining] = useState<Training | null>(null)
     const [showAddExercise, setShowAddExercise] = useState(false)
@@ -575,6 +578,7 @@ export default function TrainingTab({ user }: TrainingTabProps) {
             }
 
             setShowSavePresetModal(false)
+            closeModal('savePreset')
             setPresetName('')
         } catch (error) {
             console.error('Error saving preset:', error)
@@ -593,6 +597,7 @@ export default function TrainingTab({ user }: TrainingTabProps) {
             })
             setHasUnsavedChanges(true)
             setShowAddExercise(false)
+            closeModal('addExercise')
 
             // Update workout dates for calendar
             if (currentTraining.exercises.length === 0) {
@@ -841,7 +846,13 @@ export default function TrainingTab({ user }: TrainingTabProps) {
     }
 
     const handleDateClick = () => {
-        setShowCalendar(!showCalendar)
+        const newShowCalendar = !showCalendar
+        setShowCalendar(newShowCalendar)
+        if (newShowCalendar) {
+            openModal('calendar')
+        } else {
+            closeModal('calendar')
+        }
     }
 
     const handleDateSelect = (date: Date) => {
@@ -915,6 +926,7 @@ export default function TrainingTab({ user }: TrainingTabProps) {
         const handleClickOutside = (event: MouseEvent) => {
             if (calendarRef.current && !calendarRef.current.contains(event.target as Node)) {
                 setShowCalendar(false)
+                closeModal('calendar')
             }
         }
 
@@ -1127,7 +1139,10 @@ export default function TrainingTab({ user }: TrainingTabProps) {
                         onNameSave={handleTrainingNameSave}
                         onLoadPreset={handleLoadPreset}
                         onLoadTraining={handleLoadTraining}
-                        onSaveAsPreset={() => setShowSavePresetModal(true)}
+                        onSaveAsPreset={() => {
+                            setShowSavePresetModal(true)
+                            openModal('savePreset')
+                        }}
                         user={user}
                         trainingService={trainingServiceRef.current}
                         exercises={currentTraining?.exercises || []}
@@ -1150,7 +1165,10 @@ export default function TrainingTab({ user }: TrainingTabProps) {
                     <div className="flex items-center space-x-3">
 
                         <button
-                            onClick={() => setShowAddExercise(true)}
+                            onClick={() => {
+                                setShowAddExercise(true)
+                                openModal('addExercise')
+                            }}
                             disabled={isLoading}
                             className="w-full sm:w-auto bg-gradient-to-r from-purple-500 to-purple-600 text-white px-4 sm:px-6 py-2 sm:py-2 rounded-lg hover:from-purple-600 hover:to-purple-700 transition-all duration-200 transform hover:scale-105 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
                         >
@@ -1235,7 +1253,10 @@ export default function TrainingTab({ user }: TrainingTabProps) {
             {/* Add Exercise Modal */}
             {showAddExercise && (
                 <AddExerciseModal
-                    onClose={() => setShowAddExercise(false)}
+                    onClose={() => {
+                        setShowAddExercise(false)
+                        closeModal('addExercise')
+                    }}
                     onAdd={handleAddExercise}
                 />
             )}
@@ -1255,7 +1276,10 @@ export default function TrainingTab({ user }: TrainingTabProps) {
                         />
                         <div className="flex space-x-3">
                             <button
-                                onClick={() => setShowSavePresetModal(false)}
+                                onClick={() => {
+                                    setShowSavePresetModal(false)
+                                    closeModal('savePreset')
+                                }}
                                 className="flex-1 px-4 py-2 text-purple-600 border border-purple-300 rounded-lg hover:bg-purple-50 transition-colors"
                             >
                                 Cancel

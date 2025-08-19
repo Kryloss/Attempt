@@ -39,122 +39,122 @@ export default function AddExerciseModal({ onClose, onAdd }: AddExerciseModalPro
     }
 
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-2 sm:p-4">
-            <div className="bg-white rounded-2xl p-3 sm:p-5 w-full max-w-xs sm:max-w-sm mx-4 shadow-2xl animate-in slide-in-from-bottom-4 duration-300 max-h-[80vh] overflow-y-auto">
-                <div className="flex items-center justify-between mb-3 sm:mb-4">
-                    <h3 className="text-base sm:text-lg font-bold text-purple-800">Add New Exercise</h3>
-                    <button
-                        onClick={onClose}
-                        className="perfect-circle circle-md bg-purple-100 hover:bg-purple-200 text-purple-600 flex items-center justify-center transition-colors"
-                    >
-                        <svg className="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                    </button>
+        <div
+            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-2 sm:p-4"
+            onClick={onClose}
+        >
+            <div
+                className="bg-white rounded-xl w-full max-w-md shadow-2xl max-h-[85vh] overflow-y-auto"
+                onClick={(e) => e.stopPropagation()}
+            >
+                <div className="p-2">
+                    <div className="mb-2">
+                        <h2 className="text-base font-bold text-purple-800">Add New Exercise</h2>
+                    </div>
+
+                    <form onSubmit={handleSubmit} className="space-y-1">
+                        {/* Exercise Name */}
+                        <div>
+                            <label className="block text-xs font-medium text-purple-700 mb-0.5">
+                                Exercise Name *
+                            </label>
+                            <input
+                                type="text"
+                                value={formData.name}
+                                onChange={(e) => handleInputChange('name', e.target.value)}
+                                className="w-full px-2 py-1 border border-purple-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-xs"
+                                placeholder="e.g., Bench Press, Squats"
+                                required
+                            />
+                        </div>
+
+                        {/* Sets and Reps */}
+                        <div className="grid grid-cols-2 gap-1">
+                            <div>
+                                <label className="block text-xs font-medium text-purple-700 mb-0.5">
+                                    Sets *
+                                </label>
+                                <input
+                                    type="number"
+                                    value={formData.sets}
+                                    onChange={(e) => handleInputChange('sets', parseInt(e.target.value.slice(0, 4)) || 0)}
+                                    min="1"
+                                    max="99"
+                                    maxLength={4}
+                                    inputMode="numeric"
+                                    className="w-full px-1.5 py-1 border border-purple-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-xs"
+                                    required
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-xs font-medium text-purple-700 mb-0.5">
+                                    Reps *
+                                </label>
+                                <input
+                                    type="number"
+                                    value={formData.reps}
+                                    onChange={(e) => handleInputChange('reps', parseInt(e.target.value.slice(0, 4)) || 0)}
+                                    min="1"
+                                    max="999"
+                                    maxLength={4}
+                                    inputMode="numeric"
+                                    className="w-full px-1.5 py-1 border border-purple-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-xs"
+                                    required
+                                />
+                            </div>
+                        </div>
+
+                        {/* Weight */}
+                        <div>
+                            <label className="block text-xs font-medium text-purple-700 mb-0.5">
+                                Weight (kg)
+                            </label>
+                            <input
+                                type="number"
+                                value={formData.weight || ''}
+                                onChange={(e) => handleInputChange('weight', e.target.value ? parseFloat(e.target.value.slice(0, 7)) : undefined)}
+                                min="0"
+                                step="0.5"
+                                maxLength={7}
+                                inputMode="decimal"
+                                className="w-full px-2 py-1 border border-purple-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-xs"
+                                placeholder="Optional"
+                            />
+                        </div>
+
+                        {/* Notes */}
+                        <div>
+                            <label className="block text-xs font-medium text-purple-700 mb-0.5">
+                                Notes (optional)
+                            </label>
+                            <textarea
+                                value={formData.notes}
+                                onChange={(e) => handleInputChange('notes', e.target.value)}
+                                rows={2}
+                                className="w-full px-2 py-1 border border-purple-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none text-xs"
+                                placeholder="Any additional notes about the exercise..."
+                            />
+                        </div>
+
+                        {/* Action Buttons */}
+                        <div className="flex space-x-2 pt-0.5">
+                            <button
+                                type="button"
+                                onClick={onClose}
+                                className="flex-1 bg-gray-100 text-gray-700 py-1.5 px-3 rounded-lg hover:bg-gray-200 transition-colors font-medium text-xs"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                type="submit"
+                                disabled={!formData.name.trim() || formData.sets <= 0 || formData.reps <= 0}
+                                className="flex-1 bg-purple-500 text-white py-1.5 px-3 rounded-lg hover:bg-purple-600 transition-colors font-medium text-xs"
+                            >
+                                Add Exercise
+                            </button>
+                        </div>
+                    </form>
                 </div>
-
-                <form onSubmit={handleSubmit} className="space-y-3">
-                    {/* Exercise Name */}
-                    <div>
-                        <label className="block text-sm font-medium text-purple-700 mb-1">
-                            Exercise Name *
-                        </label>
-                        <input
-                            type="text"
-                            value={formData.name}
-                            onChange={(e) => handleInputChange('name', e.target.value)}
-                            className="w-full px-3 py-2 border-2 border-purple-200 rounded-lg focus:border-purple-500 focus:outline-none transition-colors text-sm"
-                            placeholder="e.g., Bench Press, Squats"
-                            required
-                        />
-                    </div>
-
-                    {/* Sets and Reps */}
-                    <div className="grid grid-cols-2 gap-3">
-                        <div>
-                            <label className="block text-sm font-medium text-purple-700 mb-1">
-                                Sets *
-                            </label>
-                            <input
-                                type="number"
-                                value={formData.sets}
-                                onChange={(e) => handleInputChange('sets', parseInt(e.target.value.slice(0, 4)) || 0)}
-                                min="1"
-                                max="99"
-                                maxLength={4}
-                                inputMode="numeric"
-                                className="w-full px-3 py-2 border-2 border-purple-200 rounded-lg focus:border-purple-500 focus:outline-none transition-colors text-sm"
-                                required
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-purple-700 mb-1">
-                                Reps *
-                            </label>
-                            <input
-                                type="number"
-                                value={formData.reps}
-                                onChange={(e) => handleInputChange('reps', parseInt(e.target.value.slice(0, 4)) || 0)}
-                                min="1"
-                                max="999"
-                                maxLength={4}
-                                inputMode="numeric"
-                                className="w-full px-3 py-2 border-2 border-purple-200 rounded-lg focus:border-purple-500 focus:outline-none transition-colors text-sm"
-                                required
-                            />
-                        </div>
-                    </div>
-
-                    {/* Weight */}
-                    <div>
-                        <label className="block text-sm font-medium text-purple-700 mb-1">
-                            Weight (kg)
-                        </label>
-                        <input
-                            type="number"
-                            value={formData.weight || ''}
-                            onChange={(e) => handleInputChange('weight', e.target.value ? parseFloat(e.target.value.slice(0, 7)) : undefined)}
-                            min="0"
-                            step="0.5"
-                            maxLength={7}
-                            inputMode="decimal"
-                            className="w-full px-3 py-2 border-2 border-purple-200 rounded-lg focus:border-purple-500 focus:outline-none transition-colors text-sm"
-                            placeholder="Optional"
-                        />
-                    </div>
-
-                    {/* Notes */}
-                    <div>
-                        <label className="block text-sm font-medium text-purple-700 mb-1">
-                            Notes
-                        </label>
-                        <textarea
-                            value={formData.notes}
-                            onChange={(e) => handleInputChange('notes', e.target.value)}
-                            rows={2}
-                            className="w-full px-3 py-2 border-2 border-purple-200 rounded-lg focus:outline-none focus:border-purple-500 transition-colors resize-none text-sm"
-                            placeholder="Any additional notes about the exercise..."
-                        />
-                    </div>
-
-                    {/* Action Buttons */}
-                    <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3 pt-2">
-                        <button
-                            type="button"
-                            onClick={onClose}
-                            className="w-full sm:flex-1 bg-purple-100 text-purple-700 py-2 px-4 rounded-lg hover:bg-purple-200 transition-colors font-medium text-sm"
-                        >
-                            Cancel
-                        </button>
-                        <button
-                            type="submit"
-                            disabled={!formData.name.trim() || formData.sets <= 0 || formData.reps <= 0}
-                            className="w-full sm:flex-1 bg-gradient-to-r from-purple-500 to-purple-600 text-white py-2 px-4 rounded-lg hover:from-purple-600 hover:to-purple-700 transition-all duration-200 font-medium disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 text-sm"
-                        >
-                            Add Exercise
-                        </button>
-                    </div>
-                </form>
             </div>
         </div>
     )

@@ -34,7 +34,7 @@ export default function AddFoodModal({ isOpen, onClose, onAddFood }: AddFoodModa
     const [searchResults, setSearchResults] = useState<USDAFood[]>([])
     const [isSearching, setIsSearching] = useState(false)
     const [searchError, setSearchError] = useState('')
-    const [showSearch, setShowSearch] = useState(true)
+
     const [selectedFood, setSelectedFood] = useState<USDAFood | null>(null)
     const [detailedFoodData, setDetailedFoodData] = useState<USDAFood | null>(null) // Store detailed nutrition data
     const [servingSize, setServingSize] = useState(100) // Default 100g serving
@@ -151,8 +151,6 @@ export default function AddFoodModal({ isOpen, onClose, onAddFood }: AddFoodModa
                 fat: nutrition.fat.toString(),
                 notes: food.brandName ? `Brand: ${food.brandName}` : ''
             })
-
-            setShowSearch(false)
         } catch (error) {
             console.error('Error getting food details:', error)
             // Fallback to basic info from search result
@@ -167,7 +165,6 @@ export default function AddFoodModal({ isOpen, onClose, onAddFood }: AddFoodModa
                 fat: nutrition.fat.toString(),
                 notes: food.brandName ? `Brand: ${food.brandName}` : ''
             })
-            setShowSearch(false)
         }
     }
 
@@ -248,7 +245,7 @@ export default function AddFoodModal({ isOpen, onClose, onAddFood }: AddFoodModa
         setSearchResults([])
         setSelectedFood(null)
         setDetailedFoodData(null)
-        setShowSearch(true)
+
         setServingSize(100)
         setSearchError('')
         onClose()
@@ -267,7 +264,7 @@ export default function AddFoodModal({ isOpen, onClose, onAddFood }: AddFoodModa
         setSearchResults([])
         setSelectedFood(null)
         setDetailedFoodData(null)
-        setShowSearch(true)
+
         setServingSize(100)
         setSearchError('')
     }
@@ -282,141 +279,115 @@ export default function AddFoodModal({ isOpen, onClose, onAddFood }: AddFoodModa
     if (!isOpen) return null
 
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-            <div className="bg-white rounded-xl w-full max-w-md shadow-2xl max-h-[90vh] overflow-y-auto">
-                <div className="p-6">
-                    <div className="flex items-center justify-between mb-6">
-                        <h2 className="text-xl font-bold text-purple-800">Add Food Item</h2>
-                        <button
-                            onClick={handleCancel}
-                            className="text-gray-400 hover:text-gray-600 transition-colors"
-                        >
-                            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                        </button>
+        <div
+            className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4"
+            onClick={onClose}
+        >
+            <div
+                className="bg-white rounded-xl w-full max-w-md shadow-2xl max-h-[85vh] overflow-y-auto"
+                onClick={(e) => e.stopPropagation()}
+            >
+                <div className="p-2">
+                    <div className="mb-2">
+                        <h2 className="text-base font-bold text-purple-800">Add Food Item</h2>
                     </div>
 
-                    <form onSubmit={handleSubmit} className="space-y-4">
-                        {/* USDA Food Search */}
-                        {showSearch && (
-                            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
-                                <div className="flex items-center justify-between mb-3">
-                                    <h3 className="text-sm font-semibold text-blue-800">🔍 Search USDA Food Database</h3>
-                                    <button
-                                        type="button"
-                                        onClick={() => setShowSearch(false)}
-                                        className="text-blue-600 hover:text-blue-800 text-xs"
-                                    >
-                                        Enter manually
-                                    </button>
-                                </div>
-
-                                <div className="relative">
-                                    <input
-                                        type="text"
-                                        value={searchQuery}
-                                        onChange={(e) => setSearchQuery(e.target.value)}
-                                        className="w-full px-3 py-2 pr-10 border border-blue-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                        placeholder="Search for food (e.g., chicken breast, apple, etc.)"
-                                    />
-                                    {isSearching && (
-                                        <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                                            <div className="w-4 h-4 border-2 border-blue-300 border-t-blue-600 rounded-full animate-spin"></div>
-                                        </div>
-                                    )}
-                                </div>
-
-                                {searchError && (
-                                    <p className="text-red-600 text-xs mt-2">{searchError}</p>
-                                )}
-
-                                {/* Search Results */}
-                                {searchResults.length > 0 && (
-                                    <div className="mt-3 max-h-60 overflow-y-auto border border-blue-200 rounded-lg">
-                                        {searchResults.map((food) => (
-                                            <button
-                                                key={food.fdcId}
-                                                type="button"
-                                                onClick={() => handleFoodSelect(food)}
-                                                className="w-full text-left p-3 hover:bg-blue-100 border-b border-blue-100 last:border-b-0 transition-colors"
-                                            >
-                                                <div className="font-medium text-blue-900 text-sm">{food.description}</div>
-                                                {food.brandName && (
-                                                    <div className="text-blue-600 text-xs mt-1">Brand: {food.brandName}</div>
-                                                )}
-                                                <div className="text-blue-500 text-xs mt-1">
-                                                    {food.dataType} • FDC ID: {food.fdcId}
-                                                </div>
-                                            </button>
-                                        ))}
+                    <form onSubmit={handleSubmit} className="space-y-1">
+                        {/* Search Food Database */}
+                        <div>
+                            <label className="block text-xs font-medium text-blue-700 mb-0.5">
+                                Search Food Database *
+                            </label>
+                            <div className="relative">
+                                <input
+                                    type="text"
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                    className="w-full px-2 py-1 pr-8 border border-blue-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-xs"
+                                    placeholder="Search for food..."
+                                />
+                                {isSearching && (
+                                    <div className="absolute right-2 top-1/2 transform -translate-y-1/2">
+                                        <div className="w-3 h-3 border-2 border-blue-300 border-t-blue-600 rounded-full animate-spin"></div>
                                     </div>
                                 )}
-
-                                {searchQuery.length >= 2 && searchResults.length === 0 && !isSearching && (
-                                    <p className="text-blue-600 text-xs mt-2">No foods found. Try a different search term.</p>
-                                )}
                             </div>
-                        )}
+
+                            {searchError && (
+                                <p className="text-red-600 text-xs mt-0.5">{searchError}</p>
+                            )}
+
+                            {/* Search Results */}
+                            {searchResults.length > 0 && (
+                                <div className="mt-0.5 max-h-32 overflow-y-auto border border-blue-300 rounded-lg" style={{ scrollbarColor: '#3b82f6 #dbeafe', scrollbarWidth: 'thin' }}>
+                                    {searchResults.map((food) => (
+                                        <button
+                                            key={food.fdcId}
+                                            type="button"
+                                            onClick={() => handleFoodSelect(food)}
+                                            className="w-full text-left p-1 hover:bg-blue-100 border-b border-blue-100 last:border-b-0 transition-colors"
+                                        >
+                                            <div className="font-medium text-blue-900 text-xs">{food.description}</div>
+                                            {food.brandName && (
+                                                <div className="text-blue-600 text-xs mt-0.5">Brand: {food.brandName}</div>
+                                            )}
+                                            <div className="text-blue-500 text-xs mt-0.5">
+                                                {food.dataType} • FDC ID: {food.fdcId}
+                                            </div>
+                                        </button>
+                                    ))}
+                                </div>
+                            )}
+
+                            {searchQuery.length >= 2 && searchResults.length === 0 && !isSearching && (
+                                <p className="text-blue-600 text-xs mt-0.5">No foods found. Try a different search term.</p>
+                            )}
+                        </div>
 
                         {/* Selected Food Info & Serving Size */}
-                        {selectedFood && !showSearch && (
-                            <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-4">
-                                <div className="flex items-center justify-between mb-2">
-                                    <h3 className="text-sm font-semibold text-green-800">✅ Selected Food</h3>
+                        {selectedFood && (
+                            <div className="bg-green-50 border border-green-200 rounded-lg p-1.5">
+                                <div className="flex items-center justify-between mb-0.5">
+                                    <h3 className="text-xs font-semibold text-green-800">✅ Selected Food</h3>
                                     <button
                                         type="button"
                                         onClick={() => {
-                                            setShowSearch(true)
                                             setSelectedFood(null)
                                             setDetailedFoodData(null)
                                             resetForm()
                                         }}
                                         className="text-green-600 hover:text-green-800 text-xs"
                                     >
-                                        Change food
+                                        Change
                                     </button>
                                 </div>
-                                <div className="text-green-900 font-medium text-sm mb-3">{selectedFood.description}</div>
+                                <div className="text-green-900 font-medium text-xs mb-0.5">{selectedFood.description}</div>
 
                                 {/* Serving Size Adjustment */}
-                                <div className="flex items-center space-x-3">
-                                    <label className="text-xs font-medium text-green-700">Serving Size:</label>
+                                <div className="flex items-center space-x-2">
+                                    <label className="text-xs font-medium text-green-700">Serving:</label>
                                     <input
                                         type="number"
                                         value={servingSize}
                                         onChange={(e) => setServingSize(Math.max(1, parseInt(e.target.value) || 1))}
-                                        className="w-20 px-2 py-1 text-xs border border-green-300 rounded focus:outline-none focus:ring-1 focus:ring-green-500"
+                                        className="w-16 px-2 py-0.5 text-xs border border-green-300 rounded focus:outline-none focus:ring-1 focus:ring-green-500"
                                         min="1"
                                     />
-                                    <span className="text-xs text-green-600">grams</span>
+                                    <span className="text-xs text-green-600">g</span>
                                 </div>
-                            </div>
-                        )}
-
-                        {/* Manual Entry Toggle */}
-                        {!showSearch && !selectedFood && (
-                            <div className="flex justify-center mb-4">
-                                <button
-                                    type="button"
-                                    onClick={() => setShowSearch(true)}
-                                    className="text-blue-600 hover:text-blue-800 text-sm underline"
-                                >
-                                    🔍 Search USDA Database Instead
-                                </button>
                             </div>
                         )}
 
                         {/* Food Name */}
                         <div>
-                            <label className="block text-sm font-medium text-purple-700 mb-2">
+                            <label className="block text-xs font-medium text-purple-700 mb-0.5">
                                 Food Name *
                             </label>
                             <input
                                 type="text"
                                 value={formData.name}
                                 onChange={(e) => handleInputChange('name', e.target.value)}
-                                className="w-full px-3 py-2 border border-purple-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                className="w-full px-2 py-1 border border-purple-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-xs"
                                 placeholder="e.g., Grilled Chicken Breast"
                                 required
                                 readOnly={!!selectedFood}
@@ -425,24 +396,23 @@ export default function AddFoodModal({ isOpen, onClose, onAddFood }: AddFoodModa
 
                         {/* Nutrition Values Note */}
                         {selectedFood && (
-                            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mb-4">
+                            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-1">
                                 <p className="text-yellow-800 text-xs">
-                                    💡 Nutrition values automatically calculated from USDA database for {servingSize}g serving.
-                                    You can adjust the serving size above to recalculate values.
+                                    💡 Values auto-calculated for {servingSize}g serving.
                                 </p>
                             </div>
                         )}
 
                         {/* Calories */}
                         <div>
-                            <label className="block text-sm font-medium text-purple-700 mb-2">
-                                Calories {selectedFood && <span className="text-xs text-purple-500">(auto-filled)</span>}
+                            <label className="block text-xs font-medium text-purple-700 mb-0.5">
+                                Calories {selectedFood && <span className="text-xs text-purple-500">(auto)</span>}
                             </label>
                             <input
                                 type="number"
                                 value={formData.calories}
                                 onChange={(e) => handleInputChange('calories', e.target.value)}
-                                className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:border-transparent ${selectedFood
+                                className={`w-full px-2 py-1 border rounded-lg focus:outline-none focus:ring-2 focus:border-transparent text-xs ${selectedFood
                                     ? 'border-purple-200 bg-purple-50 text-purple-700'
                                     : 'border-purple-300 focus:ring-purple-500'
                                     }`}
@@ -454,16 +424,16 @@ export default function AddFoodModal({ isOpen, onClose, onAddFood }: AddFoodModa
                         </div>
 
                         {/* Macros Row */}
-                        <div className="grid grid-cols-3 gap-3">
+                        <div className="grid grid-cols-3 gap-1">
                             <div>
-                                <label className="block text-sm font-medium text-green-700 mb-2">
-                                    Carbs (g) {selectedFood && <span className="text-xs text-green-500">(auto-filled)</span>}
+                                <label className="block text-xs font-medium text-green-700 mb-0.5">
+                                    Carbs (g) {selectedFood && <span className="text-xs text-green-500">(auto)</span>}
                                 </label>
                                 <input
                                     type="number"
                                     value={formData.carbs}
                                     onChange={(e) => handleInputChange('carbs', e.target.value)}
-                                    className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:border-transparent ${selectedFood
+                                    className={`w-full px-1.5 py-1 border rounded-lg focus:outline-none focus:ring-2 focus:border-transparent text-xs ${selectedFood
                                         ? 'border-green-200 bg-green-50 text-green-700'
                                         : 'border-green-300 focus:ring-green-500'
                                         }`}
@@ -474,14 +444,14 @@ export default function AddFoodModal({ isOpen, onClose, onAddFood }: AddFoodModa
                                 />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-blue-700 mb-2">
-                                    Protein (g) {selectedFood && <span className="text-xs text-blue-500">(auto-filled)</span>}
+                                <label className="block text-xs font-medium text-blue-700 mb-0.5">
+                                    Protein (g) {selectedFood && <span className="text-xs text-blue-500">(auto)</span>}
                                 </label>
                                 <input
                                     type="number"
                                     value={formData.protein}
                                     onChange={(e) => handleInputChange('protein', e.target.value)}
-                                    className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:border-transparent ${selectedFood
+                                    className={`w-full px-1.5 py-1 border rounded-lg focus:outline-none focus:ring-2 focus:border-transparent text-xs ${selectedFood
                                         ? 'border-blue-200 bg-blue-50 text-blue-700'
                                         : 'border-blue-300 focus:ring-blue-500'
                                         }`}
@@ -492,14 +462,14 @@ export default function AddFoodModal({ isOpen, onClose, onAddFood }: AddFoodModa
                                 />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-yellow-700 mb-2">
-                                    Fat (g) {selectedFood && <span className="text-xs text-yellow-500">(auto-filled)</span>}
+                                <label className="block text-xs font-medium text-yellow-700 mb-0.5">
+                                    Fat (g) {selectedFood && <span className="text-xs text-yellow-500">(auto)</span>}
                                 </label>
                                 <input
                                     type="number"
                                     value={formData.fat}
                                     onChange={(e) => handleInputChange('fat', e.target.value)}
-                                    className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:border-transparent ${selectedFood
+                                    className={`w-full px-1.5 py-1 border rounded-lg focus:outline-none focus:ring-2 focus:border-transparent text-xs ${selectedFood
                                         ? 'border-yellow-200 bg-yellow-50 text-yellow-700'
                                         : 'border-yellow-300 focus:ring-yellow-500'
                                         }`}
@@ -513,30 +483,30 @@ export default function AddFoodModal({ isOpen, onClose, onAddFood }: AddFoodModa
 
                         {/* Notes */}
                         <div>
-                            <label className="block text-sm font-medium text-purple-700 mb-2">
+                            <label className="block text-xs font-medium text-purple-700 mb-0.5">
                                 Notes (optional)
                             </label>
                             <textarea
                                 value={formData.notes}
                                 onChange={(e) => handleInputChange('notes', e.target.value)}
-                                className="w-full px-3 py-2 border border-purple-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none"
+                                className="w-full px-2 py-1 border border-purple-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none text-xs"
                                 placeholder="Any additional notes..."
                                 rows={2}
                             />
                         </div>
 
                         {/* Action Buttons */}
-                        <div className="flex space-x-3 pt-4">
+                        <div className="flex space-x-2 pt-0.5">
                             <button
                                 type="button"
                                 onClick={handleCancel}
-                                className="flex-1 bg-gray-100 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-200 transition-colors font-medium"
+                                className="flex-1 bg-gray-100 text-gray-700 py-1.5 px-3 rounded-lg hover:bg-gray-200 transition-colors font-medium text-xs"
                             >
                                 Cancel
                             </button>
                             <button
                                 type="submit"
-                                className="flex-1 bg-purple-500 text-white py-2 px-4 rounded-lg hover:bg-purple-600 transition-colors font-medium"
+                                className="flex-1 bg-purple-500 text-white py-1.5 px-3 rounded-lg hover:bg-purple-600 transition-colors font-medium text-xs"
                             >
                                 Add Food
                             </button>

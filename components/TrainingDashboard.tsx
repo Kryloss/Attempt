@@ -6,6 +6,7 @@ import TrainingTab from './TrainingTab'
 import NutritionTab from './NutritionTab'
 import ProgressTab from './ProgressTab'
 import SettingsMenu from './SettingsMenu'
+import { useModal } from './ModalContext'
 
 interface TrainingDashboardProps {
     user: User
@@ -17,6 +18,7 @@ type TabType = 'training' | 'nutrition' | 'progress'
 export default function TrainingDashboard({ user, onSignOut }: TrainingDashboardProps) {
     const [activeTab, setActiveTab] = useState<TabType>('training')
     const [showSettings, setShowSettings] = useState(false)
+    const { isAnyModalOpen, openModal, closeModal } = useModal()
 
     const tabs = [
         { id: 'training', label: 'Workout', icon: '💪' },
@@ -36,7 +38,8 @@ export default function TrainingDashboard({ user, onSignOut }: TrainingDashboard
 
             {/* Header */}
             <header
-                className="bg-white/95 backdrop-blur-lg border-b border-purple-200 shadow-xl"
+                className={`bg-white/95 backdrop-blur-lg border-b border-purple-200 shadow-xl transition-transform duration-300 ${isAnyModalOpen ? '-translate-y-full' : 'translate-y-0'
+                    }`}
                 style={{
                     position: 'fixed',
                     top: 0,
@@ -61,7 +64,15 @@ export default function TrainingDashboard({ user, onSignOut }: TrainingDashboard
                             {/* Status will be injected here */}
                         </div>
                         <button
-                            onClick={() => setShowSettings(!showSettings)}
+                            onClick={() => {
+                                const newShowSettings = !showSettings
+                                setShowSettings(newShowSettings)
+                                if (newShowSettings) {
+                                    openModal('settings')
+                                } else {
+                                    closeModal('settings')
+                                }
+                            }}
                             className="perfect-circle circle-md bg-purple-100 hover:bg-purple-200 text-purple-600 flex items-center justify-center transition-colors relative"
                         >
                             <svg className="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -82,7 +93,10 @@ export default function TrainingDashboard({ user, onSignOut }: TrainingDashboard
                         // For guest users, this will redirect them to sign in
                         onSignOut() // This will take them back to the auth screen
                     }}
-                    onClose={() => setShowSettings(false)}
+                    onClose={() => {
+                        setShowSettings(false)
+                        closeModal('settings')
+                    }}
                 />
             )}
 
@@ -94,7 +108,8 @@ export default function TrainingDashboard({ user, onSignOut }: TrainingDashboard
             </main>
 
             {/* Bottom Tab Navigation */}
-            <nav className="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-sm border-t border-purple-200 shadow-lg z-20">
+            <nav className={`fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-sm border-t border-purple-200 shadow-lg z-20 transition-transform duration-300 ${isAnyModalOpen ? 'translate-y-full' : 'translate-y-0'
+                }`}>
                 <div className="px-4 sm:px-6 py-0.5">
                     <div className="flex justify-around">
                         {tabs.map((tab) => (
