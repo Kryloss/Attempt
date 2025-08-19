@@ -1,7 +1,7 @@
 'use client'
 
 import { User } from '@/types/auth'
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 interface SettingsMenuProps {
     user: User
@@ -12,6 +12,7 @@ interface SettingsMenuProps {
 
 export default function SettingsMenu({ user, onSignOut, onSignIn, onClose }: SettingsMenuProps) {
     const modalRef = useRef<HTMLDivElement>(null)
+    const [headerOffset, setHeaderOffset] = useState<number>(64)
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
@@ -26,12 +27,24 @@ export default function SettingsMenu({ user, onSignOut, onSignIn, onClose }: Set
             }
         }
 
+        const syncHeaderOffset = () => {
+            const header = document.getElementById('app-header')
+            if (header) {
+                setHeaderOffset(header.offsetHeight)
+            }
+        }
+
+        // Initial measure and on resize to avoid gaps
+        syncHeaderOffset()
+        window.addEventListener('resize', syncHeaderOffset)
+
         document.addEventListener('mousedown', handleClickOutside)
         document.addEventListener('keydown', handleEscape)
 
         return () => {
             document.removeEventListener('mousedown', handleClickOutside)
             document.removeEventListener('keydown', handleEscape)
+            window.removeEventListener('resize', syncHeaderOffset)
         }
     }, [onClose])
 
@@ -46,14 +59,17 @@ export default function SettingsMenu({ user, onSignOut, onSignIn, onClose }: Set
     }
 
     return (
-        <div className="fixed inset-0 z-[99999] flex items-center justify-center p-4">
-            {/* Backdrop */}
-            <div className="absolute inset-0 bg-black bg-opacity-60" />
+        <div className="fixed inset-0 z-[99999] flex items-center justify-center p-4 pointer-events-none">
+            {/* Backdrop (do not cover top navigation area) */}
+            <div
+                className="absolute left-0 right-0 bottom-0 bg-black bg-opacity-50 pointer-events-auto"
+                style={{ top: headerOffset }}
+            />
 
             {/* Modal */}
             <div
                 ref={modalRef}
-                className="relative bg-white rounded-2xl shadow-2xl border border-purple-200 p-4 sm:p-8 min-w-80 max-w-sm sm:max-w-md w-full"
+                className="relative bg-white rounded-2xl shadow-2xl border border-purple-200 p-4 sm:p-8 min-w-80 max-w-sm sm:max-w-md w-full pointer-events-auto"
             >
                 <div className="text-center mb-4 sm:mb-6">
                     <div className="perfect-circle circle-lg bg-purple-100 flex items-center justify-center mx-auto mb-3 sm:mb-4">

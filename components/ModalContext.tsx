@@ -16,7 +16,8 @@ export function ModalProvider({ children }: { children: ReactNode }) {
     const [openModals, setOpenModals] = useState<Set<string>>(new Set())
 
     const openModal = (modalId: string) => {
-        setOpenModals(prev => new Set(prev).add(modalId))
+        // Ensure only one modal is open at a time
+        setOpenModals(new Set([modalId]))
     }
 
     const closeModal = (modalId: string) => {

@@ -40,7 +40,7 @@ interface NutritionTabProps {
 
 export default function NutritionTab({ user }: NutritionTabProps) {
     const { currentDate } = useDateContext()
-    const { openModal, closeModal } = useModal()
+    const { openModal, closeModal, openModals } = useModal()
 
     const [currentNutrition, setCurrentNutrition] = useState<NutritionData | null>(null)
     const [meals, setMeals] = useState<Meal[]>([])
@@ -151,27 +151,27 @@ export default function NutritionTab({ user }: NutritionTabProps) {
         }
     }, [meals, foods, currentNutrition, user])
 
-    // Update header with auto-save status
+    // Update header with auto-save status (match Workout tab behavior)
     useEffect(() => {
         if (typeof window !== 'undefined') {
             const statusElement = document.getElementById('auto-save-status')
-            if (statusElement) {
+            if (statusElement && user && !user.guest) {
                 let statusHTML = ''
 
                 if (autoSaveStatus === 'saving') {
                     statusHTML = `
                         <div class="flex items-center space-x-2 text-xs sm:text-sm text-purple-600">
                             <div class="w-3 h-3 sm:w-4 sm:h-4 border-2 border-purple-300 border-t-purple-600 rounded-full animate-spin"></div>
-                            <span>Saving nutrition...</span>
+                            <span>Saving...</span>
                         </div>
                     `
                 } else if (autoSaveStatus === 'saved') {
                     statusHTML = `
-                        <div class="flex items-center space-x-2 text-xs sm:text-sm text-purple-600">
+                        <div class="flex items-center space-x-2 text-xs sm:text-sm text-green-600">
                             <svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                             </svg>
-                            <span>Nutrition saved</span>
+                            <span>Saved</span>
                         </div>
                     `
                 } else if (autoSaveStatus === 'error') {
@@ -181,20 +181,84 @@ export default function NutritionTab({ user }: NutritionTabProps) {
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                             </svg>
                             <span>Save failed</span>
+                            <button id="retry-save-btn" class="text-xs bg-red-100 hover:bg-red-200 text-red-700 px-2 py-1 rounded transition-colors">
+                                Retry
+                            </button>
                         </div>
                     `
+
+                    // Add retry button functionality after a short delay to ensure DOM is updated
+                    setTimeout(() => {
+                        const retryBtn = document.getElementById('retry-save-btn')
+                        if (retryBtn) {
+                            retryBtn.addEventListener('click', handleManualSave)
+                        }
+                    }, 100)
                 } else if (autoSaveStatus === 'idle') {
                     statusHTML = `
-                        <div class="text-xs ${hasUnsavedChanges ? 'text-purple-600' : 'text-gray-400'}">
-                            🥗
+                        <div class="text-xs ${hasUnsavedChanges ? 'text-green-600' : 'text-gray-400'}">
+                            ✓
                         </div>
                     `
                 }
 
                 statusElement.innerHTML = statusHTML
+            } else if (statusElement && user?.guest) {
+                statusElement.innerHTML = `
+                    <div class="text-xs text-yellow-600">
+                        Log in to save changes
+                    </div>
+                `
+            } else if (statusElement) {
+                statusElement.innerHTML = ''
             }
         }
-    }, [autoSaveStatus, hasUnsavedChanges])
+    }, [autoSaveStatus, currentNutrition, user])
+
+    const handleManualSave = () => {
+        if (!currentNutrition) {
+            setAutoSaveStatus('error')
+            setTimeout(() => setAutoSaveStatus('idle'), 3000)
+            return
+        }
+
+        setAutoSaveStatus('saving')
+        try {
+            const updatedNutrition = {
+                ...currentNutrition,
+                meals,
+                foods
+            }
+            const userId = user?._id || 'guest'
+            const storageKey = `nutrition_${userId}_${currentNutrition.date}`
+            localStorage.setItem(storageKey, JSON.stringify(updatedNutrition))
+            if (hasUnsavedChanges) {
+                setAutoSaveStatus('saved')
+                setTimeout(() => setAutoSaveStatus('idle'), 2000)
+            } else {
+                setAutoSaveStatus('idle')
+            }
+            setHasUnsavedChanges(false)
+        } catch (error) {
+            console.error('Manual save failed:', error)
+            setAutoSaveStatus('error')
+            setTimeout(() => setAutoSaveStatus('idle'), 3000)
+        }
+    }
+
+    // Keep local modal states in sync with global modal context (exclusive modals)
+    useEffect(() => {
+        if (!openModals.has('addFood') && showAddFoodModal) {
+            setShowAddFoodModal(false)
+        }
+        if (!openModals.has('addMeal') && showAddMealModal) {
+            setShowAddMealModal(false)
+        }
+        if (!openModals.has('editFood') && showEditFoodModal) {
+            setShowEditFoodModal(false)
+            setEditingFood(null)
+        }
+    }, [openModals])
 
     const generateId = () => Date.now().toString() + Math.random().toString(36).substr(2, 9)
 

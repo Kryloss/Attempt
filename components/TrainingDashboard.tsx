@@ -18,7 +18,7 @@ type TabType = 'training' | 'nutrition' | 'progress'
 export default function TrainingDashboard({ user, onSignOut }: TrainingDashboardProps) {
     const [activeTab, setActiveTab] = useState<TabType>('training')
     const [showSettings, setShowSettings] = useState(false)
-    const { isAnyModalOpen, openModal, closeModal } = useModal()
+    const { isAnyModalOpen, openModal, closeModal, openModals } = useModal()
 
     const tabs = [
         { id: 'training', label: 'Workout', icon: '💪' },
@@ -37,7 +37,7 @@ export default function TrainingDashboard({ user, onSignOut }: TrainingDashboard
             </div>
 
             {/* Header */}
-            <header
+            <header id="app-header"
                 className="bg-white/95 backdrop-blur-lg border-b border-purple-200 shadow-xl transition-transform duration-300 translate-y-0"
                 style={{
                     position: 'fixed',

@@ -280,19 +280,19 @@ export default function AddFoodModal({ isOpen, onClose, onAddFood }: AddFoodModa
 
     return (
         <div
-            className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4"
+            className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-3"
             onClick={onClose}
         >
             <div
-                className="bg-white rounded-xl w-full max-w-md shadow-2xl max-h-[85vh] overflow-y-auto"
+                className="bg-white rounded-xl w-full max-w-sm shadow-2xl max-h-[75vh] overflow-y-auto"
                 onClick={(e) => e.stopPropagation()}
             >
-                <div className="p-2">
-                    <div className="mb-2">
+                <div className="p-1.5">
+                    <div className="mb-1">
                         <h2 className="text-base font-bold text-purple-800">Add Food Item</h2>
                     </div>
 
-                    <form onSubmit={handleSubmit} className="space-y-1">
+                    <form onSubmit={handleSubmit} className="space-y-0.5">
                         {/* Search Food Database */}
                         <div>
                             <label className="block text-xs font-medium text-blue-700 mb-0.5">
@@ -346,34 +346,18 @@ export default function AddFoodModal({ isOpen, onClose, onAddFood }: AddFoodModa
 
                         {/* Selected Food Info & Serving Size */}
                         {selectedFood && (
-                            <div className="bg-green-50 border border-green-200 rounded-lg p-1.5">
-                                <div className="flex items-center justify-between mb-0.5">
-                                    <h3 className="text-xs font-semibold text-green-800">✅ Selected Food</h3>
-                                    <button
-                                        type="button"
-                                        onClick={() => {
-                                            setSelectedFood(null)
-                                            setDetailedFoodData(null)
-                                            resetForm()
-                                        }}
-                                        className="text-green-600 hover:text-green-800 text-xs"
-                                    >
-                                        Change
-                                    </button>
-                                </div>
-                                <div className="text-green-900 font-medium text-xs mb-0.5">{selectedFood.description}</div>
-
+                            <div className="bg-blue-50 border border-blue-200 rounded-lg p-0.5">
                                 {/* Serving Size Adjustment */}
-                                <div className="flex items-center space-x-2">
-                                    <label className="text-xs font-medium text-green-700">Serving:</label>
+                                <div className="flex items-center space-x-1">
+                                    <label className="text-[10px] font-medium text-blue-700">Serving:</label>
                                     <input
                                         type="number"
                                         value={servingSize}
                                         onChange={(e) => setServingSize(Math.max(1, parseInt(e.target.value) || 1))}
-                                        className="w-16 px-2 py-0.5 text-xs border border-green-300 rounded focus:outline-none focus:ring-1 focus:ring-green-500"
+                                        className="w-14 h-5 px-1 py-0 text-[10px] leading-none border border-blue-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 no-spinner input-compact"
                                         min="1"
                                     />
-                                    <span className="text-xs text-green-600">g</span>
+                                    <span className="text-[10px] text-blue-600">g</span>
                                 </div>
                             </div>
                         )}

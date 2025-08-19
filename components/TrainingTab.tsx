@@ -41,7 +41,7 @@ export default function TrainingTab({ user }: TrainingTabProps) {
         setWorkoutDates
     } = useDateContext()
 
-    const { openModal, closeModal } = useModal()
+    const { openModal, closeModal, openModals } = useModal()
 
     const [currentTraining, setCurrentTraining] = useState<Training | null>(null)
     const [showAddExercise, setShowAddExercise] = useState(false)
@@ -353,6 +353,19 @@ export default function TrainingTab({ user }: TrainingTabProps) {
             }
         }
     }, [autoSaveStatus, currentTraining, user])
+
+    // Keep local modal states in sync with global modal context (exclusive modals)
+    useEffect(() => {
+        if (!openModals.has('addExercise') && showAddExercise) {
+            setShowAddExercise(false)
+        }
+        if (!openModals.has('savePreset') && showSavePresetModal) {
+            setShowSavePresetModal(false)
+        }
+        if (!openModals.has('calendar') && showCalendar) {
+            setShowCalendar(false)
+        }
+    }, [openModals])
 
     const navigateDate = (direction: 'prev' | 'next') => {
         // Check if date switching is blocked
