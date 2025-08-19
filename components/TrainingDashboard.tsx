@@ -20,10 +20,43 @@ export default function TrainingDashboard({ user, onSignOut }: TrainingDashboard
     const [showSettings, setShowSettings] = useState(false)
     const { isAnyModalOpen, openModal, closeModal, openModals } = useModal()
 
+    // Icons styled similarly to the settings button (stroke-based, currentColor)
+    const WorkoutIcon = () => (
+        <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            {/* Dumbbell */}
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 12h10" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 9v6" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9v6" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10v4" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 10v4" />
+        </svg>
+    )
+
+    const NutritionIcon = () => (
+        <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            {/* Apple body */}
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 21c-3.8 0-7-3-7-6.8 0-2.6 1.7-4.7 4.1-5.2 1.5-.3 2.9.2 2.9.2s1.4-.5 2.9-.2C18.3 9.5 20 11.6 20 14.2 20 18 15.8 21 12 21z" />
+            {/* Stem */}
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 7V5" />
+            {/* Leaf */}
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 5c1.6 0 3 1 3.6 2.3-1.9.2-3.6-.7-4.7-2.1" />
+        </svg>
+    )
+
+    const ProgressIcon = () => (
+        <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            {/* Bar chart */}
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 19v-3" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19V9" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 19V5" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 19v-6" />
+        </svg>
+    )
+
     const tabs = [
-        { id: 'training', label: 'Workout', icon: '💪' },
-        { id: 'nutrition', label: 'Nutrition', icon: '🥗' },
-        { id: 'progress', label: 'Progress', icon: '📊' }
+        { id: 'training', label: 'Workout', icon: <WorkoutIcon /> },
+        { id: 'nutrition', label: 'Nutrition', icon: <NutritionIcon /> },
+        { id: 'progress', label: 'Progress', icon: <ProgressIcon /> }
     ]
 
     return (
@@ -59,7 +92,7 @@ export default function TrainingDashboard({ user, onSignOut }: TrainingDashboard
 
                     <div className="flex items-center space-x-2 sm:space-x-4">
                         {/* Auto-save Status - will be populated by TrainingTab */}
-                        <div id="auto-save-status" className="text-purple-700 font-medium text-sm sm:text-base hidden sm:block">
+                        <div id="auto-save-status" className="text-purple-700 font-medium text-xs sm:text-base block">
                             {/* Status will be injected here */}
                         </div>
                         <button
@@ -120,7 +153,7 @@ export default function TrainingDashboard({ user, onSignOut }: TrainingDashboard
                                     : 'text-purple-400 hover:text-purple-500'
                                     }`}
                             >
-                                <span className="text-base sm:text-lg mb-0.5">{tab.icon}</span>
+                                <span className="mb-0.5">{tab.icon}</span>
                                 <span className="text-xs font-medium">{tab.label}</span>
                                 {activeTab === tab.id && (
                                     <div className="w-3 sm:w-4 h-0.5 bg-purple-600 rounded-full mt-0.5 animate-pulse"></div>
