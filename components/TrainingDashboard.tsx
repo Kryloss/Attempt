@@ -89,7 +89,7 @@ export default function TrainingDashboard({ user, onSignOut }: TrainingDashboard
             {/* Main Content */}
             <main className="relative z-10 pt-12 sm:pt-16 pb-12 sm:pb-16 px-4 sm:px-6">
                 {activeTab === 'training' && <TrainingTab user={user} />}
-                {activeTab === 'nutrition' && <NutritionTab />}
+                {activeTab === 'nutrition' && <NutritionTab user={user} />}
                 {activeTab === 'progress' && <ProgressTab />}
             </main>
 

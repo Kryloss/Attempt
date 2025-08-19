@@ -78,9 +78,11 @@ export default function AddExerciseModal({ onClose, onAdd }: AddExerciseModalPro
                             <input
                                 type="number"
                                 value={formData.sets}
-                                onChange={(e) => handleInputChange('sets', parseInt(e.target.value) || 0)}
+                                onChange={(e) => handleInputChange('sets', parseInt(e.target.value.slice(0, 4)) || 0)}
                                 min="1"
                                 max="99"
+                                maxLength={4}
+                                inputMode="numeric"
                                 className="w-full px-3 py-2 border-2 border-purple-200 rounded-lg focus:border-purple-500 focus:outline-none transition-colors text-sm"
                                 required
                             />
@@ -92,9 +94,11 @@ export default function AddExerciseModal({ onClose, onAdd }: AddExerciseModalPro
                             <input
                                 type="number"
                                 value={formData.reps}
-                                onChange={(e) => handleInputChange('reps', parseInt(e.target.value) || 0)}
+                                onChange={(e) => handleInputChange('reps', parseInt(e.target.value.slice(0, 4)) || 0)}
                                 min="1"
                                 max="999"
+                                maxLength={4}
+                                inputMode="numeric"
                                 className="w-full px-3 py-2 border-2 border-purple-200 rounded-lg focus:border-purple-500 focus:outline-none transition-colors text-sm"
                                 required
                             />
@@ -109,9 +113,11 @@ export default function AddExerciseModal({ onClose, onAdd }: AddExerciseModalPro
                         <input
                             type="number"
                             value={formData.weight || ''}
-                            onChange={(e) => handleInputChange('weight', e.target.value ? parseFloat(e.target.value) : undefined)}
+                            onChange={(e) => handleInputChange('weight', e.target.value ? parseFloat(e.target.value.slice(0, 7)) : undefined)}
                             min="0"
                             step="0.5"
+                            maxLength={7}
+                            inputMode="decimal"
                             className="w-full px-3 py-2 border-2 border-purple-200 rounded-lg focus:border-purple-500 focus:outline-none transition-colors text-sm"
                             placeholder="Optional"
                         />

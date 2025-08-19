@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
+import { useDateContext } from './DateContext'
 import ExerciseCard from './ExerciseCard'
 import AddExerciseModal from './AddExerciseModal'
 import TrainingNameDropdown from './TrainingNameDropdown'
@@ -28,7 +29,17 @@ interface TrainingTabProps {
 }
 
 export default function TrainingTab({ user }: TrainingTabProps) {
-    const [currentDate, setCurrentDate] = useState(new Date())
+    const {
+        currentDate,
+        setCurrentDate,
+        showCalendar,
+        setShowCalendar,
+        calendarMonth,
+        setCalendarMonth,
+        workoutDates,
+        setWorkoutDates
+    } = useDateContext()
+
     const [currentTraining, setCurrentTraining] = useState<Training | null>(null)
     const [showAddExercise, setShowAddExercise] = useState(false)
     const [trainingName, setTrainingName] = useState('')
@@ -39,9 +50,6 @@ export default function TrainingTab({ user }: TrainingTabProps) {
     const [presetName, setPresetName] = useState('')
     const [dropdownRefreshKey, setDropdownRefreshKey] = useState(0)
     const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
-    const [showCalendar, setShowCalendar] = useState(false)
-    const [calendarMonth, setCalendarMonth] = useState(new Date())
-    const [workoutDates, setWorkoutDates] = useState<Set<string>>(new Set())
 
     // Date switching delay state
     const [isDateSwitchBlocked, setIsDateSwitchBlocked] = useState(false)
@@ -355,7 +363,7 @@ export default function TrainingTab({ user }: TrainingTabProps) {
                 date: currentTraining.date
             }).then(() => {
                 setHasUnsavedChanges(false)
-                // Now navigate to the new date
+                // Now navigate to the new date using DateContext
                 const newDate = new Date(currentDate)
                 if (direction === 'prev') {
                     newDate.setDate(newDate.getDate() - 1)
@@ -375,7 +383,7 @@ export default function TrainingTab({ user }: TrainingTabProps) {
                 setCurrentDate(newDate)
             })
         } else {
-            // No unsaved changes, navigate immediately
+            // No unsaved changes, navigate immediately using DateContext
             const newDate = new Date(currentDate)
             if (direction === 'prev') {
                 newDate.setDate(newDate.getDate() - 1)
@@ -918,7 +926,7 @@ export default function TrainingTab({ user }: TrainingTabProps) {
     // Sync calendar month with current date
     useEffect(() => {
         setCalendarMonth(currentDate)
-    }, [currentDate])
+    }, [currentDate, setCalendarMonth])
 
     // Load workout dates for calendar indicators
     useEffect(() => {
@@ -996,7 +1004,7 @@ export default function TrainingTab({ user }: TrainingTabProps) {
                         </button>
 
                         {getRelativeDayLabel() && (
-                            <div className="absolute left-1/2 -translate-x-1/2 top-full -translate-y-2 text-[10px] sm:text-xs font-medium text-purple-500 pointer-events-none z-20 whitespace-nowrap">
+                            <div className="absolute left-1/2 -translate-x-1/2 top-full -translate-y-2 text-[10px] sm:text-xs font-medium text-purple-500 pointer-events-none z-50 whitespace-nowrap">
                                 {getRelativeDayLabel()}
                             </div>
                         )}
@@ -1122,7 +1130,7 @@ export default function TrainingTab({ user }: TrainingTabProps) {
 
                     {/* Auto-save Status Indicator - Moved to header */}
                     {user && !user.guest && (
-                        <div className="mt-1 flex items-center justify-center space-x-2">
+                        <div className="mt-0 flex items-center justify-center space-x-2">
                             {/* Status is now displayed in the header */}
                         </div>
                     )}
@@ -1130,18 +1138,18 @@ export default function TrainingTab({ user }: TrainingTabProps) {
             </div>
 
             {/* Exercises Section */}
-            <div className="bg-white rounded-2xl p-2 sm:p-3 shadow-lg border border-purple-100">
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-2 sm:mb-3 space-y-2.5 sm:space-y-0">
-                    <h3 className="text-lg sm:text-xl font-bold text-purple-800">Exercises</h3>
+            <div className="bg-white rounded-2xl p-1 sm:p-2 shadow-lg border border-purple-100">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-1 sm:mb-2 space-y-1 sm:space-y-0">
+                    <h3 className="text-lg sm:text-xl font-bold text-purple-800 pl-1">Exercises</h3>
                     <div className="flex items-center space-x-3">
 
                         <button
                             onClick={() => setShowAddExercise(true)}
                             disabled={isLoading}
-                            className="w-full sm:w-auto bg-gradient-to-r from-purple-500 to-purple-600 text-white px-3 sm:px-4 py-1 sm:py-1 rounded-lg hover:from-purple-600 hover:to-purple-700 transition-all duration-200 transform hover:scale-105 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
+                            className="w-full sm:w-auto bg-gradient-to-r from-purple-500 to-purple-600 text-white px-4 sm:px-6 py-2 sm:py-2 rounded-lg hover:from-purple-600 hover:to-purple-700 transition-all duration-200 transform hover:scale-105 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
                         >
                             <span className="flex items-center justify-center sm:justify-start space-x-2">
-                                <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg className="w-4 h-4 sm:w-5 sm:w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                                 </svg>
                                 <span>Add Exercise</span>
@@ -1151,18 +1159,18 @@ export default function TrainingTab({ user }: TrainingTabProps) {
                 </div>
 
                 {isLoading ? (
-                    <div className="text-center py-4 sm:py-6">
-                        <div className="w-14 h-14 sm:w-16 sm:h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                            <div className="w-5 h-5 sm:w-6 sm:h-6 border-4 border-purple-300 border-t-purple-600 rounded-full animate-spin"></div>
+                    <div className="text-center py-2 sm:py-3">
+                        <div className="w-16 h-16 sm:w-20 sm:h-20 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <div className="w-6 h-6 sm:w-8 sm:h-8 border-4 border-purple-300 border-t-purple-600 rounded-full animate-spin"></div>
                         </div>
                         <p className="text-purple-600 text-base sm:text-lg">Loading workout data...</p>
                     </div>
                 ) : (
                     <>
                         {currentTraining?.exercises.length === 0 ? (
-                            <div className="text-center py-4 sm:py-6">
-                                <div className="w-14 h-14 sm:w-16 sm:h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                                    <svg className="w-7 h-7 sm:w-9 sm:h-9 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <div className="text-center py-2 sm:py-3">
+                                <div className="w-16 h-16 sm:w-20 sm:h-20 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                    <svg className="w-8 h-8 sm:w-10 sm:h-10 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                                     </svg>
                                 </div>
@@ -1170,7 +1178,7 @@ export default function TrainingTab({ user }: TrainingTabProps) {
                                 <p className="text-purple-400 text-sm sm:text-base">Add your first exercise to get started!</p>
                             </div>
                         ) : (
-                            <div className="space-y-2 sm:space-y-2.5">
+                            <div className="space-y-1 sm:space-y-1">
                                 {currentTraining?.exercises.map((exercise, index) => (
                                     <div
                                         key={exercise.id}
