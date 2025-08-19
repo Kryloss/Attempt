@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useDateContext } from './DateContext'
 import DateCard from './DateCard'
 import MealCard from './MealCard'
@@ -9,6 +9,7 @@ import AddFoodModal from './AddFoodModal'
 import EditFoodModal from './EditFoodModal'
 import { User } from '@/types/auth'
 import { useModal } from './ModalContext'
+import { NutritionService } from '@/lib/nutrition-service'
 
 interface Food {
     id: string
@@ -52,6 +53,19 @@ export default function NutritionTab({ user }: NutritionTabProps) {
     const [isLoading, setIsLoading] = useState(false)
     const [autoSaveStatus, setAutoSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle')
     const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
+    const nutritionServiceRef = useRef<NutritionService | null>(null)
+
+    // Initialize nutrition service
+    useEffect(() => {
+        if (user && !user.guest) {
+            const userId = NutritionService.getUserId(user)
+            if (userId) {
+                nutritionServiceRef.current = new NutritionService(userId)
+            }
+        } else {
+            nutritionServiceRef.current = null
+        }
+    }, [user])
 
     // Calculate daily totals
     const dailyTotals = (meals || []).reduce((acc, meal) => {
@@ -83,27 +97,92 @@ export default function NutritionTab({ user }: NutritionTabProps) {
             setIsLoading(true)
 
             try {
-                // Create user-specific localStorage key
-                const userId = user?._id || 'guest'
-                const storageKey = `nutrition_${userId}_${dateString}`
-                const existingNutrition = localStorage.getItem(storageKey)
-                if (existingNutrition) {
-                    const parsed = JSON.parse(existingNutrition)
-                    setCurrentNutrition(parsed)
-                    setMeals(parsed.meals || [])
-                    setFoods(parsed.foods || [])
-                    setHasUnsavedChanges(false) // Reset change tracking when loading existing data
-                } else {
-                    const newNutrition: NutritionData = {
-                        id: Date.now().toString(),
-                        date: dateString,
-                        meals: [],
-                        foods: []
+                if (user && !user.guest && nutritionServiceRef.current) {
+                    // Load from server for logged-in users
+                    const dbNutrition = await nutritionServiceRef.current.loadNutrition(dateString)
+                    if (dbNutrition) {
+                        const loaded: NutritionData = {
+                            id: dbNutrition.id || Date.now().toString(),
+                            date: dbNutrition.date,
+                            meals: dbNutrition.meals || [],
+                            foods: dbNutrition.foods || []
+                        }
+                        setCurrentNutrition(loaded)
+                        setMeals(loaded.meals)
+                        setFoods(loaded.foods)
+                        setHasUnsavedChanges(false)
+                    } else {
+                        // Try migrating any existing local data for this date
+                        const localKey = `nutrition_${user._id || 'guest'}_${dateString}`
+                        const existingLocal = typeof window !== 'undefined' ? localStorage.getItem(localKey) : null
+                        if (existingLocal) {
+                            try {
+                                const parsed = JSON.parse(existingLocal)
+                                const migrated: NutritionData = {
+                                    id: parsed.id || Date.now().toString(),
+                                    date: dateString,
+                                    meals: parsed.meals || [],
+                                    foods: parsed.foods || []
+                                }
+                                setCurrentNutrition(migrated)
+                                setMeals(migrated.meals)
+                                setFoods(migrated.foods)
+                                setHasUnsavedChanges(false)
+                                // Persist migrated data to server
+                                await nutritionServiceRef.current.saveNutrition({
+                                    id: migrated.id,
+                                    date: migrated.date,
+                                    meals: migrated.meals,
+                                    foods: migrated.foods
+                                })
+                            } catch {
+                                const newNutrition: NutritionData = {
+                                    id: Date.now().toString(),
+                                    date: dateString,
+                                    meals: [],
+                                    foods: []
+                                }
+                                setCurrentNutrition(newNutrition)
+                                setMeals([])
+                                setFoods([])
+                                setHasUnsavedChanges(false)
+                            }
+                        } else {
+                            const newNutrition: NutritionData = {
+                                id: Date.now().toString(),
+                                date: dateString,
+                                meals: [],
+                                foods: []
+                            }
+                            setCurrentNutrition(newNutrition)
+                            setMeals([])
+                            setFoods([])
+                            setHasUnsavedChanges(false)
+                        }
                     }
-                    setCurrentNutrition(newNutrition)
-                    setMeals([])
-                    setFoods([])
-                    setHasUnsavedChanges(false) // Reset change tracking for new nutrition data
+                } else {
+                    // Guest mode: load from localStorage
+                    const userId = user?._id || 'guest'
+                    const storageKey = `nutrition_${userId}_${dateString}`
+                    const existingNutrition = localStorage.getItem(storageKey)
+                    if (existingNutrition) {
+                        const parsed = JSON.parse(existingNutrition)
+                        setCurrentNutrition(parsed)
+                        setMeals(parsed.meals || [])
+                        setFoods(parsed.foods || [])
+                        setHasUnsavedChanges(false)
+                    } else {
+                        const newNutrition: NutritionData = {
+                            id: Date.now().toString(),
+                            date: dateString,
+                            meals: [],
+                            foods: []
+                        }
+                        setCurrentNutrition(newNutrition)
+                        setMeals([])
+                        setFoods([])
+                        setHasUnsavedChanges(false)
+                    }
                 }
             } catch (error) {
                 console.error('Error loading nutrition data:', error)
@@ -128,25 +207,41 @@ export default function NutritionTab({ user }: NutritionTabProps) {
 
     // Auto-save nutrition data
     useEffect(() => {
-        if (currentNutrition) {
-            const updatedNutrition = {
-                ...currentNutrition,
-                meals,
-                foods
-            }
+        if (!currentNutrition) return
 
-            // Save to localStorage with user-specific key
+        const updatedNutrition = {
+            ...currentNutrition,
+            meals,
+            foods
+        }
+
+        if (user && !user.guest && nutritionServiceRef.current) {
+            if (hasUnsavedChanges) {
+                setAutoSaveStatus('saving')
+                nutritionServiceRef.current.autoSave({
+                    id: updatedNutrition.id,
+                    date: updatedNutrition.date,
+                    meals: updatedNutrition.meals,
+                    foods: updatedNutrition.foods
+                }).then(() => {
+                    setAutoSaveStatus('saved')
+                    setTimeout(() => setAutoSaveStatus('idle'), 2000)
+                }).catch(() => {
+                    setAutoSaveStatus('error')
+                    setTimeout(() => setAutoSaveStatus('idle'), 3000)
+                })
+            }
+        } else {
+            // Guest: save to localStorage
             const userId = user?._id || 'guest'
             const storageKey = `nutrition_${userId}_${currentNutrition.date}`
             localStorage.setItem(storageKey, JSON.stringify(updatedNutrition))
-
-            // Update auto-save status
             if (hasUnsavedChanges) {
                 setAutoSaveStatus('saving')
                 setTimeout(() => {
                     setAutoSaveStatus('saved')
                     setTimeout(() => setAutoSaveStatus('idle'), 2000)
-                }, 500) // Short delay to show saving status
+                }, 500)
             }
         }
     }, [meals, foods, currentNutrition, user])
@@ -215,7 +310,7 @@ export default function NutritionTab({ user }: NutritionTabProps) {
         }
     }, [autoSaveStatus, currentNutrition, user])
 
-    const handleManualSave = () => {
+    const handleManualSave = async () => {
         if (!currentNutrition) {
             setAutoSaveStatus('error')
             setTimeout(() => setAutoSaveStatus('idle'), 3000)
@@ -229,9 +324,18 @@ export default function NutritionTab({ user }: NutritionTabProps) {
                 meals,
                 foods
             }
-            const userId = user?._id || 'guest'
-            const storageKey = `nutrition_${userId}_${currentNutrition.date}`
-            localStorage.setItem(storageKey, JSON.stringify(updatedNutrition))
+            if (user && !user.guest && nutritionServiceRef.current) {
+                await nutritionServiceRef.current.saveNutrition({
+                    id: updatedNutrition.id,
+                    date: updatedNutrition.date,
+                    meals: updatedNutrition.meals,
+                    foods: updatedNutrition.foods
+                })
+            } else {
+                const userId = user?._id || 'guest'
+                const storageKey = `nutrition_${userId}_${currentNutrition.date}`
+                localStorage.setItem(storageKey, JSON.stringify(updatedNutrition))
+            }
             if (hasUnsavedChanges) {
                 setAutoSaveStatus('saved')
                 setTimeout(() => setAutoSaveStatus('idle'), 2000)
@@ -363,11 +467,22 @@ export default function NutritionTab({ user }: NutritionTabProps) {
     }
 
     const handleDragStart = (e: React.DragEvent, food: Food) => {
+        // Provide multiple mime types for broader browser support
         e.dataTransfer.setData('application/json', JSON.stringify(food))
+        // Some browsers (Safari/iOS) require a plain text payload to initiate DnD
+        try { e.dataTransfer.setData('text/plain', food.name || 'food') } catch { }
+        // Make the intent explicit
+        e.dataTransfer.effectAllowed = 'move'
+        // Improve drag image fidelity
+        const element = e.currentTarget as HTMLElement
+        if (element && e.dataTransfer.setDragImage) {
+            e.dataTransfer.setDragImage(element, element.clientWidth / 2, element.clientHeight / 2)
+        }
     }
 
     const handleDragOver = (e: React.DragEvent) => {
         e.preventDefault()
+        e.dataTransfer.dropEffect = 'move'
     }
 
     const handleDrop = (e: React.DragEvent, mealId: string) => {
