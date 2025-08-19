@@ -479,13 +479,11 @@ export default function NutritionTab({ user }: NutritionTabProps) {
                         {foods.map((food) => (
                             <div
                                 key={food.id}
-                                className="bg-purple-50 border border-purple-200 rounded-lg p-3 hover:bg-purple-100 transition-colors relative group"
+                                draggable
+                                onDragStart={(e) => handleDragStart(e, food)}
+                                className="bg-purple-50 border border-purple-200 rounded-lg p-3 hover:bg-purple-100 transition-colors relative group cursor-grab active:cursor-grabbing select-none"
                             >
-                                <div
-                                    draggable
-                                    onDragStart={(e) => handleDragStart(e, food)}
-                                    className="cursor-grab active:cursor-grabbing"
-                                >
+                                <div>
                                     <div className="font-medium text-purple-800 text-sm pr-6">{food.name}</div>
                                     <div className="text-xs text-purple-600">
                                         {food.calories}cal • {food.carbs}c • {food.protein}p • {food.fat}f
