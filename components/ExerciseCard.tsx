@@ -132,7 +132,7 @@ export default function ExerciseCard({ exercise, onDelete, onUpdate }: ExerciseC
 
         return (
             <div className="text-center" onClick={() => startEditing(field, value)}>
-                <div className="inline-block rounded px-10 py-0.5 cursor-pointer hover:bg-purple-50 transition-colors">
+                <div className="inline-block rounded px-5 py-0.5 cursor-pointer hover:bg-purple-50 transition-colors">
                     <div className="text-lg font-bold text-purple-600">
                         {field === 'weight' && value ? `${value}${unit || 'kg'}` : value || '-'}
                     </div>
@@ -217,7 +217,7 @@ export default function ExerciseCard({ exercise, onDelete, onUpdate }: ExerciseC
                     <button
                         onClick={() => setShowDeleteConfirm(true)}
                         className="perfect-circle bg-red-100 hover:bg-red-200 text-red-600 flex items-center justify-center transition-colors"
-                        style={{ '--circle-size': '32px' } as React.CSSProperties}
+                        style={{ '--circle-size': '28px' } as React.CSSProperties}
                     >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />

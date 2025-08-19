@@ -1,33 +1,518 @@
 'use client'
 
+import { useState, useEffect } from 'react'
+import { useDateContext } from './DateContext'
 import DateCard from './DateCard'
+import MealCard from './MealCard'
+import AddMealModal from './AddMealModal'
+import AddFoodModal from './AddFoodModal'
+import EditFoodModal from './EditFoodModal'
 import { User } from '@/types/auth'
+
+interface Food {
+    id: string
+    name: string
+    calories: number
+    carbs: number
+    protein: number
+    fat: number
+    notes?: string
+}
+
+interface Meal {
+    id: string
+    name: string
+    type: 'breakfast' | 'lunch' | 'dinner' | 'snack' | 'brunch' | 'custom'
+    foods: Food[]
+}
+
+interface NutritionData {
+    id: string
+    date: string
+    meals: Meal[]
+    foods: Food[]
+}
 
 interface NutritionTabProps {
     user?: User
 }
 
 export default function NutritionTab({ user }: NutritionTabProps) {
+    const { currentDate } = useDateContext()
+
+    const [currentNutrition, setCurrentNutrition] = useState<NutritionData | null>(null)
+    const [meals, setMeals] = useState<Meal[]>([])
+    const [foods, setFoods] = useState<Food[]>([])
+    const [showAddMealModal, setShowAddMealModal] = useState(false)
+    const [showAddFoodModal, setShowAddFoodModal] = useState(false)
+    const [showEditFoodModal, setShowEditFoodModal] = useState(false)
+    const [editingFood, setEditingFood] = useState<Food | null>(null)
+    const [isLoading, setIsLoading] = useState(false)
+    const [autoSaveStatus, setAutoSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle')
+    const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
+
+    // Calculate daily totals
+    const dailyTotals = (meals || []).reduce((acc, meal) => {
+        // Ensure meal.foods exists and is an array
+        const foods = meal?.foods || []
+        const mealTotals = foods.reduce((mealAcc, food) => ({
+            calories: mealAcc.calories + (food?.calories || 0),
+            carbs: mealAcc.carbs + (food?.carbs || 0),
+            protein: mealAcc.protein + (food?.protein || 0),
+            fat: mealAcc.fat + (food?.fat || 0)
+        }), { calories: 0, carbs: 0, protein: 0, fat: 0 })
+
+        return {
+            calories: acc.calories + mealTotals.calories,
+            carbs: acc.carbs + mealTotals.carbs,
+            protein: acc.protein + mealTotals.protein,
+            fat: acc.fat + mealTotals.fat
+        }
+    }, { calories: 0, carbs: 0, protein: 0, fat: 0 })
+
+    // Initialize nutrition data for current date
+    useEffect(() => {
+        const loadNutritionData = async () => {
+            // Use timezone-safe date formatting to avoid date shifts
+            const year = currentDate.getFullYear()
+            const month = String(currentDate.getMonth() + 1).padStart(2, '0')
+            const day = String(currentDate.getDate()).padStart(2, '0')
+            const dateString = `${year}-${month}-${day}`
+            setIsLoading(true)
+
+            try {
+                // For now, use localStorage for all users (can be extended to database later)
+                const existingNutrition = localStorage.getItem(`nutrition_${dateString}`)
+                if (existingNutrition) {
+                    const parsed = JSON.parse(existingNutrition)
+                    setCurrentNutrition(parsed)
+                    setMeals(parsed.meals || [])
+                    setFoods(parsed.foods || [])
+                    setHasUnsavedChanges(false) // Reset change tracking when loading existing data
+                } else {
+                    const newNutrition: NutritionData = {
+                        id: Date.now().toString(),
+                        date: dateString,
+                        meals: [],
+                        foods: []
+                    }
+                    setCurrentNutrition(newNutrition)
+                    setMeals([])
+                    setFoods([])
+                    setHasUnsavedChanges(false) // Reset change tracking for new nutrition data
+                }
+            } catch (error) {
+                console.error('Error loading nutrition data:', error)
+                // Fallback to creating new nutrition data
+                const newNutrition: NutritionData = {
+                    id: Date.now().toString(),
+                    date: dateString,
+                    meals: [],
+                    foods: []
+                }
+                setCurrentNutrition(newNutrition)
+                setMeals([])
+                setFoods([])
+                setHasUnsavedChanges(false) // Reset change tracking for fallback nutrition data
+            } finally {
+                setIsLoading(false)
+            }
+        }
+
+        loadNutritionData()
+    }, [currentDate])
+
+    // Auto-save nutrition data
+    useEffect(() => {
+        if (currentNutrition) {
+            const updatedNutrition = {
+                ...currentNutrition,
+                meals,
+                foods
+            }
+
+            // Save to localStorage
+            localStorage.setItem(`nutrition_${currentNutrition.date}`, JSON.stringify(updatedNutrition))
+
+            // Update auto-save status
+            if (hasUnsavedChanges) {
+                setAutoSaveStatus('saving')
+                setTimeout(() => {
+                    setAutoSaveStatus('saved')
+                    setTimeout(() => setAutoSaveStatus('idle'), 2000)
+                }, 500) // Short delay to show saving status
+            }
+        }
+    }, [meals, foods, currentNutrition])
+
+    // Update header with auto-save status
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            const statusElement = document.getElementById('auto-save-status')
+            if (statusElement) {
+                let statusHTML = ''
+
+                if (autoSaveStatus === 'saving') {
+                    statusHTML = `
+                        <div class="flex items-center space-x-2 text-xs sm:text-sm text-green-600">
+                            <div class="w-3 h-3 sm:w-4 sm:h-4 border-2 border-green-300 border-t-green-600 rounded-full animate-spin"></div>
+                            <span>Saving nutrition...</span>
+                        </div>
+                    `
+                } else if (autoSaveStatus === 'saved') {
+                    statusHTML = `
+                        <div class="flex items-center space-x-2 text-xs sm:text-sm text-green-600">
+                            <svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            <span>Nutrition saved</span>
+                        </div>
+                    `
+                } else if (autoSaveStatus === 'error') {
+                    statusHTML = `
+                        <div class="flex items-center space-x-2 text-xs sm:text-sm text-red-600">
+                            <svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                            <span>Save failed</span>
+                        </div>
+                    `
+                } else if (autoSaveStatus === 'idle') {
+                    statusHTML = `
+                        <div class="text-xs ${hasUnsavedChanges ? 'text-green-600' : 'text-gray-400'}">
+                            🥗
+                        </div>
+                    `
+                }
+
+                statusElement.innerHTML = statusHTML
+            }
+        }
+    }, [autoSaveStatus, hasUnsavedChanges])
+
+    const generateId = () => Date.now().toString() + Math.random().toString(36).substr(2, 9)
+
+    const handleAddMeal = (mealData: Omit<Meal, 'id' | 'foods'>) => {
+        const newMeal: Meal = {
+            ...mealData,
+            id: generateId(),
+            foods: []
+        }
+        setMeals(prev => [...prev, newMeal])
+        setHasUnsavedChanges(true)
+    }
+
+    const handleDeleteMeal = (id: string) => {
+        setMeals(prev => prev.filter(meal => meal.id !== id))
+        setHasUnsavedChanges(true)
+    }
+
+    const handleUpdateMeal = (id: string, updatedMeal: Partial<Meal>) => {
+        setMeals(prev => prev.map(meal =>
+            meal.id === id ? { ...meal, ...updatedMeal } : meal
+        ))
+        setHasUnsavedChanges(true)
+    }
+
+    const handleAddFood = (foodData: Omit<Food, 'id'>) => {
+        const newFood: Food = {
+            ...foodData,
+            id: generateId()
+        }
+        setFoods(prev => [...prev, newFood])
+        setHasUnsavedChanges(true)
+    }
+
+    const handleDeleteFood = (foodId: string) => {
+        setFoods(prev => prev.filter(food => food.id !== foodId))
+        setHasUnsavedChanges(true)
+    }
+
+    const handleEditFood = (food: Food) => {
+        setEditingFood(food)
+        setShowEditFoodModal(true)
+    }
+
+    const handleSaveEditedFood = (updatedFood: Food) => {
+        // Update food in available foods list
+        setFoods(prev => prev.map(food =>
+            food.id === updatedFood.id ? updatedFood : food
+        ))
+
+        // Update food in all meals that contain it
+        setMeals(prev => prev.map(meal => ({
+            ...meal,
+            foods: meal.foods.map(food =>
+                food.id === updatedFood.id ? updatedFood : food
+            )
+        })))
+
+        setHasUnsavedChanges(true)
+        setShowEditFoodModal(false)
+        setEditingFood(null)
+    }
+
+    const handleAddFoodToMeal = (mealId: string, food: Food) => {
+        setMeals(prev => prev.map(meal =>
+            meal.id === mealId
+                ? { ...meal, foods: [...meal.foods, food] }
+                : meal
+        ))
+        setHasUnsavedChanges(true)
+    }
+
+    const handleRemoveFoodFromMeal = (mealId: string, foodId: string) => {
+        // Find the food being removed and add it back to available foods
+        const mealWithFood = meals.find(meal => meal.id === mealId)
+        const foodToRemove = mealWithFood?.foods.find(food => food.id === foodId)
+
+        if (foodToRemove) {
+            // Clean the food data to remove any meal-specific properties
+            const cleanFood: Food = {
+                id: foodToRemove.id,
+                name: foodToRemove.name,
+                calories: foodToRemove.calories,
+                carbs: foodToRemove.carbs,
+                protein: foodToRemove.protein,
+                fat: foodToRemove.fat,
+                notes: foodToRemove.notes
+            }
+            // Add back to available foods
+            setFoods(prev => [...prev, cleanFood])
+        }
+
+        // Remove from meal
+        setMeals(prev => prev.map(meal =>
+            meal.id === mealId
+                ? { ...meal, foods: meal.foods.filter(food => food.id !== foodId) }
+                : meal
+        ))
+        setHasUnsavedChanges(true)
+    }
+
+    const handleDragStart = (e: React.DragEvent, food: Food) => {
+        e.dataTransfer.setData('application/json', JSON.stringify(food))
+    }
+
+    const handleDragOver = (e: React.DragEvent) => {
+        e.preventDefault()
+    }
+
+    const handleDrop = (e: React.DragEvent, mealId: string) => {
+        e.preventDefault()
+        try {
+            const foodData = JSON.parse(e.dataTransfer.getData('application/json'))
+
+            // Check if this food is being moved from another meal
+            if (foodData.sourceMealId && foodData.sourceMealId !== mealId) {
+                // Move food from one meal to another - extract clean food data
+                const { sourceMealId, ...cleanFoodData } = foodData
+                const foodToMove: Food = cleanFoodData as Food
+                handleMoveFoodBetweenMeals(foodData.sourceMealId, mealId, foodToMove)
+            } else if (!foodData.sourceMealId) {
+                // This is a food being moved from the available foods list
+                const foodToMove: Food = foodData as Food
+
+                // Add to meal
+                handleAddFoodToMeal(mealId, foodToMove)
+
+                // Remove from available foods
+                setFoods(prev => prev.filter(food => food.id !== foodToMove.id))
+                setHasUnsavedChanges(true)
+            }
+            // If sourceMealId === mealId, do nothing (dropping on same meal)
+        } catch (error) {
+            console.error('Error dropping food:', error)
+        }
+    }
+
+    const handleMoveFoodBetweenMeals = (fromMealId: string, toMealId: string, food: Food) => {
+        // Remove food from source meal and add to target meal
+        setMeals(prev => prev.map(meal => {
+            if (meal.id === fromMealId) {
+                // Remove from source meal
+                return { ...meal, foods: meal.foods.filter(f => f.id !== food.id) }
+            } else if (meal.id === toMealId) {
+                // Add to target meal
+                return { ...meal, foods: [...meal.foods, food] }
+            }
+            return meal
+        }))
+        setHasUnsavedChanges(true)
+    }
+
     return (
         <div className="space-y-2 sm:space-y-3">
             {/* Date Navigation */}
             <DateCard user={user} />
 
-            {/* Nutrition Content */}
-            <div className="bg-white rounded-2xl p-4 sm:p-8 shadow-lg border border-purple-100 text-center">
-                <div className="w-16 h-16 sm:w-24 sm:h-24 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4 sm:mb-6">
-                    <span className="text-2xl sm:text-4xl">🥗</span>
-                </div>
-                <h3 className="text-xl sm:text-2xl font-bold text-purple-800 mb-3 sm:mb-4">Nutrition Tracking</h3>
-                <p className="text-purple-600 mb-4 sm:mb-6 text-sm sm:text-base">
-                    Track your daily nutrition, calories, and macros to optimize your fitness journey.
-                </p>
-                <div className="bg-purple-50 rounded-lg p-3 sm:p-4 border border-purple-100">
-                    <p className="text-purple-500 text-xs sm:text-sm">
-                        🚧 Coming Soon - This feature is currently under development
-                    </p>
+            {/* Daily Summary */}
+            <div className="bg-white rounded-2xl p-4 shadow-lg border border-green-100">
+                <h3 className="text-lg font-bold text-green-800 mb-3 text-center">Daily Summary</h3>
+                <div className="grid grid-cols-4 gap-3">
+                    <div className="bg-green-50 rounded-lg p-3 text-center">
+                        <div className="text-xl font-bold text-green-600">{dailyTotals.calories}</div>
+                        <div className="text-sm text-green-500">Calories</div>
+                    </div>
+                    <div className="bg-blue-50 rounded-lg p-3 text-center">
+                        <div className="text-xl font-bold text-blue-600">{dailyTotals.carbs.toFixed(1)}g</div>
+                        <div className="text-sm text-blue-500">Carbs</div>
+                    </div>
+                    <div className="bg-red-50 rounded-lg p-3 text-center">
+                        <div className="text-xl font-bold text-red-600">{dailyTotals.protein.toFixed(1)}g</div>
+                        <div className="text-sm text-red-500">Protein</div>
+                    </div>
+                    <div className="bg-yellow-50 rounded-lg p-3 text-center">
+                        <div className="text-xl font-bold text-yellow-600">{dailyTotals.fat.toFixed(1)}g</div>
+                        <div className="text-sm text-yellow-500">Fat</div>
+                    </div>
                 </div>
             </div>
+
+            {/* Action Buttons */}
+            <div className="flex space-x-3">
+                <button
+                    onClick={() => setShowAddFoodModal(true)}
+                    className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-colors font-medium text-sm flex-1"
+                >
+                    Add Food
+                </button>
+                <button
+                    onClick={() => setShowAddMealModal(true)}
+                    className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors font-medium text-sm flex-1"
+                >
+                    Add Meal
+                </button>
+            </div>
+
+            {/* Available Foods (for dragging) - Only show if foods exist */}
+            {foods.length > 0 && (
+                <div className="bg-white rounded-2xl p-4 shadow-lg border border-green-100">
+                    <div className="flex items-center justify-between mb-3">
+                        <h3 className="text-lg font-bold text-green-800">Available Foods</h3>
+                        <span className="text-sm text-green-600 bg-green-100 px-2 py-1 rounded-full">
+                            {foods.length} {foods.length === 1 ? 'item' : 'items'}
+                        </span>
+                    </div>
+                    <p className="text-xs text-green-600 mb-3 italic">
+                        Drag foods to meals, hover to delete, or remove from meals to return them here
+                    </p>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        {foods.map((food) => (
+                            <div
+                                key={food.id}
+                                className="bg-green-50 border border-green-200 rounded-lg p-3 hover:bg-green-100 transition-colors relative group"
+                            >
+                                <div
+                                    draggable
+                                    onDragStart={(e) => handleDragStart(e, food)}
+                                    className="cursor-grab active:cursor-grabbing"
+                                >
+                                    <div className="font-medium text-green-800 text-sm pr-6">{food.name}</div>
+                                    <div className="text-xs text-green-600">
+                                        {food.calories}cal • {food.carbs}c • {food.protein}p • {food.fat}f
+                                    </div>
+                                    {food.notes && (
+                                        <div className="text-xs text-green-500 italic mt-1">{food.notes}</div>
+                                    )}
+                                </div>
+                                <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity flex space-x-1">
+                                    <button
+                                        onClick={() => handleEditFood(food)}
+                                        className="bg-blue-100 hover:bg-blue-200 text-blue-600 rounded-full p-1 flex items-center justify-center"
+                                        style={{ width: '20px', height: '20px' }}
+                                        title="Edit food"
+                                    >
+                                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                        </svg>
+                                    </button>
+                                    <button
+                                        onClick={() => handleDeleteFood(food.id)}
+                                        className="bg-red-100 hover:bg-red-200 text-red-600 rounded-full p-1 flex items-center justify-center"
+                                        style={{ width: '20px', height: '20px' }}
+                                        title="Delete food"
+                                    >
+                                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
+
+            {/* Meals List */}
+            <div className="space-y-3">
+                {isLoading ? (
+                    <div className="bg-white rounded-2xl p-8 shadow-lg border border-green-100 text-center">
+                        <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <div className="w-6 h-6 border-4 border-green-300 border-t-green-600 rounded-full animate-spin"></div>
+                        </div>
+                        <p className="text-green-600 text-base">Loading nutrition data...</p>
+                    </div>
+                ) : meals.length === 0 ? (
+                    <div className="bg-white rounded-2xl p-8 shadow-lg border border-green-100 text-center">
+                        <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <span className="text-2xl">🥗</span>
+                        </div>
+                        <h3 className="text-xl font-bold text-green-800 mb-2">No Meals Added Yet</h3>
+                        <p className="text-green-600 mb-4 text-sm">
+                            Start by adding meals to track your daily nutrition and calories.
+                        </p>
+                        <button
+                            onClick={() => setShowAddMealModal(true)}
+                            className="bg-green-500 text-white px-6 py-2 rounded-lg hover:bg-green-600 transition-colors font-medium"
+                        >
+                            Add Your First Meal
+                        </button>
+                    </div>
+                ) : (
+                    meals.map((meal) => (
+                        <div
+                            key={meal.id}
+                            onDragOver={handleDragOver}
+                            onDrop={(e) => handleDrop(e, meal.id)}
+                            className="relative"
+                        >
+                            <MealCard
+                                meal={meal}
+                                onDelete={handleDeleteMeal}
+                                onUpdate={handleUpdateMeal}
+                                onAddFood={handleAddFoodToMeal}
+                                onRemoveFood={handleRemoveFoodFromMeal}
+                                onMoveFood={handleMoveFoodBetweenMeals}
+                                onEditFood={handleEditFood}
+                            />
+                        </div>
+                    ))
+                )}
+            </div>
+
+            {/* Modals */}
+            <AddMealModal
+                isOpen={showAddMealModal}
+                onClose={() => setShowAddMealModal(false)}
+                onAddMeal={handleAddMeal}
+            />
+
+            <AddFoodModal
+                isOpen={showAddFoodModal}
+                onClose={() => setShowAddFoodModal(false)}
+                onAddFood={handleAddFood}
+            />
+
+            <EditFoodModal
+                isOpen={showEditFoodModal}
+                food={editingFood}
+                onClose={() => {
+                    setShowEditFoodModal(false)
+                    setEditingFood(null)
+                }}
+                onSaveFood={handleSaveEditedFood}
+            />
         </div>
     )
 }
