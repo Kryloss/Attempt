@@ -20,6 +20,9 @@ export const config = {
         user: process.env.GMAIL_USER || '',
         appPassword: process.env.GMAIL_APP_PASSWORD || '',
     },
+    usda: {
+        apiKey: process.env.USDA_API_KEY || '',
+    },
     app: {
         url: process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
     },
@@ -43,6 +46,12 @@ export const isGmailConfigured = () => {
     // Check if we have valid Gmail configuration
     return !!(config.gmail.user && config.gmail.appPassword &&
         config.gmail.user.trim() !== '' && config.gmail.appPassword.trim() !== '');
+};
+
+// Helper function to check if USDA API is configured
+export const isUSDAConfigured = () => {
+    // Check if we have valid USDA API key
+    return !!(config.usda.apiKey && config.usda.apiKey.trim() !== '');
 };
 
 // Helper function to check if we should attempt database operations
@@ -70,10 +79,12 @@ export const debugEnvironment = () => {
         MONGODB_URI: config.mongodb.uri ? 'SET' : 'NOT SET',
         GMAIL_USER: config.gmail.user ? 'SET' : 'NOT SET',
         GMAIL_APP_PASSWORD: config.gmail.appPassword ? 'SET' : 'NOT SET',
+        USDA_API_KEY: config.usda.apiKey ? 'SET' : 'NOT SET',
         NEXT_PUBLIC_APP_URL: config.app.url,
         isBuildTime: config.isBuildTime,
         isVercelBuild: config.isVercelBuild,
         isMongoDBConfigured: isMongoDBConfigured(),
         isGmailConfigured: isGmailConfigured(),
+        isUSDAConfigured: isUSDAConfigured(),
     };
 };
