@@ -38,8 +38,7 @@ export default function TrainingDashboard({ user, onSignOut }: TrainingDashboard
 
             {/* Header */}
             <header
-                className={`bg-white/95 backdrop-blur-lg border-b border-purple-200 shadow-xl transition-transform duration-300 ${isAnyModalOpen ? '-translate-y-full' : 'translate-y-0'
-                    }`}
+                className="bg-white/95 backdrop-blur-lg border-b border-purple-200 shadow-xl transition-transform duration-300 translate-y-0"
                 style={{
                     position: 'fixed',
                     top: 0,

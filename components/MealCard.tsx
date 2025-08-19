@@ -176,7 +176,7 @@ export default function MealCard({ meal, onDelete, onUpdate, onAddFood, onRemove
                                             {food.calories}cal • {food.carbs}c • {food.protein}p • {food.fat}f
                                         </div>
                                         {food.notes && (
-                                            <div className="text-xs text-purple-500 italic truncate">{food.notes}</div>
+                                            <div className="text-xs text-purple-500 italic break-words whitespace-normal">{food.notes}</div>
                                         )}
                                     </div>
                                     <div className="flex items-center space-x-2">
