@@ -107,11 +107,11 @@ export default function MealCard({ meal, onDelete, onUpdate, onAddFood, onRemove
     }
 
     return (
-        <div className="bg-white border border-green-200 rounded-lg p-0 shadow-sm hover:shadow-md transition-all duration-200 hover:border-green-300 group relative">
+        <div className="bg-white border border-purple-200 rounded-lg p-0 shadow-sm hover:shadow-md transition-all duration-200 hover:border-purple-300 group relative">
             <div className="flex items-start justify-between">
                 <div className="flex-1 min-w-0">
                     {/* Meal Header */}
-                    <div className="pl-2 pr-1 pb-2 border-b border-green-100">
+                    <div className="pl-2 pr-1 pb-2 border-b border-purple-100">
                         <div className="flex items-center space-x-2 mb-1">
                             <span className="text-lg">{getMealTypeEmoji(meal.type)}</span>
                             {editingField === 'name' ? (
@@ -121,12 +121,12 @@ export default function MealCard({ meal, onDelete, onUpdate, onAddFood, onRemove
                                     onChange={(e) => setEditValue(e.target.value)}
                                     onBlur={saveEdit}
                                     onKeyDown={handleKeyPress}
-                                    className="text-sm font-bold text-green-800 bg-transparent focus:outline-none flex-1"
+                                    className="text-sm font-bold text-purple-800 bg-transparent focus:outline-none flex-1"
                                     autoFocus
                                 />
                             ) : (
                                 <h4
-                                    className="text-sm font-bold text-green-800 mb-0 break-words cursor-text flex-1"
+                                    className="text-sm font-bold text-purple-800 mb-0 break-words cursor-text flex-1"
                                     onClick={() => startEditing('name', meal.name)}
                                     title="Click to edit name"
                                 >
@@ -137,17 +137,17 @@ export default function MealCard({ meal, onDelete, onUpdate, onAddFood, onRemove
 
                         {/* Meal Totals */}
                         <div className="grid grid-cols-4 gap-1 text-center">
+                            <div className="bg-purple-50 rounded px-2 py-1">
+                                <div className="text-sm font-bold text-purple-600">{totals.calories}</div>
+                                <div className="text-xs text-purple-500">Cal</div>
+                            </div>
                             <div className="bg-green-50 rounded px-2 py-1">
-                                <div className="text-sm font-bold text-green-600">{totals.calories}</div>
-                                <div className="text-xs text-green-500">Cal</div>
+                                <div className="text-sm font-bold text-green-600">{totals.carbs}g</div>
+                                <div className="text-xs text-green-500">Carbs</div>
                             </div>
                             <div className="bg-blue-50 rounded px-2 py-1">
-                                <div className="text-sm font-bold text-blue-600">{totals.carbs}g</div>
-                                <div className="text-xs text-blue-500">Carbs</div>
-                            </div>
-                            <div className="bg-red-50 rounded px-2 py-1">
-                                <div className="text-sm font-bold text-red-600">{totals.protein}g</div>
-                                <div className="text-xs text-red-500">Protein</div>
+                                <div className="text-sm font-bold text-blue-600">{totals.protein}g</div>
+                                <div className="text-xs text-blue-500">Protein</div>
                             </div>
                             <div className="bg-yellow-50 rounded px-2 py-1">
                                 <div className="text-sm font-bold text-yellow-600">{totals.fat}g</div>
@@ -159,7 +159,7 @@ export default function MealCard({ meal, onDelete, onUpdate, onAddFood, onRemove
                     {/* Foods List */}
                     <div className="px-2 py-2 space-y-1">
                         {(meal?.foods || []).length === 0 ? (
-                            <p className="text-xs text-green-400 italic text-center py-2">
+                            <p className="text-xs text-purple-400 italic text-center py-2">
                                 No foods added yet. Drag foods here or use Add Food button.
                             </p>
                         ) : (
@@ -168,21 +168,22 @@ export default function MealCard({ meal, onDelete, onUpdate, onAddFood, onRemove
                                     key={food.id}
                                     draggable
                                     onDragStart={(e) => handleFoodDragStart(e, food)}
-                                    className="flex items-center justify-between bg-green-50 rounded p-1.5 border border-green-100 cursor-grab active:cursor-grabbing hover:bg-green-100 transition-colors"
+                                    className="flex items-center justify-between bg-purple-50 rounded p-1.5 border border-purple-100 cursor-grab active:cursor-grabbing hover:bg-purple-100 transition-colors"
                                 >
                                     <div className="flex-1 min-w-0">
-                                        <div className="text-xs font-medium text-green-800 truncate">{food.name}</div>
-                                        <div className="text-xs text-green-600">
+                                        <div className="text-xs font-medium text-purple-800 truncate">{food.name}</div>
+                                        <div className="text-xs text-purple-600">
                                             {food.calories}cal • {food.carbs}c • {food.protein}p • {food.fat}f
                                         </div>
                                         {food.notes && (
-                                            <div className="text-xs text-green-500 italic truncate">{food.notes}</div>
+                                            <div className="text-xs text-purple-500 italic truncate">{food.notes}</div>
                                         )}
                                     </div>
-                                    <div className="flex items-center space-x-1">
+                                    <div className="flex items-center space-x-2">
                                         <button
                                             onClick={() => onEditFood(food)}
-                                            className="text-blue-400 hover:text-blue-600 transition-colors"
+                                            className="perfect-circle bg-blue-100 hover:bg-blue-200 text-blue-600 flex items-center justify-center transition-colors"
+                                            style={{ '--circle-size': '24px' } as React.CSSProperties}
                                             title="Edit food"
                                         >
                                             <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -191,7 +192,8 @@ export default function MealCard({ meal, onDelete, onUpdate, onAddFood, onRemove
                                         </button>
                                         <button
                                             onClick={() => handleRemoveFood(food.id)}
-                                            className="text-red-400 hover:text-red-600 transition-colors"
+                                            className="perfect-circle bg-red-100 hover:bg-red-200 text-red-600 flex items-center justify-center transition-colors"
+                                            style={{ '--circle-size': '24px' } as React.CSSProperties}
                                             title="Remove from meal"
                                         >
                                             <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -220,13 +222,13 @@ export default function MealCard({ meal, onDelete, onUpdate, onAddFood, onRemove
 
             {/* Drag Handle */}
             <div
-                className="mt-0 pt-0 border-t border-green-100 flex items-center justify-center touch-manipulation select-none cursor-grab active:cursor-grabbing"
+                className="mt-0 pt-0 border-t border-purple-100 flex items-center justify-center touch-manipulation select-none cursor-grab active:cursor-grabbing"
                 onContextMenu={(e) => e.preventDefault()}
             >
                 <div className="flex space-x-1.5 py-0.5">
-                    <div className="w-1.5 h-1.5 bg-green-300/60 rounded-full"></div>
-                    <div className="w-1.5 h-1.5 bg-green-300/60 rounded-full"></div>
-                    <div className="w-1.5 h-1.5 bg-green-300/60 rounded-full"></div>
+                    <div className="w-1.5 h-1.5 bg-purple-300/60 rounded-full"></div>
+                    <div className="w-1.5 h-1.5 bg-purple-300/60 rounded-full"></div>
+                    <div className="w-1.5 h-1.5 bg-purple-300/60 rounded-full"></div>
                 </div>
             </div>
 
@@ -234,14 +236,14 @@ export default function MealCard({ meal, onDelete, onUpdate, onAddFood, onRemove
             {showDeleteConfirm && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-2 sm:p-4">
                     <div className="bg-white rounded-xl p-4 sm:p-6 w-full max-w-sm shadow-2xl">
-                        <h3 className="text-lg font-bold text-green-800 mb-4">Delete Meal</h3>
-                        <p className="text-green-600 mb-6 text-sm sm:text-base">
+                        <h3 className="text-lg font-bold text-purple-800 mb-4">Delete Meal</h3>
+                        <p className="text-purple-600 mb-6 text-sm sm:text-base">
                             Are you sure you want to delete "{meal.name}"? This action cannot be undone.
                         </p>
                         <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-3">
                             <button
                                 onClick={() => setShowDeleteConfirm(false)}
-                                className="w-full sm:flex-1 bg-green-100 text-green-700 py-2 px-4 rounded-lg hover:bg-green-200 transition-colors text-sm sm:text-base"
+                                className="w-full sm:flex-1 bg-purple-100 text-purple-700 py-2 px-4 rounded-lg hover:bg-purple-200 transition-colors text-sm sm:text-base"
                             >
                                 Cancel
                             </button>

@@ -81,8 +81,10 @@ export default function NutritionTab({ user }: NutritionTabProps) {
             setIsLoading(true)
 
             try {
-                // For now, use localStorage for all users (can be extended to database later)
-                const existingNutrition = localStorage.getItem(`nutrition_${dateString}`)
+                // Create user-specific localStorage key
+                const userId = user?._id || 'guest'
+                const storageKey = `nutrition_${userId}_${dateString}`
+                const existingNutrition = localStorage.getItem(storageKey)
                 if (existingNutrition) {
                     const parsed = JSON.parse(existingNutrition)
                     setCurrentNutrition(parsed)
@@ -120,7 +122,7 @@ export default function NutritionTab({ user }: NutritionTabProps) {
         }
 
         loadNutritionData()
-    }, [currentDate])
+    }, [currentDate, user])
 
     // Auto-save nutrition data
     useEffect(() => {
@@ -131,8 +133,10 @@ export default function NutritionTab({ user }: NutritionTabProps) {
                 foods
             }
 
-            // Save to localStorage
-            localStorage.setItem(`nutrition_${currentNutrition.date}`, JSON.stringify(updatedNutrition))
+            // Save to localStorage with user-specific key
+            const userId = user?._id || 'guest'
+            const storageKey = `nutrition_${userId}_${currentNutrition.date}`
+            localStorage.setItem(storageKey, JSON.stringify(updatedNutrition))
 
             // Update auto-save status
             if (hasUnsavedChanges) {
@@ -143,7 +147,7 @@ export default function NutritionTab({ user }: NutritionTabProps) {
                 }, 500) // Short delay to show saving status
             }
         }
-    }, [meals, foods, currentNutrition])
+    }, [meals, foods, currentNutrition, user])
 
     // Update header with auto-save status
     useEffect(() => {
@@ -154,14 +158,14 @@ export default function NutritionTab({ user }: NutritionTabProps) {
 
                 if (autoSaveStatus === 'saving') {
                     statusHTML = `
-                        <div class="flex items-center space-x-2 text-xs sm:text-sm text-green-600">
-                            <div class="w-3 h-3 sm:w-4 sm:h-4 border-2 border-green-300 border-t-green-600 rounded-full animate-spin"></div>
+                        <div class="flex items-center space-x-2 text-xs sm:text-sm text-purple-600">
+                            <div class="w-3 h-3 sm:w-4 sm:h-4 border-2 border-purple-300 border-t-purple-600 rounded-full animate-spin"></div>
                             <span>Saving nutrition...</span>
                         </div>
                     `
                 } else if (autoSaveStatus === 'saved') {
                     statusHTML = `
-                        <div class="flex items-center space-x-2 text-xs sm:text-sm text-green-600">
+                        <div class="flex items-center space-x-2 text-xs sm:text-sm text-purple-600">
                             <svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                             </svg>
@@ -179,7 +183,7 @@ export default function NutritionTab({ user }: NutritionTabProps) {
                     `
                 } else if (autoSaveStatus === 'idle') {
                     statusHTML = `
-                        <div class="text-xs ${hasUnsavedChanges ? 'text-green-600' : 'text-gray-400'}">
+                        <div class="text-xs ${hasUnsavedChanges ? 'text-purple-600' : 'text-gray-400'}">
                             🥗
                         </div>
                     `
@@ -347,20 +351,20 @@ export default function NutritionTab({ user }: NutritionTabProps) {
             <DateCard user={user} />
 
             {/* Daily Summary */}
-            <div className="bg-white rounded-2xl p-4 shadow-lg border border-green-100">
-                <h3 className="text-lg font-bold text-green-800 mb-3 text-center">Daily Summary</h3>
+            <div className="bg-white rounded-2xl p-4 shadow-lg border border-purple-100">
+                <h3 className="text-lg font-bold text-purple-800 mb-3 text-center">Daily Summary</h3>
                 <div className="grid grid-cols-4 gap-3">
+                    <div className="bg-purple-50 rounded-lg p-3 text-center">
+                        <div className="text-xl font-bold text-purple-600">{dailyTotals.calories}</div>
+                        <div className="text-sm text-purple-500">Calories</div>
+                    </div>
                     <div className="bg-green-50 rounded-lg p-3 text-center">
-                        <div className="text-xl font-bold text-green-600">{dailyTotals.calories}</div>
-                        <div className="text-sm text-green-500">Calories</div>
+                        <div className="text-xl font-bold text-green-600">{dailyTotals.carbs.toFixed(1)}g</div>
+                        <div className="text-sm text-green-500">Carbs</div>
                     </div>
                     <div className="bg-blue-50 rounded-lg p-3 text-center">
-                        <div className="text-xl font-bold text-blue-600">{dailyTotals.carbs.toFixed(1)}g</div>
-                        <div className="text-sm text-blue-500">Carbs</div>
-                    </div>
-                    <div className="bg-red-50 rounded-lg p-3 text-center">
-                        <div className="text-xl font-bold text-red-600">{dailyTotals.protein.toFixed(1)}g</div>
-                        <div className="text-sm text-red-500">Protein</div>
+                        <div className="text-xl font-bold text-blue-600">{dailyTotals.protein.toFixed(1)}g</div>
+                        <div className="text-sm text-blue-500">Protein</div>
                     </div>
                     <div className="bg-yellow-50 rounded-lg p-3 text-center">
                         <div className="text-xl font-bold text-yellow-600">{dailyTotals.fat.toFixed(1)}g</div>
@@ -373,13 +377,13 @@ export default function NutritionTab({ user }: NutritionTabProps) {
             <div className="flex space-x-3">
                 <button
                     onClick={() => setShowAddFoodModal(true)}
-                    className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-colors font-medium text-sm flex-1"
+                    className="bg-purple-500/90 text-white px-4 py-2 rounded-lg hover:bg-purple-600/90 transition-colors font-medium text-sm flex-1"
                 >
                     Add Food
                 </button>
                 <button
                     onClick={() => setShowAddMealModal(true)}
-                    className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors font-medium text-sm flex-1"
+                    className="bg-purple-500/90 text-white px-4 py-2 rounded-lg hover:bg-purple-600/90 transition-colors font-medium text-sm flex-1"
                 >
                     Add Meal
                 </button>
@@ -387,53 +391,53 @@ export default function NutritionTab({ user }: NutritionTabProps) {
 
             {/* Available Foods (for dragging) - Only show if foods exist */}
             {foods.length > 0 && (
-                <div className="bg-white rounded-2xl p-4 shadow-lg border border-green-100">
+                <div className="bg-white rounded-2xl p-4 shadow-lg border border-purple-100">
                     <div className="flex items-center justify-between mb-3">
-                        <h3 className="text-lg font-bold text-green-800">Available Foods</h3>
-                        <span className="text-sm text-green-600 bg-green-100 px-2 py-1 rounded-full">
+                        <h3 className="text-lg font-bold text-purple-800">Available Foods</h3>
+                        <span className="text-sm text-purple-600 bg-purple-100 px-2 py-1 rounded-full">
                             {foods.length} {foods.length === 1 ? 'item' : 'items'}
                         </span>
                     </div>
-                    <p className="text-xs text-green-600 mb-3 italic">
+                    <p className="text-xs text-purple-600 mb-3 italic">
                         Drag foods to meals, hover to delete, or remove from meals to return them here
                     </p>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                         {foods.map((food) => (
                             <div
                                 key={food.id}
-                                className="bg-green-50 border border-green-200 rounded-lg p-3 hover:bg-green-100 transition-colors relative group"
+                                className="bg-purple-50 border border-purple-200 rounded-lg p-3 hover:bg-purple-100 transition-colors relative group"
                             >
                                 <div
                                     draggable
                                     onDragStart={(e) => handleDragStart(e, food)}
                                     className="cursor-grab active:cursor-grabbing"
                                 >
-                                    <div className="font-medium text-green-800 text-sm pr-6">{food.name}</div>
-                                    <div className="text-xs text-green-600">
+                                    <div className="font-medium text-purple-800 text-sm pr-6">{food.name}</div>
+                                    <div className="text-xs text-purple-600">
                                         {food.calories}cal • {food.carbs}c • {food.protein}p • {food.fat}f
                                     </div>
                                     {food.notes && (
-                                        <div className="text-xs text-green-500 italic mt-1">{food.notes}</div>
+                                        <div className="text-xs text-purple-500 italic mt-1">{food.notes}</div>
                                     )}
                                 </div>
-                                <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity flex space-x-1">
+                                <div className="absolute top-1/2 right-2 transform -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity flex space-x-2">
                                     <button
                                         onClick={() => handleEditFood(food)}
-                                        className="bg-blue-100 hover:bg-blue-200 text-blue-600 rounded-full p-1 flex items-center justify-center"
-                                        style={{ width: '20px', height: '20px' }}
+                                        className="perfect-circle bg-blue-100 hover:bg-blue-200 text-blue-600 flex items-center justify-center"
+                                        style={{ '--circle-size': '28px' } as React.CSSProperties}
                                         title="Edit food"
                                     >
-                                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                         </svg>
                                     </button>
                                     <button
                                         onClick={() => handleDeleteFood(food.id)}
-                                        className="bg-red-100 hover:bg-red-200 text-red-600 rounded-full p-1 flex items-center justify-center"
-                                        style={{ width: '20px', height: '20px' }}
+                                        className="perfect-circle bg-red-100 hover:bg-red-200 text-red-600 flex items-center justify-center"
+                                        style={{ '--circle-size': '28px' } as React.CSSProperties}
                                         title="Delete food"
                                     >
-                                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                                         </svg>
                                     </button>
@@ -447,24 +451,24 @@ export default function NutritionTab({ user }: NutritionTabProps) {
             {/* Meals List */}
             <div className="space-y-3">
                 {isLoading ? (
-                    <div className="bg-white rounded-2xl p-8 shadow-lg border border-green-100 text-center">
-                        <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <div className="w-6 h-6 border-4 border-green-300 border-t-green-600 rounded-full animate-spin"></div>
+                    <div className="bg-white rounded-2xl p-8 shadow-lg border border-purple-100 text-center">
+                        <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <div className="w-6 h-6 border-4 border-purple-300 border-t-purple-600 rounded-full animate-spin"></div>
                         </div>
-                        <p className="text-green-600 text-base">Loading nutrition data...</p>
+                        <p className="text-purple-600 text-base">Loading nutrition data...</p>
                     </div>
                 ) : meals.length === 0 ? (
-                    <div className="bg-white rounded-2xl p-8 shadow-lg border border-green-100 text-center">
-                        <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <div className="bg-white rounded-2xl p-8 shadow-lg border border-purple-100 text-center">
+                        <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
                             <span className="text-2xl">🥗</span>
                         </div>
-                        <h3 className="text-xl font-bold text-green-800 mb-2">No Meals Added Yet</h3>
-                        <p className="text-green-600 mb-4 text-sm">
+                        <h3 className="text-xl font-bold text-purple-800 mb-2">No Meals Added Yet</h3>
+                        <p className="text-purple-600 mb-4 text-sm">
                             Start by adding meals to track your daily nutrition and calories.
                         </p>
                         <button
                             onClick={() => setShowAddMealModal(true)}
-                            className="bg-green-500 text-white px-6 py-2 rounded-lg hover:bg-green-600 transition-colors font-medium"
+                            className="bg-purple-500 text-white px-6 py-2 rounded-lg hover:bg-purple-600 transition-colors font-medium"
                         >
                             Add Your First Meal
                         </button>

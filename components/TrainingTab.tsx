@@ -146,8 +146,10 @@ export default function TrainingTab({ user }: TrainingTabProps) {
                         setHasUnsavedChanges(false) // Reset change tracking for new workout
                     }
                 } else {
-                    // Guest mode - use localStorage
-                    const existingTraining = localStorage.getItem(`training_${dateString}`)
+                    // Guest mode - use localStorage with user-specific key
+                    const userId = user?._id || 'guest'
+                    const storageKey = `training_${userId}_${dateString}`
+                    const existingTraining = localStorage.getItem(storageKey)
                     if (existingTraining) {
                         const parsed = JSON.parse(existingTraining)
                         setCurrentTraining(parsed)
@@ -276,7 +278,9 @@ export default function TrainingTab({ user }: TrainingTabProps) {
         } else if (currentTraining) {
             // Guest mode - only save if training should be saved
             if (shouldSaveTraining(currentTraining)) {
-                localStorage.setItem(`training_${currentTraining.date}`, JSON.stringify(currentTraining))
+                const userId = user?._id || 'guest'
+                const storageKey = `training_${userId}_${currentTraining.date}`
+                localStorage.setItem(storageKey, JSON.stringify(currentTraining))
             }
             // Clear date switch delay for guest mode
             setIsDateSwitchBlocked(false)
@@ -934,11 +938,13 @@ export default function TrainingTab({ user }: TrainingTabProps) {
             const dates = new Set<string>()
 
             if (!user || user.guest) {
-                // For guest users, check localStorage
+                // For guest users, check localStorage with user-specific keys
+                const userId = user?._id || 'guest'
+                const keyPrefix = `training_${userId}_`
                 for (let i = 0; i < localStorage.length; i++) {
                     const key = localStorage.key(i)
-                    if (key && key.startsWith('training_')) {
-                        const dateString = key.replace('training_', '')
+                    if (key && key.startsWith(keyPrefix)) {
+                        const dateString = key.replace(keyPrefix, '')
                         try {
                             const training = JSON.parse(localStorage.getItem(key) || '{}')
                             if (training.exercises && training.exercises.length > 0) {

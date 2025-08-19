@@ -75,7 +75,7 @@ export default function AddMealModal({ isOpen, onClose, onAddMeal }: AddMealModa
             <div className="bg-white rounded-xl w-full max-w-md shadow-2xl">
                 <div className="p-6">
                     <div className="flex items-center justify-between mb-6">
-                        <h2 className="text-xl font-bold text-green-800">Add Meal</h2>
+                        <h2 className="text-xl font-bold text-purple-800">Add Meal</h2>
                         <button
                             onClick={handleCancel}
                             className="text-gray-400 hover:text-gray-600 transition-colors"
@@ -88,7 +88,7 @@ export default function AddMealModal({ isOpen, onClose, onAddMeal }: AddMealModa
 
                     <form onSubmit={handleSubmit} className="space-y-4">
                         <div>
-                            <label className="block text-sm font-medium text-green-700 mb-3">
+                            <label className="block text-sm font-medium text-purple-700 mb-3">
                                 Choose Meal Type
                             </label>
                             <div className="grid grid-cols-2 gap-3">
@@ -98,8 +98,8 @@ export default function AddMealModal({ isOpen, onClose, onAddMeal }: AddMealModa
                                         type="button"
                                         onClick={() => setSelectedType(type.id)}
                                         className={`p-3 rounded-lg border-2 transition-all duration-200 ${selectedType === type.id
-                                                ? 'border-green-500 bg-green-50 text-green-700'
-                                                : 'border-gray-200 hover:border-green-300 hover:bg-green-25'
+                                            ? 'border-purple-500 bg-purple-50 text-purple-700'
+                                            : 'border-gray-200 hover:border-purple-300 hover:bg-purple-25'
                                             }`}
                                     >
                                         <div className="text-center">
@@ -114,14 +114,14 @@ export default function AddMealModal({ isOpen, onClose, onAddMeal }: AddMealModa
                         {/* Custom meal name input */}
                         {selectedType === 'custom' && (
                             <div>
-                                <label className="block text-sm font-medium text-green-700 mb-2">
+                                <label className="block text-sm font-medium text-purple-700 mb-2">
                                     Custom Meal Name
                                 </label>
                                 <input
                                     type="text"
                                     value={customName}
                                     onChange={(e) => setCustomName(e.target.value)}
-                                    className="w-full px-3 py-2 border border-green-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                                    className="w-full px-3 py-2 border border-purple-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                                     placeholder="Enter custom meal name"
                                     required
                                 />
@@ -139,7 +139,7 @@ export default function AddMealModal({ isOpen, onClose, onAddMeal }: AddMealModa
                             </button>
                             <button
                                 type="submit"
-                                className="flex-1 bg-green-500 text-white py-2 px-4 rounded-lg hover:bg-green-600 transition-colors font-medium"
+                                className="flex-1 bg-purple-500 text-white py-2 px-4 rounded-lg hover:bg-purple-600 transition-colors font-medium"
                             >
                                 Add Meal
                             </button>
