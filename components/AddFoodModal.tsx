@@ -11,6 +11,15 @@ interface Food {
     protein: number
     fat: number
     notes?: string
+    proteinComplete?: number
+    proteinIncomplete?: number
+    carbsSimple?: number
+    carbsComplex?: number
+    fiber?: number
+    fatsUnsaturated?: number
+    fatsSaturated?: number
+    fatsTrans?: number
+    fdcId?: number
 }
 
 interface AddFoodModalProps {
@@ -26,7 +35,16 @@ export default function AddFoodModal({ isOpen, onClose, onAddFood }: AddFoodModa
         carbs: '',
         protein: '',
         fat: '',
-        notes: ''
+        notes: '',
+        // Advanced subclasses
+        fiber: '',
+        fatsSaturated: '',
+        fatsTrans: '',
+        fatsUnsaturated: '',
+        carbsSimple: '',
+        carbsComplex: '',
+        proteinComplete: '',
+        proteinIncomplete: ''
     })
 
     // USDA search states
@@ -38,6 +56,28 @@ export default function AddFoodModal({ isOpen, onClose, onAddFood }: AddFoodModa
     const [selectedFood, setSelectedFood] = useState<USDAFood | null>(null)
     const [detailedFoodData, setDetailedFoodData] = useState<USDAFood | null>(null) // Store detailed nutrition data
     const [servingSize, setServingSize] = useState(100) // Default 100g serving
+    const [isAutoCalculated, setIsAutoCalculated] = useState(false)
+    const [advancedEnabled, setAdvancedEnabled] = useState(false)
+
+    // Sync advanced setting
+    useEffect(() => {
+        const readSetting = () => {
+            try {
+                const stored = typeof window !== 'undefined' ? localStorage.getItem('advanced_nutrition_enabled') : null
+                setAdvancedEnabled(stored === 'true')
+            } catch { }
+        }
+        readSetting()
+        const handler = () => readSetting()
+        if (typeof window !== 'undefined') {
+            window.addEventListener('advancedNutritionSettingChanged', handler)
+        }
+        return () => {
+            if (typeof window !== 'undefined') {
+                window.removeEventListener('advancedNutritionSettingChanged', handler)
+            }
+        }
+    }, [])
 
     const handleInputChange = (field: string, value: string) => {
         setFormData(prev => ({ ...prev, [field]: value }))
@@ -95,23 +135,59 @@ export default function AddFoodModal({ isOpen, onClose, onAddFood }: AddFoodModa
     // Calculate nutrition values based on serving size
     const calculateNutrition = (food: USDAFood, servingGrams: number) => {
         if (!food || !servingGrams || servingGrams <= 0) {
-            return { calories: 0, carbs: 0, protein: 0, fat: 0 }
+            return { calories: 0, carbs: 0, protein: 0, fat: 0, fiber: 0, fatsSaturated: 0, fatsTrans: 0, fatsUnsaturated: 0, carbsSimple: 0, carbsComplex: 0, proteinComplete: 0, proteinIncomplete: 0 }
         }
 
         // Try multiple nutrient names for better compatibility
-        const calories = getNutrientValue(food, 'energy') ||
+        let calories = getNutrientValue(food, 'energy') ||
             getNutrientValue(food, 'calories') ||
             getNutrientValue(food, 'kcal')
 
-        const carbs = getNutrientValue(food, 'carbohydrate') ||
+        let carbs = getNutrientValue(food, 'carbohydrate') ||
             getNutrientValue(food, 'carbs') ||
             getNutrientValue(food, 'total carbohydrate')
 
-        const protein = getNutrientValue(food, 'protein')
+        let protein = getNutrientValue(food, 'protein')
 
-        const fat = getNutrientValue(food, 'fat') ||
+        let fat = getNutrientValue(food, 'fat') ||
             getNutrientValue(food, 'total fat') ||
             getNutrientValue(food, 'lipid')
+
+        // Subclasses
+        let fiber = getNutrientValue(food, 'fiber') || getNutrientValue(food, 'dietary fiber')
+        let fatsSaturated = getNutrientValue(food, 'saturated fat')
+        let fatsTrans = getNutrientValue(food, 'trans fat')
+        let sugars = getNutrientValue(food, 'sugars') || getNutrientValue(food, 'sugar')
+
+        // Fallback to labelNutrients (for Branded foods)
+        const label: any = (food as any).labelNutrients
+        if (label) {
+            const lnCalories = label.calories?.value ?? label.energyKcal?.value
+            const lnCarbs = label.carbohydrates?.value
+            const lnProtein = label.protein?.value
+            const lnFat = label.fat?.value
+            const lnFiber = label.fiber?.value
+            const lnSat = label.saturatedFat?.value
+            const lnTrans = label.transFat?.value
+            const lnSugars = label.sugars?.value
+
+            // If servingSize is in grams we can normalize to per 100g
+            const declaredServing = (food as any).servingSize
+            const unit = (food as any).servingSizeUnit
+            let toPer100 = 1
+            if (typeof declaredServing === 'number' && declaredServing > 0 && typeof unit === 'string' && unit.toLowerCase() === 'g') {
+                toPer100 = 100 / declaredServing
+            }
+
+            if (!calories && lnCalories) calories = lnCalories * toPer100
+            if (!carbs && lnCarbs) carbs = lnCarbs * toPer100
+            if (!protein && lnProtein) protein = lnProtein * toPer100
+            if (!fat && lnFat) fat = lnFat * toPer100
+            if (!fiber && lnFiber) fiber = lnFiber * toPer100
+            if (!fatsSaturated && lnSat) fatsSaturated = lnSat * toPer100
+            if (!fatsTrans && lnTrans) fatsTrans = lnTrans * toPer100
+            if (!sugars && lnSugars) sugars = lnSugars * toPer100
+        }
 
         // Values in USDA are typically per 100g, scale to serving size
         const scaleFactor = servingGrams / 100
@@ -120,7 +196,16 @@ export default function AddFoodModal({ isOpen, onClose, onAddFood }: AddFoodModa
             calories: Math.round(Math.max(0, calories * scaleFactor)),
             carbs: Math.round(Math.max(0, carbs * scaleFactor) * 10) / 10,
             protein: Math.round(Math.max(0, protein * scaleFactor) * 10) / 10,
-            fat: Math.round(Math.max(0, fat * scaleFactor) * 10) / 10
+            fat: Math.round(Math.max(0, fat * scaleFactor) * 10) / 10,
+            fiber: Math.round(Math.max(0, fiber * scaleFactor) * 10) / 10,
+            fatsSaturated: Math.round(Math.max(0, fatsSaturated * scaleFactor) * 10) / 10,
+            fatsTrans: Math.round(Math.max(0, fatsTrans * scaleFactor) * 10) / 10,
+            fatsUnsaturated: Math.max(0, Math.round(((fat - fatsSaturated - fatsTrans) * scaleFactor) * 10) / 10),
+            carbsSimple: Math.round(Math.max(0, sugars * scaleFactor) * 10) / 10,
+            carbsComplex: Math.max(0, Math.round(((carbs - sugars - fiber) * scaleFactor) * 10) / 10),
+            // Protein completeness is complex; heuristic: 0 for now (client could allow manual edit later)
+            proteinComplete: 0,
+            proteinIncomplete: Math.round(Math.max(0, protein * scaleFactor) * 10) / 10
         }
     }
 
@@ -136,11 +221,20 @@ export default function AddFoodModal({ isOpen, onClose, onAddFood }: AddFoodModa
         setSearchQuery('')
 
         try {
-            // Get detailed nutrition info
-            const detailedFood = await USDAClient.getFoodDetails(food.fdcId, 'full')
-            setDetailedFoodData(detailedFood) // Store detailed data for serving size calculations
+            // Get detailed nutrition info (try full, then abridged)
+            let detailedFood = await USDAClient.getFoodDetails(food.fdcId, 'full')
+            let nutrition = calculateNutrition(detailedFood, servingSize)
 
-            const nutrition = calculateNutrition(detailedFood, servingSize)
+            // If "full" returns no usable macros, fallback to "abridged"
+            if ((nutrition.calories + nutrition.carbs + nutrition.protein + nutrition.fat) === 0) {
+                try {
+                    const abridged = await USDAClient.getFoodDetails(food.fdcId, 'abridged')
+                    detailedFood = abridged
+                    nutrition = calculateNutrition(abridged, servingSize)
+                } catch { /* ignore, we'll fall back to search result below */ }
+            }
+
+            setDetailedFoodData(detailedFood)
 
             // Update form with food data
             setFormData({
@@ -149,8 +243,18 @@ export default function AddFoodModal({ isOpen, onClose, onAddFood }: AddFoodModa
                 carbs: nutrition.carbs.toString(),
                 protein: nutrition.protein.toString(),
                 fat: nutrition.fat.toString(),
-                notes: food.brandName ? `Brand: ${food.brandName}` : ''
+                notes: food.brandName ? `Brand: ${food.brandName}` : '',
+                fiber: nutrition.fiber ? nutrition.fiber.toString() : '',
+                fatsSaturated: nutrition.fatsSaturated ? nutrition.fatsSaturated.toString() : '',
+                fatsTrans: nutrition.fatsTrans ? nutrition.fatsTrans.toString() : '',
+                fatsUnsaturated: nutrition.fatsUnsaturated ? nutrition.fatsUnsaturated.toString() : '',
+                carbsSimple: nutrition.carbsSimple ? nutrition.carbsSimple.toString() : '',
+                carbsComplex: nutrition.carbsComplex ? nutrition.carbsComplex.toString() : '',
+                proteinComplete: nutrition.proteinComplete ? nutrition.proteinComplete.toString() : '',
+                proteinIncomplete: nutrition.proteinIncomplete ? nutrition.proteinIncomplete.toString() : ''
             })
+            // Mark auto if any values present
+            setIsAutoCalculated((nutrition.calories + nutrition.carbs + nutrition.protein + nutrition.fat) > 0)
         } catch (error) {
             console.error('Error getting food details:', error)
             // Fallback to basic info from search result
@@ -163,8 +267,17 @@ export default function AddFoodModal({ isOpen, onClose, onAddFood }: AddFoodModa
                 carbs: nutrition.carbs.toString(),
                 protein: nutrition.protein.toString(),
                 fat: nutrition.fat.toString(),
-                notes: food.brandName ? `Brand: ${food.brandName}` : ''
+                notes: food.brandName ? `Brand: ${food.brandName}` : '',
+                fiber: nutrition.fiber ? nutrition.fiber.toString() : '',
+                fatsSaturated: nutrition.fatsSaturated ? nutrition.fatsSaturated.toString() : '',
+                fatsTrans: nutrition.fatsTrans ? nutrition.fatsTrans.toString() : '',
+                fatsUnsaturated: nutrition.fatsUnsaturated ? nutrition.fatsUnsaturated.toString() : '',
+                carbsSimple: nutrition.carbsSimple ? nutrition.carbsSimple.toString() : '',
+                carbsComplex: nutrition.carbsComplex ? nutrition.carbsComplex.toString() : '',
+                proteinComplete: nutrition.proteinComplete ? nutrition.proteinComplete.toString() : '',
+                proteinIncomplete: nutrition.proteinIncomplete ? nutrition.proteinIncomplete.toString() : ''
             })
+            setIsAutoCalculated((nutrition.calories + nutrition.carbs + nutrition.protein + nutrition.fat) > 0)
         }
     }
 
@@ -183,7 +296,15 @@ export default function AddFoodModal({ isOpen, onClose, onAddFood }: AddFoodModa
                 calories: nutrition.calories.toString(),
                 carbs: nutrition.carbs.toString(),
                 protein: nutrition.protein.toString(),
-                fat: nutrition.fat.toString()
+                fat: nutrition.fat.toString(),
+                fiber: nutrition.fiber ? nutrition.fiber.toString() : prev.fiber,
+                fatsSaturated: nutrition.fatsSaturated ? nutrition.fatsSaturated.toString() : prev.fatsSaturated,
+                fatsTrans: nutrition.fatsTrans ? nutrition.fatsTrans.toString() : prev.fatsTrans,
+                fatsUnsaturated: nutrition.fatsUnsaturated ? nutrition.fatsUnsaturated.toString() : prev.fatsUnsaturated,
+                carbsSimple: nutrition.carbsSimple ? nutrition.carbsSimple.toString() : prev.carbsSimple,
+                carbsComplex: nutrition.carbsComplex ? nutrition.carbsComplex.toString() : prev.carbsComplex,
+                proteinComplete: nutrition.proteinComplete ? nutrition.proteinComplete.toString() : prev.proteinComplete,
+                proteinIncomplete: nutrition.proteinIncomplete ? nutrition.proteinIncomplete.toString() : prev.proteinIncomplete
             }))
         }
     }, [servingSize, detailedFoodData, selectedFood])
@@ -207,13 +328,38 @@ export default function AddFoodModal({ isOpen, onClose, onAddFood }: AddFoodModa
             return
         }
 
-        const newFood = {
+        const newFood: Omit<Food, 'id'> = {
             name: formData.name.trim(),
             calories,
             carbs,
             protein,
             fat,
             notes: formData.notes.trim() || undefined
+        }
+
+        // If USDA data exists, enrich with subclasses and FDC id
+        if (selectedFood && detailedFoodData && isAutoCalculated) {
+            const nutrition = calculateNutrition(detailedFoodData, servingSize)
+                ; (newFood as any).fiber = nutrition.fiber
+                ; (newFood as any).fatsSaturated = nutrition.fatsSaturated
+                ; (newFood as any).fatsTrans = nutrition.fatsTrans
+                ; (newFood as any).fatsUnsaturated = nutrition.fatsUnsaturated
+                ; (newFood as any).carbsSimple = nutrition.carbsSimple
+                ; (newFood as any).carbsComplex = nutrition.carbsComplex
+                ; (newFood as any).proteinComplete = nutrition.proteinComplete
+                ; (newFood as any).proteinIncomplete = nutrition.proteinIncomplete
+                ; (newFood as any).fdcId = selectedFood.fdcId
+        } else if (advancedEnabled) {
+            // Use manual inputs if provided
+            const parseOrUndefined = (v: string) => v.trim() === '' ? undefined : Math.max(0, parseFloat(v) || 0)
+                ; (newFood as any).fiber = parseOrUndefined(formData.fiber)
+                ; (newFood as any).fatsSaturated = parseOrUndefined(formData.fatsSaturated)
+                ; (newFood as any).fatsTrans = parseOrUndefined(formData.fatsTrans)
+                ; (newFood as any).fatsUnsaturated = parseOrUndefined(formData.fatsUnsaturated)
+                ; (newFood as any).carbsSimple = parseOrUndefined(formData.carbsSimple)
+                ; (newFood as any).carbsComplex = parseOrUndefined(formData.carbsComplex)
+                ; (newFood as any).proteinComplete = parseOrUndefined(formData.proteinComplete)
+                ; (newFood as any).proteinIncomplete = parseOrUndefined(formData.proteinIncomplete)
         }
 
         onAddFood(newFood)
@@ -225,7 +371,15 @@ export default function AddFoodModal({ isOpen, onClose, onAddFood }: AddFoodModa
             carbs: '',
             protein: '',
             fat: '',
-            notes: ''
+            notes: '',
+            fiber: '',
+            fatsSaturated: '',
+            fatsTrans: '',
+            fatsUnsaturated: '',
+            carbsSimple: '',
+            carbsComplex: '',
+            proteinComplete: '',
+            proteinIncomplete: ''
         })
 
         onClose()
@@ -239,7 +393,15 @@ export default function AddFoodModal({ isOpen, onClose, onAddFood }: AddFoodModa
             carbs: '',
             protein: '',
             fat: '',
-            notes: ''
+            notes: '',
+            fiber: '',
+            fatsSaturated: '',
+            fatsTrans: '',
+            fatsUnsaturated: '',
+            carbsSimple: '',
+            carbsComplex: '',
+            proteinComplete: '',
+            proteinIncomplete: ''
         })
         setSearchQuery('')
         setSearchResults([])
@@ -258,7 +420,15 @@ export default function AddFoodModal({ isOpen, onClose, onAddFood }: AddFoodModa
             carbs: '',
             protein: '',
             fat: '',
-            notes: ''
+            notes: '',
+            fiber: '',
+            fatsSaturated: '',
+            fatsTrans: '',
+            fatsUnsaturated: '',
+            carbsSimple: '',
+            carbsComplex: '',
+            proteinComplete: '',
+            proteinIncomplete: ''
         })
         setSearchQuery('')
         setSearchResults([])
@@ -396,19 +566,20 @@ export default function AddFoodModal({ isOpen, onClose, onAddFood }: AddFoodModa
                                 type="number"
                                 value={formData.calories}
                                 onChange={(e) => handleInputChange('calories', e.target.value)}
-                                className={`w-full px-2 py-1 border rounded-lg focus:outline-none focus:ring-2 focus:border-transparent text-xs ${selectedFood
+                                className={`w-full px-2 py-1 border rounded-lg focus:outline-none focus:ring-2 focus:border-transparent text-xs ${(selectedFood && isAutoCalculated)
                                     ? 'border-purple-200 bg-purple-50 text-purple-700'
                                     : 'border-purple-300 focus:ring-purple-500'
                                     }`}
                                 placeholder="0"
                                 min="0"
                                 step="1"
-                                readOnly={!!selectedFood}
+                                readOnly={!!selectedFood && isAutoCalculated}
                             />
                         </div>
 
                         {/* Macros Row */}
                         <div className="grid grid-cols-3 gap-1">
+                            {/* Carbs and subclasses */}
                             <div>
                                 <label className="block text-xs font-medium text-green-700 mb-0.5">
                                     Carbs (g) {selectedFood && <span className="text-xs text-green-500">(auto)</span>}
@@ -417,16 +588,62 @@ export default function AddFoodModal({ isOpen, onClose, onAddFood }: AddFoodModa
                                     type="number"
                                     value={formData.carbs}
                                     onChange={(e) => handleInputChange('carbs', e.target.value)}
-                                    className={`w-full px-1.5 py-1 border rounded-lg focus:outline-none focus:ring-2 focus:border-transparent text-xs ${selectedFood
+                                    className={`w-full px-1.5 py-1 border rounded-lg focus:outline-none focus:ring-2 focus:border-transparent text-xs ${(selectedFood && isAutoCalculated)
                                         ? 'border-green-200 bg-green-50 text-green-700'
                                         : 'border-green-300 focus:ring-green-500'
                                         }`}
                                     placeholder="0"
                                     min="0"
                                     step="0.1"
-                                    readOnly={!!selectedFood}
+                                    readOnly={!!selectedFood && isAutoCalculated}
                                 />
+                                {advancedEnabled && (
+                                    <div className="mt-0.5 space-y-0.5">
+                                        <div className="grid grid-cols-3 gap-1">
+                                            <div>
+                                                <label className="block text-[10px] font-medium text-green-700 mb-0.5">Simple</label>
+                                                <input
+                                                    type="number"
+                                                    value={formData.carbsSimple}
+                                                    onChange={(e) => handleInputChange('carbsSimple', e.target.value)}
+                                                    className="w-full px-1 py-0.5 border rounded focus:outline-none focus:ring-1 focus:ring-green-500 text-[10px] border-green-300"
+                                                    placeholder="0"
+                                                    min="0"
+                                                    step="0.1"
+                                                    readOnly={!!selectedFood && isAutoCalculated}
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="block text-[10px] font-medium text-green-700 mb-0.5">Complex</label>
+                                                <input
+                                                    type="number"
+                                                    value={formData.carbsComplex}
+                                                    onChange={(e) => handleInputChange('carbsComplex', e.target.value)}
+                                                    className="w-full px-1 py-0.5 border rounded focus:outline-none focus:ring-1 focus:ring-green-500 text-[10px] border-green-300"
+                                                    placeholder="0"
+                                                    min="0"
+                                                    step="0.1"
+                                                    readOnly={!!selectedFood && isAutoCalculated}
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="block text-[10px] font-medium text-green-700 mb-0.5">Fiber</label>
+                                                <input
+                                                    type="number"
+                                                    value={formData.fiber}
+                                                    onChange={(e) => handleInputChange('fiber', e.target.value)}
+                                                    className="w-full px-1 py-0.5 border rounded focus:outline-none focus:ring-1 focus:ring-green-500 text-[10px] border-green-300"
+                                                    placeholder="0"
+                                                    min="0"
+                                                    step="0.1"
+                                                    readOnly={!!selectedFood && isAutoCalculated}
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
                             </div>
+                            {/* Protein and subclasses */}
                             <div>
                                 <label className="block text-xs font-medium text-blue-700 mb-0.5">
                                     Protein (g) {selectedFood && <span className="text-xs text-blue-500">(auto)</span>}
@@ -435,16 +652,49 @@ export default function AddFoodModal({ isOpen, onClose, onAddFood }: AddFoodModa
                                     type="number"
                                     value={formData.protein}
                                     onChange={(e) => handleInputChange('protein', e.target.value)}
-                                    className={`w-full px-1.5 py-1 border rounded-lg focus:outline-none focus:ring-2 focus:border-transparent text-xs ${selectedFood
+                                    className={`w-full px-1.5 py-1 border rounded-lg focus:outline-none focus:ring-2 focus:border-transparent text-xs ${(selectedFood && isAutoCalculated)
                                         ? 'border-blue-200 bg-blue-50 text-blue-700'
                                         : 'border-blue-300 focus:ring-blue-500'
                                         }`}
                                     placeholder="0"
                                     min="0"
                                     step="0.1"
-                                    readOnly={!!selectedFood}
+                                    readOnly={!!selectedFood && isAutoCalculated}
                                 />
+                                {advancedEnabled && (
+                                    <div className="mt-0.5 space-y-0.5">
+                                        <div className="grid grid-cols-2 gap-1">
+                                            <div>
+                                                <label className="block text-[10px] font-medium text-blue-700 mb-0.5">Complete</label>
+                                                <input
+                                                    type="number"
+                                                    value={formData.proteinComplete}
+                                                    onChange={(e) => handleInputChange('proteinComplete', e.target.value)}
+                                                    className="w-full px-1 py-0.5 border rounded focus:outline-none focus:ring-1 focus:ring-blue-500 text-[10px] border-blue-300"
+                                                    placeholder="0"
+                                                    min="0"
+                                                    step="0.1"
+                                                    readOnly={!!selectedFood && isAutoCalculated}
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="block text-[10px] font-medium text-blue-700 mb-0.5">Incomplete</label>
+                                                <input
+                                                    type="number"
+                                                    value={formData.proteinIncomplete}
+                                                    onChange={(e) => handleInputChange('proteinIncomplete', e.target.value)}
+                                                    className="w-full px-1 py-0.5 border rounded focus:outline-none focus:ring-1 focus:ring-blue-500 text-[10px] border-blue-300"
+                                                    placeholder="0"
+                                                    min="0"
+                                                    step="0.1"
+                                                    readOnly={!!selectedFood && isAutoCalculated}
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
                             </div>
+                            {/* Fats and subclasses */}
                             <div>
                                 <label className="block text-xs font-medium text-yellow-700 mb-0.5">
                                     Fat (g) {selectedFood && <span className="text-xs text-yellow-500">(auto)</span>}
@@ -453,15 +703,60 @@ export default function AddFoodModal({ isOpen, onClose, onAddFood }: AddFoodModa
                                     type="number"
                                     value={formData.fat}
                                     onChange={(e) => handleInputChange('fat', e.target.value)}
-                                    className={`w-full px-1.5 py-1 border rounded-lg focus:outline-none focus:ring-2 focus:border-transparent text-xs ${selectedFood
+                                    className={`w-full px-1.5 py-1 border rounded-lg focus:outline-none focus:ring-2 focus:border-transparent text-xs ${(selectedFood && isAutoCalculated)
                                         ? 'border-yellow-200 bg-yellow-50 text-yellow-700'
                                         : 'border-yellow-300 focus:ring-yellow-500'
                                         }`}
                                     placeholder="0"
                                     min="0"
                                     step="0.1"
-                                    readOnly={!!selectedFood}
+                                    readOnly={!!selectedFood && isAutoCalculated}
                                 />
+                                {advancedEnabled && (
+                                    <div className="mt-0.5">
+                                        <div className="grid grid-cols-3 gap-1">
+                                            <div>
+                                                <label className="block text-[10px] font-medium text-yellow-700 mb-0.5">Unsat</label>
+                                                <input
+                                                    type="number"
+                                                    value={formData.fatsUnsaturated}
+                                                    onChange={(e) => handleInputChange('fatsUnsaturated', e.target.value)}
+                                                    className="w-full px-1 py-0.5 border rounded focus:outline-none focus:ring-1 focus:ring-yellow-500 text-[10px] border-yellow-300"
+                                                    placeholder="0"
+                                                    min="0"
+                                                    step="0.1"
+                                                    readOnly={!!selectedFood && isAutoCalculated}
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="block text-[10px] font-medium text-yellow-700 mb-0.5">Sat</label>
+                                                <input
+                                                    type="number"
+                                                    value={formData.fatsSaturated}
+                                                    onChange={(e) => handleInputChange('fatsSaturated', e.target.value)}
+                                                    className="w-full px-1 py-0.5 border rounded focus:outline-none focus:ring-1 focus:ring-yellow-500 text-[10px] border-yellow-300"
+                                                    placeholder="0"
+                                                    min="0"
+                                                    step="0.1"
+                                                    readOnly={!!selectedFood && isAutoCalculated}
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="block text-[10px] font-medium text-yellow-700 mb-0.5">Trans</label>
+                                                <input
+                                                    type="number"
+                                                    value={formData.fatsTrans}
+                                                    onChange={(e) => handleInputChange('fatsTrans', e.target.value)}
+                                                    className="w-full px-1 py-0.5 border rounded focus:outline-none focus:ring-1 focus:ring-yellow-500 text-[10px] border-yellow-300"
+                                                    placeholder="0"
+                                                    min="0"
+                                                    step="0.1"
+                                                    readOnly={!!selectedFood && isAutoCalculated}
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                         </div>
 

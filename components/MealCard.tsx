@@ -10,6 +10,15 @@ interface Food {
     protein: number
     fat: number
     notes?: string
+    proteinComplete?: number
+    proteinIncomplete?: number
+    carbsSimple?: number
+    carbsComplex?: number
+    fiber?: number
+    fatsUnsaturated?: number
+    fatsSaturated?: number
+    fatsTrans?: number
+    fdcId?: number
 }
 
 interface Meal {
@@ -27,9 +36,15 @@ interface MealCardProps {
     onRemoveFood: (mealId: string, foodId: string) => void
     onMoveFood?: (fromMealId: string, toMealId: string, food: Food) => void
     onEditFood: (food: Food) => void
+    dragHandleProps?: {
+        draggable?: boolean
+        onDragStart?: (e: React.DragEvent) => void
+        onDragEnd?: (e: React.DragEvent) => void
+    }
+    showAdvanced?: boolean
 }
 
-export default function MealCard({ meal, onDelete, onUpdate, onAddFood, onRemoveFood, onMoveFood, onEditFood }: MealCardProps) {
+export default function MealCard({ meal, onDelete, onUpdate, onAddFood, onRemoveFood, onMoveFood, onEditFood, dragHandleProps, showAdvanced = false }: MealCardProps) {
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
     const [editingField, setEditingField] = useState<string | null>(null)
     const [editValue, setEditValue] = useState<string>('')
@@ -175,6 +190,29 @@ export default function MealCard({ meal, onDelete, onUpdate, onAddFood, onRemove
                                         <div className="text-xs text-purple-600">
                                             {food.calories}cal • {food.carbs}c • {food.protein}p • {food.fat}f
                                         </div>
+                                        {showAdvanced && (
+                                            <div className="mt-0.5">
+                                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-1 text-[10px]">
+                                                    <div className="text-blue-700">
+                                                        <span className="font-medium">Proteins:</span>
+                                                        <span className="ml-1">Complete {food.proteinComplete ?? 0}g</span>
+                                                        <span className="ml-1">Incomplete {food.proteinIncomplete ?? 0}g</span>
+                                                    </div>
+                                                    <div className="text-green-700">
+                                                        <span className="font-medium">Carbs:</span>
+                                                        <span className="ml-1">Simple {food.carbsSimple ?? 0}g</span>
+                                                        <span className="ml-1">Complex {food.carbsComplex ?? 0}g</span>
+                                                        <span className="ml-1">Fiber {food.fiber ?? 0}g</span>
+                                                    </div>
+                                                    <div className="text-yellow-700">
+                                                        <span className="font-medium">Fats:</span>
+                                                        <span className="ml-1">Unsat {food.fatsUnsaturated ?? 0}g</span>
+                                                        <span className="ml-1">Sat {food.fatsSaturated ?? 0}g</span>
+                                                        <span className="ml-1">Trans {food.fatsTrans ?? 0}g</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        )}
                                         {food.notes && (
                                             <div className="text-xs text-purple-500 italic break-words whitespace-normal">{food.notes}</div>
                                         )}
@@ -224,6 +262,7 @@ export default function MealCard({ meal, onDelete, onUpdate, onAddFood, onRemove
             <div
                 className="mt-0 pt-0 border-t border-purple-100 flex items-center justify-center touch-manipulation select-none cursor-grab active:cursor-grabbing"
                 onContextMenu={(e) => e.preventDefault()}
+                {...(dragHandleProps || {})}
             >
                 <div className="flex space-x-1.5 py-0.5">
                     <div className="w-1.5 h-1.5 bg-purple-300/60 rounded-full"></div>

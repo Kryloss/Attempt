@@ -10,6 +10,15 @@ interface Food {
     protein: number
     fat: number
     notes?: string
+    proteinComplete?: number
+    proteinIncomplete?: number
+    carbsSimple?: number
+    carbsComplex?: number
+    fiber?: number
+    fatsUnsaturated?: number
+    fatsSaturated?: number
+    fatsTrans?: number
+    fdcId?: number
 }
 
 interface EditFoodModalProps {
@@ -26,8 +35,39 @@ export default function EditFoodModal({ isOpen, food, onClose, onSaveFood }: Edi
         carbs: '',
         protein: '',
         fat: '',
-        notes: ''
+        notes: '',
+        // Advanced subclasses
+        fiber: '',
+        fatsSaturated: '',
+        fatsTrans: '',
+        fatsUnsaturated: '',
+        carbsSimple: '',
+        carbsComplex: '',
+        proteinComplete: '',
+        proteinIncomplete: ''
     })
+
+    const [advancedEnabled, setAdvancedEnabled] = useState(false)
+
+    // Sync advanced setting
+    useEffect(() => {
+        const readSetting = () => {
+            try {
+                const stored = typeof window !== 'undefined' ? localStorage.getItem('advanced_nutrition_enabled') : null
+                setAdvancedEnabled(stored === 'true')
+            } catch { }
+        }
+        readSetting()
+        const handler = () => readSetting()
+        if (typeof window !== 'undefined') {
+            window.addEventListener('advancedNutritionSettingChanged', handler)
+        }
+        return () => {
+            if (typeof window !== 'undefined') {
+                window.removeEventListener('advancedNutritionSettingChanged', handler)
+            }
+        }
+    }, [])
 
     // Update form data when food prop changes
     useEffect(() => {
@@ -38,7 +78,15 @@ export default function EditFoodModal({ isOpen, food, onClose, onSaveFood }: Edi
                 carbs: food.carbs.toString(),
                 protein: food.protein.toString(),
                 fat: food.fat.toString(),
-                notes: food.notes || ''
+                notes: food.notes || '',
+                fiber: food.fiber?.toString() || '',
+                fatsSaturated: food.fatsSaturated?.toString() || '',
+                fatsTrans: food.fatsTrans?.toString() || '',
+                fatsUnsaturated: food.fatsUnsaturated?.toString() || '',
+                carbsSimple: food.carbsSimple?.toString() || '',
+                carbsComplex: food.carbsComplex?.toString() || '',
+                proteinComplete: food.proteinComplete?.toString() || '',
+                proteinIncomplete: food.proteinIncomplete?.toString() || ''
             })
         }
     }, [food])
@@ -75,7 +123,15 @@ export default function EditFoodModal({ isOpen, food, onClose, onSaveFood }: Edi
             carbs,
             protein,
             fat,
-            notes: formData.notes.trim() || undefined
+            notes: formData.notes.trim() || undefined,
+            fiber: formData.fiber.trim() === '' ? undefined : Math.max(0, parseFloat(formData.fiber) || 0),
+            fatsSaturated: formData.fatsSaturated.trim() === '' ? undefined : Math.max(0, parseFloat(formData.fatsSaturated) || 0),
+            fatsTrans: formData.fatsTrans.trim() === '' ? undefined : Math.max(0, parseFloat(formData.fatsTrans) || 0),
+            fatsUnsaturated: formData.fatsUnsaturated.trim() === '' ? undefined : Math.max(0, parseFloat(formData.fatsUnsaturated) || 0),
+            carbsSimple: formData.carbsSimple.trim() === '' ? undefined : Math.max(0, parseFloat(formData.carbsSimple) || 0),
+            carbsComplex: formData.carbsComplex.trim() === '' ? undefined : Math.max(0, parseFloat(formData.carbsComplex) || 0),
+            proteinComplete: formData.proteinComplete.trim() === '' ? undefined : Math.max(0, parseFloat(formData.proteinComplete) || 0),
+            proteinIncomplete: formData.proteinIncomplete.trim() === '' ? undefined : Math.max(0, parseFloat(formData.proteinIncomplete) || 0)
         }
 
         onSaveFood(updatedFood)
@@ -91,7 +147,15 @@ export default function EditFoodModal({ isOpen, food, onClose, onSaveFood }: Edi
                 carbs: food.carbs.toString(),
                 protein: food.protein.toString(),
                 fat: food.fat.toString(),
-                notes: food.notes || ''
+                notes: food.notes || '',
+                fiber: food.fiber?.toString() || '',
+                fatsSaturated: food.fatsSaturated?.toString() || '',
+                fatsTrans: food.fatsTrans?.toString() || '',
+                fatsUnsaturated: food.fatsUnsaturated?.toString() || '',
+                carbsSimple: food.carbsSimple?.toString() || '',
+                carbsComplex: food.carbsComplex?.toString() || '',
+                proteinComplete: food.proteinComplete?.toString() || '',
+                proteinIncomplete: food.proteinIncomplete?.toString() || ''
             })
         }
         onClose()
@@ -147,6 +211,7 @@ export default function EditFoodModal({ isOpen, food, onClose, onSaveFood }: Edi
 
                         {/* Macros Row */}
                         <div className="grid grid-cols-3 gap-1">
+                            {/* Carbs and subclasses */}
                             <div>
                                 <label className="block text-xs font-medium text-green-700 mb-0.5">
                                     Carbs (g)
@@ -160,7 +225,50 @@ export default function EditFoodModal({ isOpen, food, onClose, onSaveFood }: Edi
                                     min="0"
                                     step="0.1"
                                 />
+                                {advancedEnabled && (
+                                    <div className="mt-0.5 space-y-0.5">
+                                        <div className="grid grid-cols-3 gap-1">
+                                            <div>
+                                                <label className="block text-[10px] font-medium text-green-700 mb-0.5">Simple</label>
+                                                <input
+                                                    type="number"
+                                                    value={formData.carbsSimple}
+                                                    onChange={(e) => handleInputChange('carbsSimple', e.target.value)}
+                                                    className="w-full px-1 py-0.5 border rounded focus:outline-none focus:ring-1 focus:ring-green-500 text-[10px] border-green-300"
+                                                    placeholder="0"
+                                                    min="0"
+                                                    step="0.1"
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="block text-[10px] font-medium text-green-700 mb-0.5">Complex</label>
+                                                <input
+                                                    type="number"
+                                                    value={formData.carbsComplex}
+                                                    onChange={(e) => handleInputChange('carbsComplex', e.target.value)}
+                                                    className="w-full px-1 py-0.5 border rounded focus:outline-none focus:ring-1 focus:ring-green-500 text-[10px] border-green-300"
+                                                    placeholder="0"
+                                                    min="0"
+                                                    step="0.1"
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="block text-[10px] font-medium text-green-700 mb-0.5">Fiber</label>
+                                                <input
+                                                    type="number"
+                                                    value={formData.fiber}
+                                                    onChange={(e) => handleInputChange('fiber', e.target.value)}
+                                                    className="w-full px-1 py-0.5 border rounded focus:outline-none focus:ring-1 focus:ring-green-500 text-[10px] border-green-300"
+                                                    placeholder="0"
+                                                    min="0"
+                                                    step="0.1"
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
                             </div>
+                            {/* Protein and subclasses */}
                             <div>
                                 <label className="block text-xs font-medium text-blue-700 mb-0.5">
                                     Protein (g)
@@ -174,7 +282,38 @@ export default function EditFoodModal({ isOpen, food, onClose, onSaveFood }: Edi
                                     min="0"
                                     step="0.1"
                                 />
+                                {advancedEnabled && (
+                                    <div className="mt-0.5 space-y-0.5">
+                                        <div className="grid grid-cols-2 gap-1">
+                                            <div>
+                                                <label className="block text-[10px] font-medium text-blue-700 mb-0.5">Complete</label>
+                                                <input
+                                                    type="number"
+                                                    value={formData.proteinComplete}
+                                                    onChange={(e) => handleInputChange('proteinComplete', e.target.value)}
+                                                    className="w-full px-1 py-0.5 border rounded focus:outline-none focus:ring-1 focus:ring-blue-500 text-[10px] border-blue-300"
+                                                    placeholder="0"
+                                                    min="0"
+                                                    step="0.1"
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="block text-xs font-medium text-blue-700 mb-0.5">Incomplete</label>
+                                                <input
+                                                    type="number"
+                                                    value={formData.proteinIncomplete}
+                                                    onChange={(e) => handleInputChange('proteinIncomplete', e.target.value)}
+                                                    className="w-full px-1 py-0.5 border rounded focus:outline-none focus:ring-1 focus:ring-blue-500 text-[10px] border-blue-300"
+                                                    placeholder="0"
+                                                    min="0"
+                                                    step="0.1"
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
                             </div>
+                            {/* Fats and subclasses */}
                             <div>
                                 <label className="block text-xs font-medium text-yellow-700 mb-0.5">
                                     Fat (g)
@@ -188,6 +327,48 @@ export default function EditFoodModal({ isOpen, food, onClose, onSaveFood }: Edi
                                     min="0"
                                     step="0.1"
                                 />
+                                {advancedEnabled && (
+                                    <div className="mt-0.5">
+                                        <div className="grid grid-cols-3 gap-1">
+                                            <div>
+                                                <label className="block text-[10px] font-medium text-yellow-700 mb-0.5">Unsat</label>
+                                                <input
+                                                    type="number"
+                                                    value={formData.fatsUnsaturated}
+                                                    onChange={(e) => handleInputChange('fatsUnsaturated', e.target.value)}
+                                                    className="w-full px-1 py-0.5 border rounded focus:outline-none focus:ring-1 focus:ring-yellow-500 text-[10px] border-yellow-300"
+                                                    placeholder="0"
+                                                    min="0"
+                                                    step="0.1"
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="block text-[10px] font-medium text-yellow-700 mb-0.5">Sat</label>
+                                                <input
+                                                    type="number"
+                                                    value={formData.fatsSaturated}
+                                                    onChange={(e) => handleInputChange('fatsSaturated', e.target.value)}
+                                                    className="w-full px-1 py-0.5 border rounded focus:outline-none focus:ring-1 focus:ring-yellow-500 text-[10px] border-yellow-300"
+                                                    placeholder="0"
+                                                    min="0"
+                                                    step="0.1"
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="block text-[10px] font-medium text-yellow-700 mb-0.5">Trans</label>
+                                                <input
+                                                    type="number"
+                                                    value={formData.fatsTrans}
+                                                    onChange={(e) => handleInputChange('fatsTrans', e.target.value)}
+                                                    className="w-full px-1 py-0.5 border rounded focus:outline-none focus:ring-1 focus:ring-yellow-500 text-[10px] border-yellow-300"
+                                                    placeholder="0"
+                                                    min="0"
+                                                    step="0.1"
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                         </div>
 

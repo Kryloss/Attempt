@@ -8,6 +8,16 @@ export interface IFood {
     protein: number;
     fat: number;
     notes?: string;
+    // Advanced subclasses (all optional)
+    proteinComplete?: number;
+    proteinIncomplete?: number;
+    carbsSimple?: number;
+    carbsComplex?: number;
+    fiber?: number;
+    fatsUnsaturated?: number;
+    fatsSaturated?: number;
+    fatsTrans?: number;
+    fdcId?: number;
 }
 
 export type MealType = 'breakfast' | 'lunch' | 'dinner' | 'snack' | 'brunch' | 'custom';
@@ -62,6 +72,16 @@ const FoodSchema = new Schema({
         type: String,
         trim: true,
     },
+    // Advanced subclasses (optional)
+    proteinComplete: { type: Number, min: 0 },
+    proteinIncomplete: { type: Number, min: 0 },
+    carbsSimple: { type: Number, min: 0 },
+    carbsComplex: { type: Number, min: 0 },
+    fiber: { type: Number, min: 0 },
+    fatsUnsaturated: { type: Number, min: 0 },
+    fatsSaturated: { type: Number, min: 0 },
+    fatsTrans: { type: Number, min: 0 },
+    fdcId: { type: Number },
 });
 
 const MealSchema = new Schema({

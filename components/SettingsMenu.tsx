@@ -13,6 +13,17 @@ interface SettingsMenuProps {
 export default function SettingsMenu({ user, onSignOut, onSignIn, onClose }: SettingsMenuProps) {
     const modalRef = useRef<HTMLDivElement>(null)
     const [headerOffset, setHeaderOffset] = useState<number>(64)
+    const [advancedNutrition, setAdvancedNutrition] = useState(false)
+
+    // Load and persist Advanced Nutrition setting
+    useEffect(() => {
+        try {
+            const stored = typeof window !== 'undefined' ? localStorage.getItem('advanced_nutrition_enabled') : null
+            if (stored !== null) {
+                setAdvancedNutrition(stored === 'true')
+            }
+        } catch { }
+    }, [])
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
@@ -58,6 +69,19 @@ export default function SettingsMenu({ user, onSignOut, onSignIn, onClose }: Set
         onClose()
     }
 
+    const toggleAdvancedNutrition = () => {
+        setAdvancedNutrition(prev => {
+            const next = !prev
+            try {
+                if (typeof window !== 'undefined') {
+                    localStorage.setItem('advanced_nutrition_enabled', String(next))
+                    window.dispatchEvent(new Event('advancedNutritionSettingChanged'))
+                }
+            } catch { }
+            return next
+        })
+    }
+
     return (
         <div className="fixed inset-0 z-[99999] flex items-center justify-center p-4 pointer-events-none">
             {/* Backdrop (do not cover top navigation area) */}
@@ -96,6 +120,27 @@ export default function SettingsMenu({ user, onSignOut, onSignIn, onClose }: Set
                         </div>
                     </div>
                 )}
+
+                {/* Preferences */}
+                <div className="p-3 sm:p-4 bg-purple-50 rounded-xl border border-purple-200">
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <h4 className="font-semibold text-purple-800 text-sm sm:text-base">Advanced nutrition breakdown</h4>
+                            <p className="text-purple-600 text-xs sm:text-sm">Show macros subclasses (protein, carbs, fats)</p>
+                        </div>
+                        <label className="relative inline-flex items-center cursor-pointer">
+                            <input
+                                type="checkbox"
+                                checked={advancedNutrition}
+                                onChange={toggleAdvancedNutrition}
+                                className="sr-only"
+                            />
+                            <span className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${advancedNutrition ? 'bg-purple-600' : 'bg-purple-200'}`}>
+                                <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${advancedNutrition ? 'translate-x-6' : 'translate-x-1'}`} />
+                            </span>
+                        </label>
+                    </div>
+                </div>
 
                 <div className="space-y-3 sm:space-y-4">
                     {user.guest ? (

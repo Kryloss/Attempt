@@ -19,6 +19,16 @@ interface Food {
     protein: number
     fat: number
     notes?: string
+    // Advanced subclasses
+    proteinComplete?: number
+    proteinIncomplete?: number
+    carbsSimple?: number
+    carbsComplex?: number
+    fiber?: number
+    fatsUnsaturated?: number
+    fatsSaturated?: number
+    fatsTrans?: number
+    fdcId?: number
 }
 
 interface Meal {
@@ -53,6 +63,7 @@ export default function NutritionTab({ user }: NutritionTabProps) {
     const [isLoading, setIsLoading] = useState(false)
     const [autoSaveStatus, setAutoSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle')
     const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
+    const [advancedNutritionEnabled, setAdvancedNutritionEnabled] = useState<boolean>(false)
     const nutritionServiceRef = useRef<NutritionService | null>(null)
 
     // Initialize nutrition service
@@ -66,6 +77,26 @@ export default function NutritionTab({ user }: NutritionTabProps) {
             nutritionServiceRef.current = null
         }
     }, [user])
+
+    // Sync advanced nutrition setting from localStorage
+    useEffect(() => {
+        const readSetting = () => {
+            try {
+                const stored = typeof window !== 'undefined' ? localStorage.getItem('advanced_nutrition_enabled') : null
+                setAdvancedNutritionEnabled(stored === 'true')
+            } catch { }
+        }
+        readSetting()
+        const handler = () => readSetting()
+        if (typeof window !== 'undefined') {
+            window.addEventListener('advancedNutritionSettingChanged', handler)
+        }
+        return () => {
+            if (typeof window !== 'undefined') {
+                window.removeEventListener('advancedNutritionSettingChanged', handler)
+            }
+        }
+    }, [])
 
     // Calculate daily totals
     const dailyTotals = (meals || []).reduce((acc, meal) => {
@@ -85,6 +116,22 @@ export default function NutritionTab({ user }: NutritionTabProps) {
             fat: acc.fat + mealTotals.fat
         }
     }, { calories: 0, carbs: 0, protein: 0, fat: 0 })
+
+    // Advanced totals (optional)
+    const advancedTotals = (meals || []).reduce((acc, meal) => {
+        const foods = meal?.foods || []
+        foods.forEach(food => {
+            acc.proteinComplete += food.proteinComplete || 0
+            acc.proteinIncomplete += food.proteinIncomplete || 0
+            acc.carbsSimple += food.carbsSimple || 0
+            acc.carbsComplex += food.carbsComplex || 0
+            acc.fiber += food.fiber || 0
+            acc.fatsUnsaturated += food.fatsUnsaturated || 0
+            acc.fatsSaturated += food.fatsSaturated || 0
+            acc.fatsTrans += food.fatsTrans || 0
+        })
+        return acc
+    }, { proteinComplete: 0, proteinIncomplete: 0, carbsSimple: 0, carbsComplex: 0, fiber: 0, fatsUnsaturated: 0, fatsSaturated: 0, fatsTrans: 0 })
 
     // Initialize nutrition data for current date
     useEffect(() => {
@@ -534,24 +581,44 @@ export default function NutritionTab({ user }: NutritionTabProps) {
             <DateCard user={user} />
 
             {/* Daily Summary */}
-            <div className="bg-white rounded-2xl p-4 shadow-lg border border-purple-100">
-                <h3 className="text-lg font-bold text-purple-800 mb-3 text-center">Daily Summary</h3>
-                <div className="grid grid-cols-4 gap-3">
-                    <div className="bg-purple-50 rounded-lg p-3 text-center">
-                        <div className="text-xl font-bold text-purple-600">{dailyTotals.calories}</div>
-                        <div className="text-sm text-purple-500">Calories</div>
+            <div className="bg-white rounded-2xl p-2 shadow-lg border border-purple-100">
+                <h3 className="text-base font-bold text-purple-800 mb-1 text-center">Daily Summary</h3>
+                <div className="grid grid-cols-4 gap-1">
+                    <div className="bg-purple-50 rounded-lg p-1.5 text-center">
+                        <div className="text-lg font-bold text-purple-600">{dailyTotals.calories}</div>
+                        <div className="text-xs text-purple-500">Calories</div>
                     </div>
-                    <div className="bg-green-50 rounded-lg p-3 text-center">
-                        <div className="text-xl font-bold text-green-600">{dailyTotals.carbs.toFixed(1)}g</div>
-                        <div className="text-sm text-green-500">Carbs</div>
+                    <div className="bg-green-50 rounded-lg p-1.5 text-center">
+                        <div className="text-lg font-bold text-green-600">{dailyTotals.carbs.toFixed(1)}g</div>
+                        <div className="text-xs text-green-500">Carbs</div>
+                        {advancedNutritionEnabled && (
+                            <div className="mt-0.5 text-[10px] text-green-600">
+                                <div>Simple: {advancedTotals.carbsSimple.toFixed(1)}g</div>
+                                <div>Complex: {advancedTotals.carbsComplex.toFixed(1)}g</div>
+                                <div>Fiber: {advancedTotals.fiber.toFixed(1)}g</div>
+                            </div>
+                        )}
                     </div>
-                    <div className="bg-blue-50 rounded-lg p-3 text-center">
-                        <div className="text-xl font-bold text-blue-600">{dailyTotals.protein.toFixed(1)}g</div>
-                        <div className="text-sm text-blue-500">Protein</div>
+                    <div className="bg-blue-50 rounded-lg p-1.5 text-center">
+                        <div className="text-lg font-bold text-blue-600">{dailyTotals.protein.toFixed(1)}g</div>
+                        <div className="text-xs text-blue-500">Protein</div>
+                        {advancedNutritionEnabled && (
+                            <div className="mt-0.5 text-[10px] text-blue-600">
+                                <div>Complete: {advancedTotals.proteinComplete.toFixed(1)}g</div>
+                                <div>Incomplete: {advancedTotals.proteinIncomplete.toFixed(1)}g</div>
+                            </div>
+                        )}
                     </div>
-                    <div className="bg-yellow-50 rounded-lg p-3 text-center">
-                        <div className="text-xl font-bold text-yellow-600">{dailyTotals.fat.toFixed(1)}g</div>
-                        <div className="text-sm text-yellow-500">Fat</div>
+                    <div className="bg-yellow-50 rounded-lg p-1.5 text-center">
+                        <div className="text-lg font-bold text-yellow-600">{dailyTotals.fat.toFixed(1)}g</div>
+                        <div className="text-xs text-yellow-500">Fat</div>
+                        {advancedNutritionEnabled && (
+                            <div className="mt-0.5 text-[10px] text-yellow-600">
+                                <div>Unsat: {advancedTotals.fatsUnsaturated.toFixed(1)}g</div>
+                                <div>Sat: {advancedTotals.fatsSaturated.toFixed(1)}g</div>
+                                <div>Trans: {advancedTotals.fatsTrans.toFixed(1)}g</div>
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>
@@ -664,11 +731,34 @@ export default function NutritionTab({ user }: NutritionTabProps) {
                         </button>
                     </div>
                 ) : (
-                    meals.map((meal) => (
+                    meals.map((meal, index) => (
                         <div
                             key={meal.id}
-                            onDragOver={handleDragOver}
-                            onDrop={(e) => handleDrop(e, meal.id)}
+                            onDragOver={(e) => {
+                                // Accept dragging of foods and meals onto meal body
+                                handleDragOver(e)
+                            }}
+                            onDrop={(e) => {
+                                e.preventDefault()
+                                try {
+                                    const mealTransfer = e.dataTransfer.getData('application/x-meal')
+                                    if (mealTransfer) {
+                                        const { fromIndex } = JSON.parse(mealTransfer)
+                                        if (typeof fromIndex === 'number' && fromIndex !== index) {
+                                            setMeals(prev => {
+                                                const updated = [...prev]
+                                                const [moved] = updated.splice(fromIndex, 1)
+                                                updated.splice(index, 0, moved)
+                                                return updated
+                                            })
+                                            setHasUnsavedChanges(true)
+                                            return
+                                        }
+                                    }
+                                } catch { }
+                                // Fallback: treat as dropping a food item
+                                handleDrop(e, meal.id)
+                            }}
                             className="relative"
                         >
                             <MealCard
@@ -679,6 +769,17 @@ export default function NutritionTab({ user }: NutritionTabProps) {
                                 onRemoveFood={handleRemoveFoodFromMeal}
                                 onMoveFood={handleMoveFoodBetweenMeals}
                                 onEditFood={handleEditFood}
+                                dragHandleProps={{
+                                    draggable: true,
+                                    onDragStart: (e: React.DragEvent) => {
+                                        // Mark that we are dragging a meal (not food)
+                                        e.dataTransfer.setData('application/x-meal', JSON.stringify({ id: meal.id, fromIndex: index }))
+                                        try { e.dataTransfer.setData('text/plain', meal.name || 'meal') } catch { }
+                                        e.dataTransfer.effectAllowed = 'move'
+                                    },
+                                    onDragEnd: () => { }
+                                }}
+                                showAdvanced={advancedNutritionEnabled}
                             />
                         </div>
                     ))

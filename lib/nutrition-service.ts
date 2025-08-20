@@ -6,6 +6,16 @@ export interface NutritionFood {
     protein: number;
     fat: number;
     notes?: string;
+    // Advanced subclasses (all optional)
+    proteinComplete?: number;
+    proteinIncomplete?: number;
+    carbsSimple?: number;
+    carbsComplex?: number;
+    fiber?: number;
+    fatsUnsaturated?: number;
+    fatsSaturated?: number;
+    fatsTrans?: number;
+    fdcId?: number;
 }
 
 export interface NutritionMeal {
