@@ -31,7 +31,7 @@ export default function AuthorizationPage() {
                         <Image src="/favicon.svg" alt="gymNote Logo" width={40} height={40} priority />
                     </div>
                     <h1 className="text-4xl sm:text-5xl font-bold text-purple-800 mb-4 font-display gradient-text">
-                        gymNote
+                        GymNote
                     </h1>
                     <div className="flex justify-center items-center p-8">
                         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
@@ -64,9 +64,9 @@ export default function AuthorizationPage() {
                             </div>
                         </div>
                         <h1 className="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-purple-500 to-purple-500 bg-clip-text text-transparent mb-2 leading-tight pb-1">
-                            gymNote
+                            GymNote
                         </h1>
-                        <p className="text-gray-600 text-sm">Your personal fitness companion</p>
+                        <p className="text-gray-600 text-sm">Your ultimate workout tracker and fitness companion</p>
                     </div>
 
                     {/* Main content card */}

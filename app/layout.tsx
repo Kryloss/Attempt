@@ -7,8 +7,21 @@ import { ModalProvider } from '@/components/ModalContext'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-    title: 'gymNote - Email Confirmation',
-    description: 'Send confirmation emails using gymNote',
+    title: 'GymNote - Your Personal Fitness Companion',
+    description: 'GymNote workout tracker - Your ultimate fitness app for tracking workouts, nutrition, and progress. Start your fitness journey today!',
+    keywords: 'GymNote, workout tracker, fitness app, exercise tracking, nutrition tracking, fitness companion',
+    authors: [{ name: 'GymNote Team' }],
+    openGraph: {
+        title: 'GymNote - Your Personal Fitness Companion',
+        description: 'Track your workouts, nutrition, and progress with GymNote fitness app',
+        type: 'website',
+        locale: 'en_US',
+    },
+    twitter: {
+        card: 'summary_large_image',
+        title: 'GymNote - Your Personal Fitness Companion',
+        description: 'Track your workouts, nutrition, and progress with GymNote fitness app',
+    },
     icons: {
         icon: '/favicon.svg',
         shortcut: '/favicon.svg',

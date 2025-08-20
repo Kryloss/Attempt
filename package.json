@@ -1,13 +1,14 @@
 {
-    "name": "email-confirmation",
+    "name": "gymnote",
     "version": "1.0.0",
-    "description": "A website that sends confirmation emails using Gmail SMTP",
+    "description": "GymNote - Your ultimate workout tracker and fitness companion",
     "main": "index.js",
     "scripts": {
         "dev": "next dev",
         "build": "next build",
         "start": "next start",
-        "lint": "next lint"
+        "lint": "next lint",
+        "generate-sitemap": "node scripts/generate-sitemap.js"
     },
     "dependencies": {
         "@types/bcryptjs": "^2.4.6",
@@ -33,13 +34,16 @@
         "eslint-config-next": "^14.0.0"
     },
     "keywords": [
-        "email",
-        "gmail",
-        "smtp",
-        "confirmation",
+        "gymnote",
+        "fitness",
+        "workout-tracker",
+        "nutrition-tracking",
+        "fitness-app",
+        "exercise-logging",
         "nextjs",
-        "react"
+        "react",
+        "typescript"
     ],
-    "author": "",
+    "author": "GymNote Team",
     "license": "MIT"
 }

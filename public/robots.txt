@@ -1,0 +1,30 @@
+User-agent: *
+Allow: /
+
+# Allow crawling of main pages
+Allow: /authorization
+Allow: /workouts
+Allow: /nutrition
+Allow: /progress
+
+# Allow crawling of API endpoints (for discovery)
+Allow: /api/health
+Allow: /api/nutrition/
+Allow: /api/workout/
+Allow: /api/training/
+Allow: /api/usda/
+Allow: /api/cnf/
+Allow: /api/off/
+
+# Block sensitive areas
+Disallow: /api/auth/
+Disallow: /api/debug-env/
+Disallow: /api/test-*
+Disallow: /api/send-email*
+Disallow: /api/emails/
+
+# Sitemap location
+Sitemap: https://attempt-three.vercel.app/sitemap.xml
+
+# Crawl delay (optional - be respectful to your server)
+Crawl-delay: 1
