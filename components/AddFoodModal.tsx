@@ -453,7 +453,7 @@ export default function AddFoodModal({ isOpen, onClose, onAddFood }: AddFoodModa
                     <form onSubmit={handleSubmit} className="space-y-0.5">
                         {/* Search Food Database */}
                         <div>
-                            <label className="block text-xs font-medium text-blue-700 dark:text-blue-300 mb-0.5">
+                            <label className="block text-xs font-medium text-blue-500 dark:text-blue-500 mb-0.5">
                                 Search Food Database *
                             </label>
                             <div className="relative">
@@ -564,7 +564,7 @@ export default function AddFoodModal({ isOpen, onClose, onAddFood }: AddFoodModa
                         <div className="grid grid-cols-3 gap-1">
                             {/* Carbs and subclasses */}
                             <div>
-                                <label className="block text-xs font-medium text-green-700 dark:text-green-300 mb-0.5">
+                                <label className="block text-xs font-medium text-green-500 dark:text-green-500 mb-0.5">
                                     Carbs (g) {selectedItem && <span className="text-xs text-green-500">(auto)</span>}
                                 </label>
                                 <input
@@ -584,7 +584,7 @@ export default function AddFoodModal({ isOpen, onClose, onAddFood }: AddFoodModa
                                     <div className="mt-0.5 space-y-0.5">
                                         <div className="grid grid-cols-3 gap-1">
                                             <div>
-                                                <label className="block text-[10px] font-medium text-green-700 dark:text-green-300 mb-0.5">Simple</label>
+                                                <label className="block text-[10px] font-medium text-green-500 dark:text-green-500 mb-0.5">Simple</label>
                                                 <input
                                                     type="number"
                                                     value={formData.carbsSimple}
@@ -597,7 +597,7 @@ export default function AddFoodModal({ isOpen, onClose, onAddFood }: AddFoodModa
                                                 />
                                             </div>
                                             <div>
-                                                <label className="block text-[10px] font-medium text-green-700 dark:text-green-300 mb-0.5">Complex</label>
+                                                <label className="block text-[10px] font-medium text-green-500 dark:text-green-500 mb-0.5">Complex</label>
                                                 <input
                                                     type="number"
                                                     value={formData.carbsComplex}
@@ -610,7 +610,7 @@ export default function AddFoodModal({ isOpen, onClose, onAddFood }: AddFoodModa
                                                 />
                                             </div>
                                             <div>
-                                                <label className="block text-[10px] font-medium text-green-700 dark:text-green-300 mb-0.5">Fiber</label>
+                                                <label className="block text-[10px] font-medium text-green-500 dark:text-green-500 mb-0.5">Fiber</label>
                                                 <input
                                                     type="number"
                                                     value={formData.fiber}
@@ -628,7 +628,7 @@ export default function AddFoodModal({ isOpen, onClose, onAddFood }: AddFoodModa
                             </div>
                             {/* Protein and subclasses */}
                             <div>
-                                <label className="block text-xs font-medium text-blue-700 dark:text-blue-300 mb-0.5">
+                                <label className="block text-xs font-medium text-blue-500 dark:text-blue-500 mb-0.5">
                                     Protein (g) {selectedItem && <span className="text-xs text-blue-500">(auto)</span>}
                                 </label>
                                 <input
@@ -645,15 +645,18 @@ export default function AddFoodModal({ isOpen, onClose, onAddFood }: AddFoodModa
                                     readOnly={!!selectedItem && isAutoCalculated}
                                 />
                                 {advancedEnabled && (
-                                    <div className="mt-0.5 space-y-0.5">
+                                    <div className="mt-0.5">
                                         <div className="grid grid-cols-2 gap-1">
                                             <div>
-                                                <label className="block text-[10px] font-medium text-blue-700 dark:text-blue-300 mb-0.5">Complete</label>
+                                                <label className="block text-[10px] font-medium text-blue-500 dark:text-blue-300 mb-0.5">Complete</label>
                                                 <input
                                                     type="number"
                                                     value={formData.proteinComplete}
                                                     onChange={(e) => handleInputChange('proteinComplete', e.target.value)}
-                                                    className="w-full px-1 py-0.5 border rounded focus:outline-none focus:ring-1 focus:ring-blue-500 dark:focus:ring-blue-700 text-[10px] border-blue-300 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100"
+                                                    className={`w-full px-1 py-0.5 border rounded focus:outline-none focus:ring-1 focus:ring-blue-500 dark:focus:ring-blue-700 text-[10px] ${(selectedItem && isAutoCalculated)
+                                                        ? 'border-blue-200 bg-blue-50 text-blue-700 dark:border-blue-700 dark:bg-blue-900/20 dark:text-blue-300'
+                                                        : 'border-blue-300 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100'
+                                                        }`}
                                                     placeholder="0"
                                                     min="0"
                                                     step="0.1"
@@ -661,12 +664,15 @@ export default function AddFoodModal({ isOpen, onClose, onAddFood }: AddFoodModa
                                                 />
                                             </div>
                                             <div>
-                                                <label className="block text-[10px] font-medium text-blue-700 dark:text-blue-300 mb-0.5">Incomplete</label>
+                                                <label className="block text-[10px] font-medium text-blue-500 dark:text-blue-300 mb-0.5">Incomplete</label>
                                                 <input
                                                     type="number"
                                                     value={formData.proteinIncomplete}
                                                     onChange={(e) => handleInputChange('proteinIncomplete', e.target.value)}
-                                                    className="w-full px-1 py-0.5 border rounded focus:outline-none focus:ring-1 focus:ring-blue-500 dark:focus:ring-blue-700 text-[10px] border-blue-300 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100"
+                                                    className={`w-full px-1 py-0.5 border rounded focus:outline-none focus:ring-1 focus:ring-blue-500 dark:focus:ring-blue-700 text-[10px] ${(selectedItem && isAutoCalculated)
+                                                        ? 'border-blue-200 bg-blue-50 text-blue-700 dark:border-blue-700 dark:bg-blue-900/20 dark:text-blue-300'
+                                                        : 'border-blue-300 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100'
+                                                        }`}
                                                     placeholder="0"
                                                     min="0"
                                                     step="0.1"
@@ -679,7 +685,7 @@ export default function AddFoodModal({ isOpen, onClose, onAddFood }: AddFoodModa
                             </div>
                             {/* Fats and subclasses */}
                             <div>
-                                <label className="block text-xs font-medium text-yellow-700 dark:text-yellow-300 mb-0.5">
+                                <label className="block text-xs font-medium text-yellow-500 dark:text-yellow-500 mb-0.5">
                                     Fat (g) {selectedItem && <span className="text-xs text-yellow-500">(auto)</span>}
                                 </label>
                                 <input
@@ -699,7 +705,7 @@ export default function AddFoodModal({ isOpen, onClose, onAddFood }: AddFoodModa
                                     <div className="mt-0.5">
                                         <div className="grid grid-cols-3 gap-1">
                                             <div>
-                                                <label className="block text-[10px] font-medium text-yellow-700 dark:text-yellow-300 mb-0.5">Unsat</label>
+                                                <label className="block text-[10px] font-medium text-yellow-500 dark:text-yellow-500 mb-0.5">Unsat</label>
                                                 <input
                                                     type="number"
                                                     value={formData.fatsUnsaturated}
@@ -712,7 +718,7 @@ export default function AddFoodModal({ isOpen, onClose, onAddFood }: AddFoodModa
                                                 />
                                             </div>
                                             <div>
-                                                <label className="block text-[10px] font-medium text-yellow-700 dark:text-yellow-300 mb-0.5">Sat</label>
+                                                <label className="block text-[10px] font-medium text-yellow-500 dark:text-yellow-500 mb-0.5">Sat</label>
                                                 <input
                                                     type="number"
                                                     value={formData.fatsSaturated}
@@ -725,7 +731,7 @@ export default function AddFoodModal({ isOpen, onClose, onAddFood }: AddFoodModa
                                                 />
                                             </div>
                                             <div>
-                                                <label className="block text-[10px] font-medium text-yellow-700 dark:text-yellow-300 mb-0.5">Trans</label>
+                                                <label className="block text-[10px] font-medium text-yellow-500 dark:text-yellow-500 mb-0.5">Trans</label>
                                                 <input
                                                     type="number"
                                                     value={formData.fatsTrans}

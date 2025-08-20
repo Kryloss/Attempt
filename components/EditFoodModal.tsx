@@ -195,7 +195,7 @@ export default function EditFoodModal({ isOpen, food, onClose, onSaveFood }: Edi
 
                         {/* Calories */}
                         <div>
-                            <label className="block text-xs font-medium text-purple-700 dark:text-purple-300 mb-0.5">
+                            <label className="block text-xs font-medium text-purple-500 dark:text-purple-500 mb-0.5">
                                 Calories
                             </label>
                             <input
@@ -213,7 +213,7 @@ export default function EditFoodModal({ isOpen, food, onClose, onSaveFood }: Edi
                         <div className="grid grid-cols-3 gap-1">
                             {/* Carbs and subclasses */}
                             <div>
-                                <label className="block text-xs font-medium text-green-700 dark:text-green-300 mb-0.5">
+                                <label className="block text-xs font-medium text-green-500 dark:text-green-500 mb-0.5">
                                     Carbs (g)
                                 </label>
                                 <input
@@ -229,7 +229,7 @@ export default function EditFoodModal({ isOpen, food, onClose, onSaveFood }: Edi
                                     <div className="mt-0.5 space-y-0.5">
                                         <div className="grid grid-cols-3 gap-1">
                                             <div>
-                                                <label className="block text-[10px] font-medium text-green-700 dark:text-green-300 mb-0.5">Simple</label>
+                                                <label className="block text-[10px] font-medium text-green-500 dark:text-green-500 mb-0.5">Simple</label>
                                                 <input
                                                     type="number"
                                                     value={formData.carbsSimple}
@@ -241,7 +241,7 @@ export default function EditFoodModal({ isOpen, food, onClose, onSaveFood }: Edi
                                                 />
                                             </div>
                                             <div>
-                                                <label className="block text-[10px] font-medium text-green-700 dark:text-green-300 mb-0.5">Complex</label>
+                                                <label className="block text-[10px] font-medium text-green-500 dark:text-green-500 mb-0.5">Complex</label>
                                                 <input
                                                     type="number"
                                                     value={formData.carbsComplex}
@@ -253,7 +253,7 @@ export default function EditFoodModal({ isOpen, food, onClose, onSaveFood }: Edi
                                                 />
                                             </div>
                                             <div>
-                                                <label className="block text-[10px] font-medium text-green-700 dark:text-green-300 mb-0.5">Fiber</label>
+                                                <label className="block text-[10px] font-medium text-green-500 dark:text-green-500 mb-0.5">Fiber</label>
                                                 <input
                                                     type="number"
                                                     value={formData.fiber}
@@ -270,7 +270,7 @@ export default function EditFoodModal({ isOpen, food, onClose, onSaveFood }: Edi
                             </div>
                             {/* Protein and subclasses */}
                             <div>
-                                <label className="block text-xs font-medium text-blue-700 dark:text-blue-300 mb-0.5">
+                                <label className="block text-xs font-medium text-blue-500 dark:text-blue-500 mb-0.5">
                                     Protein (g)
                                 </label>
                                 <input
@@ -286,7 +286,7 @@ export default function EditFoodModal({ isOpen, food, onClose, onSaveFood }: Edi
                                     <div className="mt-0.5 space-y-0.5">
                                         <div className="grid grid-cols-2 gap-1">
                                             <div>
-                                                <label className="block text-[10px] font-medium text-blue-700 dark:text-blue-300 mb-0.5">Complete</label>
+                                                <label className="block text-[10px] font-medium text-blue-500 dark:text-blue-300 mb-0.5">Complete</label>
                                                 <input
                                                     type="number"
                                                     value={formData.proteinComplete}
@@ -298,7 +298,7 @@ export default function EditFoodModal({ isOpen, food, onClose, onSaveFood }: Edi
                                                 />
                                             </div>
                                             <div>
-                                                <label className="block text-xs font-medium text-blue-700 dark:text-blue-300 mb-0.5">Incomplete</label>
+                                                <label className="block text-xs font-medium text-blue-500 dark:text-blue-500 mb-0.5">Incomplete</label>
                                                 <input
                                                     type="number"
                                                     value={formData.proteinIncomplete}
@@ -315,7 +315,7 @@ export default function EditFoodModal({ isOpen, food, onClose, onSaveFood }: Edi
                             </div>
                             {/* Fats and subclasses */}
                             <div>
-                                <label className="block text-xs font-medium text-yellow-700 dark:text-yellow-300 mb-0.5">
+                                <label className="block text-xs font-medium text-yellow-500 dark:text-yellow-500 mb-0.5">
                                     Fat (g)
                                 </label>
                                 <input
@@ -331,7 +331,7 @@ export default function EditFoodModal({ isOpen, food, onClose, onSaveFood }: Edi
                                     <div className="mt-0.5">
                                         <div className="grid grid-cols-3 gap-1">
                                             <div>
-                                                <label className="block text-[10px] font-medium text-yellow-700 dark:text-yellow-300 mb-0.5">Unsat</label>
+                                                <label className="block text-[10px] font-medium text-yellow-500 dark:text-yellow-%00 mb-0.5">Unsat</label>
                                                 <input
                                                     type="number"
                                                     value={formData.fatsUnsaturated}
@@ -343,7 +343,7 @@ export default function EditFoodModal({ isOpen, food, onClose, onSaveFood }: Edi
                                                 />
                                             </div>
                                             <div>
-                                                <label className="block text-[10px] font-medium text-yellow-700 dark:text-yellow-300 mb-0.5">Sat</label>
+                                                <label className="block text-[10px] font-medium text-yellow-500 dark:text-yellow-500 mb-0.5">Sat</label>
                                                 <input
                                                     type="number"
                                                     value={formData.fatsSaturated}
@@ -355,7 +355,7 @@ export default function EditFoodModal({ isOpen, food, onClose, onSaveFood }: Edi
                                                 />
                                             </div>
                                             <div>
-                                                <label className="block text-[10px] font-medium text-yellow-700 dark:text-yellow-300 mb-0.5">Trans</label>
+                                                <label className="block text-[10px] font-medium text-yellow-500 dark:text-yellow-500 mb-0.5">Trans</label>
                                                 <input
                                                     type="number"
                                                     value={formData.fatsTrans}
