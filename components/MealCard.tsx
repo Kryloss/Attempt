@@ -182,12 +182,12 @@ export default function MealCard({ meal, onDelete, onUpdate, onAddFood, onRemove
                                                 <div className="font-semibold">{advancedTotals.carbsSimple.toFixed(1)}g</div>
                                             </div>
                                             <div>
-                                                <div className="text-[8px] sm:text-[9px] text-green-700/80">Complex</div>
-                                                <div className="font-semibold">{advancedTotals.carbsComplex.toFixed(1)}g</div>
-                                            </div>
-                                            <div>
                                                 <div className="text-[8px] sm:text-[9px] text-green-700/80">Fiber</div>
                                                 <div className="font-semibold">{advancedTotals.fiber.toFixed(1)}g</div>
+                                            </div>
+                                            <div>
+                                                <div className="text-[8px] sm:text-[9px] text-green-700/80">Complex</div>
+                                                <div className="font-semibold">{advancedTotals.carbsComplex.toFixed(1)}g</div>
                                             </div>
                                         </div>
                                     )}
