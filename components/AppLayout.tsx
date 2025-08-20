@@ -4,30 +4,27 @@ import { useState, useEffect } from 'react'
 import { User } from '@/types/auth'
 import SettingsMenu from './SettingsMenu'
 import { useModal } from './ModalContext'
-import { useRouter, usePathname } from 'next/navigation'
-import Link from 'next/link'
 
 interface AppLayoutProps {
     children: React.ReactNode
     user: User
     onSignOut: () => void
+    activeTab: 'workouts' | 'nutrition' | 'progress'
+    onTabChange: (tab: 'workouts' | 'nutrition' | 'progress') => void
 }
 
-export default function AppLayout({ children, user, onSignOut }: AppLayoutProps) {
+export default function AppLayout({ children, user, onSignOut, activeTab, onTabChange }: AppLayoutProps) {
     const [showSettings, setShowSettings] = useState(false)
     const { isAnyModalOpen, openModal, closeModal } = useModal()
-    const router = useRouter()
-    const pathname = usePathname()
 
     const tabs = [
-        { id: 'workouts', label: 'Workout', icon: '💪', path: '/workouts' },
-        { id: 'nutrition', label: 'Nutrition', icon: '🥗', path: '/nutrition' },
-        { id: 'progress', label: 'Progress', icon: '📊', path: '/progress' }
+        { id: 'workouts', label: 'Workout', icon: '💪', tab: 'workouts' as const },
+        { id: 'nutrition', label: 'Nutrition', icon: '🥗', tab: 'nutrition' as const },
+        { id: 'progress', label: 'Progress', icon: '📊', tab: 'progress' as const }
     ]
 
     const handleSignOut = () => {
         onSignOut()
-        router.push('/authorization')
     }
 
     return (
@@ -114,11 +111,11 @@ export default function AppLayout({ children, user, onSignOut }: AppLayoutProps)
                 <div className="px-4 sm:px-6 py-0.5">
                     <div className="flex justify-around">
                         {tabs.map((tab) => {
-                            const isActive = pathname === tab.path
+                            const isActive = activeTab === tab.tab
                             return (
-                                <Link
+                                <button
                                     key={tab.id}
-                                    href={tab.path}
+                                    onClick={() => onTabChange(tab.tab)}
                                     className={`flex flex-col items-center py-0.5 px-2 sm:px-4 transition-all duration-200 ${isActive
                                         ? 'text-purple-500 transform scale-110'
                                         : 'text-purple-400 hover:text-purple-500'
@@ -129,7 +126,7 @@ export default function AppLayout({ children, user, onSignOut }: AppLayoutProps)
                                     {isActive && (
                                         <div className="w-3 sm:w-4 h-0.5 bg-purple-500 rounded-full mt-0.5 animate-pulse"></div>
                                     )}
-                                </Link>
+                                </button>
                             )
                         })}
                     </div>
