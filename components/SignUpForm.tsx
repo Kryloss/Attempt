@@ -163,7 +163,7 @@ export default function SignUpForm({ onSuccess, onSwitchToSignIn, onGuestMode }:
                     Already have an account?{' '}
                     <button
                         onClick={onSwitchToSignIn}
-                        className="text-purple-800 font-semibold hover:underline focus:outline-none"
+                        className="text-purple-500 font-semibold hover:underline focus:outline-none"
                     >
                         Sign In
                     </button>

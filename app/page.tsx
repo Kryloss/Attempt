@@ -103,7 +103,7 @@ export default function Home() {
                                     <img src="/favicon.svg" alt="gymNote Logo" className="w-10 h-10" />
                                 </div>
                             </div>
-                            <h1 className="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-purple-600 to-purple-800 bg-clip-text text-transparent mb-2 leading-tight pb-1">
+                            <h1 className="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-purple-500 to-purple-500 bg-clip-text text-transparent mb-2 leading-tight pb-1">
                                 gymNote
                             </h1>
                             <p className="text-gray-600 text-sm">Your personal fitness companion</p>

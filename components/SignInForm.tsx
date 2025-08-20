@@ -120,7 +120,7 @@ export default function SignInForm({ onSuccess, onSwitchToSignUp, onSwitchToForg
                     Don't have an account?{' '}
                     <button
                         onClick={onSwitchToSignUp}
-                        className="text-purple-800 font-semibold hover:underline focus:outline-none"
+                        className="text-purple-500 font-semibold hover:underline focus:outline-none"
                     >
                         Sign Up
                     </button>

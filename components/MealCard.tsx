@@ -137,7 +137,7 @@ export default function MealCard({ meal, onDelete, onUpdate, onAddFood, onRemove
     }
 
     return (
-        <div className="bg-white dark:bg-gray-900 border border-purple-200 dark:border-gray-700 rounded-lg p-0 shadow-sm hover:shadow-md transition-all duration-200 hover:border-purple-300 dark:hover:border-gray-600 group relative">
+        <div className="bg-white dark:bg-gray-900 border border-purple-200 dark:border-gray-700 rounded-lg p-0 shadow-sm hover:shadow-md transition-all duration-200 hover:border-purple-300 dark:hover:border-gray-600 group relative neon-surface light-surface">
             <div className="flex items-start justify-between">
                 <div className="flex-1 min-w-0">
                     {/* Meal Header */}

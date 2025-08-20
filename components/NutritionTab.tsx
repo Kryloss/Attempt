@@ -650,14 +650,14 @@ export default function NutritionTab({ user }: NutritionTabProps) {
             {/* Meals List */}
             <div className="space-y-3">
                 {isLoading ? (
-                    <div className="bg-white dark:bg-gray-900 rounded-2xl p-8 shadow-lg border border-purple-100 dark:border-gray-700 text-center">
+                    <div className="bg-white dark:bg-gray-900 rounded-2xl p-8 shadow-lg border border-purple-100 dark:border-gray-700 text-center neon-surface light-surface">
                         <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 border-2 border-purple-300 bg-purple-500/5 shadow-[0_0_16px_rgba(168,85,247,0.25)]">
                             <div className="w-6 h-6 border-4 border-purple-300 border-t-purple-600 rounded-full animate-spin"></div>
                         </div>
                         <p className="text-purple-600 text-base">Loading nutrition data...</p>
                     </div>
                 ) : meals.length === 0 ? (
-                    <div className="bg-white dark:bg-gray-900 rounded-2xl p-8 shadow-lg border border-purple-100 dark:border-gray-700 text-center">
+                    <div className="bg-white dark:bg-gray-900 rounded-2xl p-8 shadow-lg border border-purple-100 dark:border-gray-700 text-center neon-surface light-surface">
                         <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 border-2 border-purple-300 bg-purple-500/5 shadow-[0_0_16px_rgba(168,85,247,0.25)]">
                             <span className="text-2xl">🥗</span>
                         </div>
@@ -670,7 +670,7 @@ export default function NutritionTab({ user }: NutritionTabProps) {
                                 setShowAddMealModal(true)
                                 openModal('addMeal')
                             }}
-                            className="bg-purple-500 text-white px-6 py-2 rounded-lg hover:bg-purple-600 transition-colors font-medium"
+                            className="bg-purple-500 text-white px-6 py-2 rounded-lg hover:bg-purple-600 transition-colors font-medium dark:bg-purple-500/10 dark:text-purple-300 dark:border-2 dark:border-purple-400 dark:hover:bg-purple-500/15 dark:shadow-[0_0_16px_rgba(168,85,247,0.45)] dark:hover:shadow-[0_0_24px_rgba(168,85,247,0.65)]"
                         >
                             Add Your First Meal
                         </button>
@@ -741,7 +741,7 @@ export default function NutritionTab({ user }: NutritionTabProps) {
                                     setShowAddMealModal(true)
                                     openModal('addMeal')
                                 }}
-                                className="bg-purple-500/90 text-white px-6 py-2 rounded-lg hover:bg-purple-600/90 transition-colors font-medium text-sm w-full max-w-xs"
+                                className="bg-purple-500/90 text-white px-6 py-2 rounded-lg hover:bg-purple-600/90 transition-colors font-medium text-sm w-full max-w-xs dark:bg-purple-500/10 dark:text-purple-300 dark:border-2 dark:border-purple-400 dark:hover:bg-purple-500/15 dark:shadow-[0_0_16px_rgba(168,85,247,0.45)] dark:hover:shadow-[0_0_24px_rgba(168,85,247,0.65)]"
                             >
                                 Add Meal
                             </button>

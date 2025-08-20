@@ -122,7 +122,7 @@ export default function ExerciseCard({ exercise, onDelete, onUpdate }: ExerciseC
                         onKeyDown={handleKeyPress}
                         maxLength={field === 'weight' ? 7 : 4}
                         inputMode="numeric"
-                        className={`text-lg font-bold text-purple-600 bg-purple-50 border border-purple-300 rounded px-1 py-0.5 text-center ${field === 'weight' ? 'w-20' : 'w-16'} focus:outline-none focus:border-purple-500`}
+                        className={`text-lg font-bold text-purple-500 bg-purple-50 border border-purple-300 rounded px-1 py-0.5 text-center ${field === 'weight' ? 'w-20' : 'w-16'} focus:outline-none focus:border-purple-500`}
                         autoFocus
                     />
                     <div className="text-sm text-purple-500 font-medium">{label}</div>
@@ -133,7 +133,7 @@ export default function ExerciseCard({ exercise, onDelete, onUpdate }: ExerciseC
         return (
             <div className="text-center" onClick={() => startEditing(field, value)}>
                 <div className="inline-block rounded px-5 py-0.5 cursor-pointer hover:bg-purple-50 transition-colors">
-                    <div className="text-lg font-bold text-purple-600">
+                    <div className="text-lg font-bold text-purple-500">
                         {field === 'weight' && value ? `${value}${unit || 'kg'}` : value || '-'}
                     </div>
                     <div className="text-sm text-purple-500 font-medium">{label}</div>
@@ -175,7 +175,7 @@ export default function ExerciseCard({ exercise, onDelete, onUpdate }: ExerciseC
     }
 
     return (
-        <div className="bg-white dark:bg-gray-900 border border-purple-200 dark:border-gray-700 rounded-lg p-0 shadow-sm hover:shadow-md transition-all duration-200 hover:border-purple-300 dark:hover:border-gray-600 group relative">
+        <div className="bg-white dark:bg-gray-900 border border-purple-200 dark:border-gray-700 rounded-lg p-0 shadow-sm hover:shadow-md transition-all duration-200 hover:border-purple-300 dark:hover:border-gray-600 group relative neon-surface light-surface">
             <div className="flex items-start justify-between">
                 <div className="flex-1 min-w-0">
                     <div className="pl-2 pr-1">
@@ -216,7 +216,7 @@ export default function ExerciseCard({ exercise, onDelete, onUpdate }: ExerciseC
                 <div className="absolute top-1 right-1 flex flex-col items-end">
                     <button
                         onClick={() => setShowDeleteConfirm(true)}
-                        className="perfect-circle bg-red-100 hover:bg-red-200 text-red-600 flex items-center justify-center transition-colors"
+                        className="perfect-circle bg-red-100 hover:bg-red-200 text-red-600 dark:bg-red-900/30 dark:hover:bg-red-900/50 dark:text-red-300 flex items-center justify-center transition-colors"
                         style={{ '--circle-size': '28px' } as React.CSSProperties}
                     >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

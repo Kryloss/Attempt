@@ -148,7 +148,7 @@ export default function AddExerciseModal({ onClose, onAdd }: AddExerciseModalPro
                             <button
                                 type="submit"
                                 disabled={!formData.name.trim() || formData.sets <= 0 || formData.reps <= 0}
-                                className="flex-1 bg-purple-500 text-white py-1.5 px-3 rounded-lg hover:bg-purple-600 transition-colors font-medium text-xs"
+                                className="flex-1 bg-purple-500 text-white py-1.5 px-3 rounded-lg hover:bg-purple-600 transition-colors font-medium text-xs dark:bg-purple-500/10 dark:text-purple-300 dark:border-2 dark:border-purple-400 dark:hover:bg-purple-500/15 dark:shadow-[0_0_16px_rgba(168,85,247,0.45)] dark:hover:shadow-[0_0_24px_rgba(168,85,247,0.65)]"
                             >
                                 Add Exercise
                             </button>

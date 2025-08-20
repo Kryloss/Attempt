@@ -39,7 +39,7 @@ export default function TrainingDashboard({ user, onSignOut }: TrainingDashboard
 
             {/* Header */}
             <header id="app-header"
-                className="bg-white/95 dark:bg-gray-900/90 backdrop-blur-lg border-b border-purple-200 dark:border-gray-800 shadow-xl transition-transform duration-300 translate-y-0"
+                className="bg-white/95 dark:bg-gray-900/90 backdrop-blur-lg border-b border-purple-200 dark:border-gray-800 shadow-xl transition-transform duration-300 translate-y-0 neon-surface light-surface"
                 style={{
                     position: 'fixed',
                     top: 0,
@@ -108,7 +108,7 @@ export default function TrainingDashboard({ user, onSignOut }: TrainingDashboard
             </main>
 
             {/* Bottom Tab Navigation */}
-            <nav className={`fixed bottom-0 left-0 right-0 bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm border-t border-purple-200 dark:border-gray-800 shadow-lg z-20 transition-transform duration-300 ${isAnyModalOpen ? 'translate-y-full' : 'translate-y-0'
+            <nav className={`fixed bottom-0 left-0 right-0 bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm border-t border-purple-200 dark:border-gray-800 shadow-lg z-20 transition-transform duration-300 neon-surface light-surface ${isAnyModalOpen ? 'translate-y-full' : 'translate-y-0'
                 }`}>
                 <div className="px-4 sm:px-6 py-0.5">
                     <div className="flex justify-around">
@@ -117,14 +117,14 @@ export default function TrainingDashboard({ user, onSignOut }: TrainingDashboard
                                 key={tab.id}
                                 onClick={() => setActiveTab(tab.id as TabType)}
                                 className={`flex flex-col items-center py-0.5 px-2 sm:px-4 transition-all duration-200 ${activeTab === tab.id
-                                    ? 'text-purple-600 transform scale-110'
+                                    ? 'text-purple-500 transform scale-110'
                                     : 'text-purple-400 hover:text-purple-500'
                                     }`}
                             >
                                 <span className="mb-0.5 text-base sm:text-lg">{tab.icon}</span>
                                 <span className="text-xs font-medium">{tab.label}</span>
                                 {activeTab === tab.id && (
-                                    <div className="w-3 sm:w-4 h-0.5 bg-purple-600 rounded-full mt-0.5 animate-pulse"></div>
+                                    <div className="w-3 sm:w-4 h-0.5 bg-purple-500 rounded-full mt-0.5 animate-pulse"></div>
                                 )}
                             </button>
                         ))}

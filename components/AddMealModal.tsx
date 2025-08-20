@@ -76,7 +76,7 @@ export default function AddMealModal({ isOpen, onClose, onAddMeal }: AddMealModa
             onClick={onClose}
         >
             <div
-                className="bg-white dark:bg-gray-900 rounded-xl w-full max-w-md shadow-2xl"
+                className="bg-white dark:bg-gray-900 rounded-xl w-full max-w-md shadow-2xl neon-surface light-surface"
                 onClick={(e) => e.stopPropagation()}
             >
                 <div className="p-2">
@@ -137,7 +137,7 @@ export default function AddMealModal({ isOpen, onClose, onAddMeal }: AddMealModa
                             </button>
                             <button
                                 type="submit"
-                                className="flex-1 bg-purple-500 text-white py-1.5 px-3 rounded-lg hover:bg-purple-600 transition-colors font-medium text-xs"
+                                className="flex-1 bg-purple-500 text-white py-1.5 px-3 rounded-lg hover:bg-purple-600 transition-colors font-medium text-xs dark:bg-purple-500/10 dark:text-purple-300 dark:border-2 dark:border-purple-400 dark:hover:bg-purple-500/15 dark:shadow-[0_0_16px_rgba(168,85,247,0.45)] dark:hover:shadow-[0_0_24px_rgba(168,85,247,0.65)]"
                             >
                                 Add Meal
                             </button>
