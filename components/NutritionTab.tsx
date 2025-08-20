@@ -307,8 +307,8 @@ export default function NutritionTab({ user }: NutritionTabProps) {
 
                 if (autoSaveStatus === 'saving') {
                     statusHTML = `
-                        <div class="flex items-center space-x-2 text-xs sm:text-sm text-purple-600">
-                            <div class="w-3 h-3 sm:w-4 sm:h-4 border-2 border-purple-300 border-t-purple-600 rounded-full animate-spin"></div>
+                        <div class="flex items-center space-x-2 text-xs sm:text-sm text-purple-500">
+                            <div class="w-3 h-3 sm:w-4 sm:h-4 border-2 border-purple-300 border-t-purple-500 rounded-full animate-spin"></div>
                             <span>Saving...</span>
                         </div>
                     `
@@ -576,14 +576,14 @@ export default function NutritionTab({ user }: NutritionTabProps) {
 
             {/* Daily Summary (visible only when more than one meal has foods) */}
             {showDailySummary && (
-                <div className="bg-white rounded-2xl p-2 shadow-lg border border-purple-100">
-                    <h3 className="text-base font-bold text-purple-800 mb-1 text-center">Daily Summary</h3>
+                <div className="bg-white dark:bg-gray-900 rounded-2xl p-2 shadow-lg border border-purple-100 dark:border-gray-700">
+                    <h3 className="text-base font-bold text-purple-800 dark:text-purple-200 mb-1 text-center">Daily Summary</h3>
                     <div className="grid grid-cols-4 gap-1">
-                        <div className="bg-purple-50 rounded-lg p-1.5 text-center">
+                        <div className="rounded-lg p-1.5 text-center border-2 border-purple-300 bg-purple-500/5 shadow-[0_0_18px_rgba(168,85,247,0.25)]">
                             <div className="text-xs text-purple-500">Calories</div>
                             <div className="text-lg font-bold text-purple-600">{dailyTotals.calories}</div>
                         </div>
-                        <div className="bg-green-50 rounded-lg p-1.5 text-center">
+                        <div className="rounded-lg p-1.5 text-center border-2 border-green-300 bg-green-500/5 shadow-[0_0_18px_rgba(16,185,129,0.25)]">
                             <div className="text-xs text-green-500">Carbs</div>
                             <div className="text-lg font-bold text-green-600">{dailyTotals.carbs.toFixed(1)}g</div>
                             {advancedNutritionEnabled && (
@@ -603,7 +603,7 @@ export default function NutritionTab({ user }: NutritionTabProps) {
                                 </div>
                             )}
                         </div>
-                        <div className="bg-blue-50 rounded-lg p-1.5 text-center">
+                        <div className="rounded-lg p-1.5 text-center border-2 border-blue-300 bg-blue-500/5 shadow-[0_0_18px_rgba(59,130,246,0.25)]">
                             <div className="text-xs text-blue-500">Protein</div>
                             <div className="text-lg font-bold text-blue-600">{dailyTotals.protein.toFixed(1)}g</div>
                             {advancedNutritionEnabled && (
@@ -619,7 +619,7 @@ export default function NutritionTab({ user }: NutritionTabProps) {
                                 </div>
                             )}
                         </div>
-                        <div className="bg-yellow-50 rounded-lg p-1.5 text-center">
+                        <div className="rounded-lg p-1.5 text-center border-2 border-yellow-300 bg-yellow-500/5 shadow-[0_0_18px_rgba(234,179,8,0.25)]">
                             <div className="text-xs text-yellow-500">Fat</div>
                             <div className="text-lg font-bold text-yellow-600">{dailyTotals.fat.toFixed(1)}g</div>
                             {advancedNutritionEnabled && (
@@ -650,19 +650,19 @@ export default function NutritionTab({ user }: NutritionTabProps) {
             {/* Meals List */}
             <div className="space-y-3">
                 {isLoading ? (
-                    <div className="bg-white rounded-2xl p-8 shadow-lg border border-purple-100 text-center">
-                        <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <div className="bg-white dark:bg-gray-900 rounded-2xl p-8 shadow-lg border border-purple-100 dark:border-gray-700 text-center">
+                        <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 border-2 border-purple-300 bg-purple-500/5 shadow-[0_0_16px_rgba(168,85,247,0.25)]">
                             <div className="w-6 h-6 border-4 border-purple-300 border-t-purple-600 rounded-full animate-spin"></div>
                         </div>
                         <p className="text-purple-600 text-base">Loading nutrition data...</p>
                     </div>
                 ) : meals.length === 0 ? (
-                    <div className="bg-white rounded-2xl p-8 shadow-lg border border-purple-100 text-center">
-                        <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <div className="bg-white dark:bg-gray-900 rounded-2xl p-8 shadow-lg border border-purple-100 dark:border-gray-700 text-center">
+                        <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 border-2 border-purple-300 bg-purple-500/5 shadow-[0_0_16px_rgba(168,85,247,0.25)]">
                             <span className="text-2xl">🥗</span>
                         </div>
-                        <h3 className="text-xl font-bold text-purple-800 mb-2">No Meals Added Yet</h3>
-                        <p className="text-purple-600 mb-4 text-sm">
+                        <h3 className="text-xl font-bold text-purple-800 dark:text-purple-200 mb-2">No Meals Added Yet</h3>
+                        <p className="text-purple-600 dark:text-purple-300 mb-4 text-sm">
                             Start by adding meals to track your daily nutrition and calories.
                         </p>
                         <button

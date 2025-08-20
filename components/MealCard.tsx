@@ -137,11 +137,11 @@ export default function MealCard({ meal, onDelete, onUpdate, onAddFood, onRemove
     }
 
     return (
-        <div className="bg-white border border-purple-200 rounded-lg p-0 shadow-sm hover:shadow-md transition-all duration-200 hover:border-purple-300 group relative">
+        <div className="bg-white dark:bg-gray-900 border border-purple-200 dark:border-gray-700 rounded-lg p-0 shadow-sm hover:shadow-md transition-all duration-200 hover:border-purple-300 dark:hover:border-gray-600 group relative">
             <div className="flex items-start justify-between">
                 <div className="flex-1 min-w-0">
                     {/* Meal Header */}
-                    <div className="pl-2 pr-1 pb-2 border-b border-purple-100">
+                    <div className="pl-2 pr-1 pb-2 border-b border-purple-100 dark:border-gray-800">
                         <div className="flex items-center space-x-2 mb-1">
                             <span className="text-lg">{getMealTypeEmoji(meal.type)}</span>
                             {editingField === 'name' ? (
@@ -151,12 +151,12 @@ export default function MealCard({ meal, onDelete, onUpdate, onAddFood, onRemove
                                     onChange={(e) => setEditValue(e.target.value)}
                                     onBlur={saveEdit}
                                     onKeyDown={handleKeyPress}
-                                    className="text-sm font-bold text-purple-800 bg-transparent focus:outline-none flex-1"
+                                    className="text-sm font-bold text-purple-800 dark:text-purple-200 bg-transparent focus:outline-none flex-1"
                                     autoFocus
                                 />
                             ) : (
                                 <h4
-                                    className="text-sm font-bold text-purple-800 mb-0 break-words cursor-text flex-1"
+                                    className="text-sm font-bold text-purple-800 dark:text-purple-200 mb-0 break-words cursor-text flex-1"
                                     onClick={() => startEditing('name', meal.name)}
                                     title="Click to edit name"
                                 >
@@ -168,61 +168,61 @@ export default function MealCard({ meal, onDelete, onUpdate, onAddFood, onRemove
                         {/* Meal Totals */}
                         {showTotals && (
                             <div className="grid grid-cols-4 gap-1 text-center">
-                                <div className="bg-purple-50 rounded px-2 py-1">
-                                    <div className="text-sm font-bold text-purple-600">{totals.calories}</div>
+                                <div className="bg-purple-50 dark:bg-purple-900/20 rounded px-2 py-1">
+                                    <div className="text-sm font-bold text-purple-500">{totals.calories}</div>
                                     <div className="text-xs text-purple-500">Cal</div>
                                 </div>
-                                <div className="bg-green-50 rounded px-2 py-1">
-                                    <div className="text-sm font-bold text-green-600">{totals.carbs}g</div>
+                                <div className="bg-green-50 dark:bg-green-900/20 rounded px-2 py-1">
+                                    <div className="text-sm font-bold text-green-500">{totals.carbs}g</div>
                                     <div className="text-xs text-green-500">Carbs</div>
                                     {showAdvanced && (
-                                        <div className="mt-0.5 grid grid-cols-3 gap-0.5 sm:gap-1 text-[9px] sm:text-[10px] text-green-600 leading-3 sm:leading-4 scale-90 sm:scale-100 origin-top">
+                                        <div className="mt-0.5 grid grid-cols-3 gap-0.5 sm:gap-1 text-[9px] sm:text-[10px] text-green-500 leading-3 sm:leading-4 scale-90 sm:scale-100 origin-top">
                                             <div>
-                                                <div className="text-[8px] sm:text-[9px] text-green-700/80">Simple</div>
+                                                <div className="text-[8px] sm:text-[9px] text-green-500/80">Simple</div>
                                                 <div className="font-semibold">{advancedTotals.carbsSimple.toFixed(1)}g</div>
                                             </div>
                                             <div>
-                                                <div className="text-[8px] sm:text-[9px] text-green-700/80">Fiber</div>
+                                                <div className="text-[8px] sm:text-[9px] text-green-500/80">Fiber</div>
                                                 <div className="font-semibold">{advancedTotals.fiber.toFixed(1)}g</div>
                                             </div>
                                             <div>
-                                                <div className="text-[8px] sm:text-[9px] text-green-700/80">Complex</div>
+                                                <div className="text-[8px] sm:text-[9px] text-green-500/80">Complex</div>
                                                 <div className="font-semibold">{advancedTotals.carbsComplex.toFixed(1)}g</div>
                                             </div>
                                         </div>
                                     )}
                                 </div>
-                                <div className="bg-blue-50 rounded px-2 py-1">
-                                    <div className="text-sm font-bold text-blue-600">{totals.protein}g</div>
+                                <div className="bg-blue-50 dark:bg-blue-900/20 rounded px-2 py-1">
+                                    <div className="text-sm font-bold text-blue-500">{totals.protein}g</div>
                                     <div className="text-xs text-blue-500">Protein</div>
                                     {showAdvanced && (
-                                        <div className="mt-0.5 grid grid-cols-2 gap-0.5 sm:gap-1 text-[9px] sm:text-[10px] text-blue-600 leading-3 sm:leading-4 scale-90 sm:scale-100 origin-top">
+                                        <div className="mt-0.5 grid grid-cols-2 gap-0.5 sm:gap-1 text-[9px] sm:text-[10px] text-blue-500 leading-3 sm:leading-4 scale-90 sm:scale-100 origin-top">
                                             <div>
-                                                <div className="text-[8px] sm:text-[9px] text-blue-700/80">Complete</div>
+                                                <div className="text-[8px] sm:text-[9px] text-blue-500/80">Complete</div>
                                                 <div className="font-semibold">{advancedTotals.proteinComplete.toFixed(1)}g</div>
                                             </div>
                                             <div>
-                                                <div className="text-[8px] sm:text-[9px] text-blue-700/80">Incomplete</div>
+                                                <div className="text-[8px] sm:text-[9px] text-blue-500/80">Incomplete</div>
                                                 <div className="font-semibold">{advancedTotals.proteinIncomplete.toFixed(1)}g</div>
                                             </div>
                                         </div>
                                     )}
                                 </div>
-                                <div className="bg-yellow-50 rounded px-2 py-1">
-                                    <div className="text-sm font-bold text-yellow-600">{totals.fat}g</div>
+                                <div className="bg-yellow-50 dark:bg-yellow-900/20 rounded px-2 py-1">
+                                    <div className="text-sm font-bold text-yellow-500">{totals.fat}g</div>
                                     <div className="text-xs text-yellow-500">Fat</div>
                                     {showAdvanced && (
-                                        <div className="mt-0.5 grid grid-cols-3 gap-0.5 sm:gap-1 text-[9px] sm:text-[10px] text-yellow-600 leading-3 sm:leading-4 scale-90 sm:scale-100 origin-top">
+                                        <div className="mt-0.5 grid grid-cols-3 gap-0.5 sm:gap-1 text-[9px] sm:text-[10px] text-yellow-500 leading-3 sm:leading-4 scale-90 sm:scale-100 origin-top">
                                             <div>
-                                                <div className="text-[8px] sm:text-[9px] text-yellow-700/80">Unsat</div>
+                                                <div className="text-[8px] sm:text-[9px] text-yellow-500/80">Unsat</div>
                                                 <div className="font-semibold">{advancedTotals.fatsUnsaturated.toFixed(1)}g</div>
                                             </div>
                                             <div>
-                                                <div className="text-[8px] sm:text-[9px] text-yellow-700/80">Sat</div>
+                                                <div className="text-[8px] sm:text-[9px] text-yellow-500/80">Sat</div>
                                                 <div className="font-semibold">{advancedTotals.fatsSaturated.toFixed(1)}g</div>
                                             </div>
                                             <div>
-                                                <div className="text-[8px] sm:text-[9px] text-yellow-700/80">Trans</div>
+                                                <div className="text-[8px] sm:text-[9px] text-yellow-500/80">Trans</div>
                                                 <div className="font-semibold">{advancedTotals.fatsTrans.toFixed(1)}g</div>
                                             </div>
                                         </div>
@@ -235,7 +235,7 @@ export default function MealCard({ meal, onDelete, onUpdate, onAddFood, onRemove
                     {/* Foods List */}
                     <div className="px-2 py-2 space-y-1">
                         {(meal?.foods || []).length === 0 ? (
-                            <p className="text-xs text-purple-400 italic text-center py-2">
+                            <p className="text-xs text-purple-400 dark:text-purple-300/70 italic text-center py-2">
                                 No foods added yet. Drag foods here or use Add Food button.
                             </p>
                         ) : (
@@ -244,28 +244,28 @@ export default function MealCard({ meal, onDelete, onUpdate, onAddFood, onRemove
                                     key={food.id}
                                     draggable
                                     onDragStart={(e) => handleFoodDragStart(e, food)}
-                                    className="flex items-center justify-between bg-purple-50 rounded p-1.5 border border-purple-100 cursor-grab active:cursor-grabbing hover:bg-purple-100 transition-colors"
+                                    className="flex items-center justify-between bg-purple-50 dark:bg-gray-800 rounded p-1.5 border border-purple-100 dark:border-gray-700 cursor-grab active:cursor-grabbing hover:bg-purple-100 dark:hover:bg-gray-700 transition-colors"
                                 >
                                     <div className="flex-1 min-w-0">
-                                        <div className="text-xs font-medium text-purple-800 truncate">{food.name}</div>
-                                        <div className="text-xs text-purple-600">
+                                        <div className="text-xs font-medium text-purple-800 dark:text-purple-200 truncate">{food.name}</div>
+                                        <div className="text-xs text-purple-600 dark:text-purple-300">
                                             {food.calories}cal • {food.carbs}c • {food.protein}p • {food.fat}f
                                         </div>
                                         {showAdvanced && (
                                             <div className="mt-0.5">
                                                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-1 text-[10px]">
-                                                    <div className="text-blue-700">
+                                                    <div className="text-xs text-blue-700 dark:text-blue-300">
                                                         <span className="font-medium">Proteins:</span>
                                                         <span className="ml-1">Complete {food.proteinComplete ?? 0}g</span>
                                                         <span className="ml-1">Incomplete {food.proteinIncomplete ?? 0}g</span>
                                                     </div>
-                                                    <div className="text-green-700">
+                                                    <div className="text-xs text-green-700 dark:text-green-300">
                                                         <span className="font-medium">Carbs:</span>
                                                         <span className="ml-1">Simple {food.carbsSimple ?? 0}g</span>
                                                         <span className="ml-1">Complex {food.carbsComplex ?? 0}g</span>
                                                         <span className="ml-1">Fiber {food.fiber ?? 0}g</span>
                                                     </div>
-                                                    <div className="text-yellow-700">
+                                                    <div className="text-xs text-yellow-700 dark:text-yellow-300">
                                                         <span className="font-medium">Fats:</span>
                                                         <span className="ml-1">Unsat {food.fatsUnsaturated ?? 0}g</span>
                                                         <span className="ml-1">Sat {food.fatsSaturated ?? 0}g</span>
@@ -275,13 +275,13 @@ export default function MealCard({ meal, onDelete, onUpdate, onAddFood, onRemove
                                             </div>
                                         )}
                                         {food.notes && (
-                                            <div className="text-xs text-purple-500 italic break-words whitespace-normal">{food.notes}</div>
+                                            <div className="text-xs text-purple-500 dark:text-purple-300 italic break-words whitespace-normal">{food.notes}</div>
                                         )}
                                     </div>
                                     <div className="flex items-center space-x-2">
                                         <button
                                             onClick={() => onEditFood(food)}
-                                            className="perfect-circle bg-blue-100 hover:bg-blue-200 text-blue-600 flex items-center justify-center transition-colors"
+                                            className="perfect-circle bg-blue-100 hover:bg-blue-200 text-blue-600 dark:bg-blue-900/30 dark:hover:bg-blue-900/50 dark:text-blue-300 flex items-center justify-center transition-colors"
                                             style={{ '--circle-size': '24px' } as React.CSSProperties}
                                             title="Edit food"
                                         >
@@ -291,7 +291,7 @@ export default function MealCard({ meal, onDelete, onUpdate, onAddFood, onRemove
                                         </button>
                                         <button
                                             onClick={() => handleRemoveFood(food.id)}
-                                            className="perfect-circle bg-red-100 hover:bg-red-200 text-red-600 flex items-center justify-center transition-colors"
+                                            className="perfect-circle bg-red-100 hover:bg-red-200 text-red-600 dark:bg-red-900/30 dark:hover:bg-red-900/50 dark:text-red-300 flex items-center justify-center transition-colors"
                                             style={{ '--circle-size': '24px' } as React.CSSProperties}
                                             title="Delete food"
                                         >
@@ -309,7 +309,7 @@ export default function MealCard({ meal, onDelete, onUpdate, onAddFood, onRemove
                 <div className="absolute top-1 right-1 flex items-center space-x-1">
                     <button
                         onClick={() => onOpenAddFood && onOpenAddFood(meal.id)}
-                        className="perfect-circle bg-purple-100 hover:bg-purple-200 text-purple-600 flex items-center justify-center transition-colors"
+                        className="perfect-circle bg-purple-100 hover:bg-purple-200 text-purple-600 dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-purple-300 flex items-center justify-center transition-colors"
                         style={{ '--circle-size': '28px' } as React.CSSProperties}
                         title="Add food"
                     >
@@ -319,7 +319,7 @@ export default function MealCard({ meal, onDelete, onUpdate, onAddFood, onRemove
                     </button>
                     <button
                         onClick={() => setShowDeleteConfirm(true)}
-                        className="perfect-circle bg-red-100 hover:bg-red-200 text-red-600 flex items-center justify-center transition-colors"
+                        className="perfect-circle bg-red-100 hover:bg-red-200 text-red-600 dark:bg-red-900/30 dark:hover:bg-red-900/50 dark:text-red-300 flex items-center justify-center transition-colors"
                         style={{ '--circle-size': '28px' } as React.CSSProperties}
                     >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -331,7 +331,7 @@ export default function MealCard({ meal, onDelete, onUpdate, onAddFood, onRemove
 
             {/* Drag Handle */}
             <div
-                className="mt-0 pt-0 border-t border-purple-100 flex items-center justify-center touch-manipulation select-none cursor-grab active:cursor-grabbing"
+                className="mt-0 pt-0 border-t border-purple-100 dark:border-gray-800 flex items-center justify-center touch-manipulation select-none cursor-grab active:cursor-grabbing"
                 onContextMenu={(e) => e.preventDefault()}
                 {...(dragHandleProps || {})}
             >
@@ -345,15 +345,15 @@ export default function MealCard({ meal, onDelete, onUpdate, onAddFood, onRemove
             {/* Delete Confirmation Modal */}
             {showDeleteConfirm && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-2 sm:p-4">
-                    <div className="bg-white rounded-xl p-4 sm:p-6 w-full max-w-sm shadow-2xl">
-                        <h3 className="text-lg font-bold text-purple-800 mb-4">Delete Meal</h3>
-                        <p className="text-purple-600 mb-6 text-sm sm:text-base">
+                    <div className="bg-white dark:bg-gray-900 rounded-xl p-4 sm:p-6 w-full max-w-sm shadow-2xl">
+                        <h3 className="text-lg font-bold text-purple-800 dark:text-purple-200 mb-4">Delete Meal</h3>
+                        <p className="text-purple-600 dark:text-purple-300 mb-6 text-sm sm:text-base">
                             Are you sure you want to delete "{meal.name}"? This action cannot be undone.
                         </p>
                         <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-3">
                             <button
                                 onClick={() => setShowDeleteConfirm(false)}
-                                className="w-full sm:flex-1 bg-purple-100 text-purple-700 py-2 px-4 rounded-lg hover:bg-purple-200 transition-colors text-sm sm:text-base"
+                                className="w-full sm:flex-1 bg-purple-100 text-purple-700 dark:bg-gray-800 dark:text-purple-300 py-2 px-4 rounded-lg hover:bg-purple-200 dark:hover:bg-gray-700 transition-colors text-sm sm:text-base"
                             >
                                 Cancel
                             </button>

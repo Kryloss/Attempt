@@ -175,7 +175,7 @@ export default function ExerciseCard({ exercise, onDelete, onUpdate }: ExerciseC
     }
 
     return (
-        <div className="bg-white border border-purple-200 rounded-lg p-0 shadow-sm hover:shadow-md transition-all duration-200 hover:border-purple-300 group relative">
+        <div className="bg-white dark:bg-gray-900 border border-purple-200 dark:border-gray-700 rounded-lg p-0 shadow-sm hover:shadow-md transition-all duration-200 hover:border-purple-300 dark:hover:border-gray-600 group relative">
             <div className="flex items-start justify-between">
                 <div className="flex-1 min-w-0">
                     <div className="pl-2 pr-1">
@@ -186,12 +186,12 @@ export default function ExerciseCard({ exercise, onDelete, onUpdate }: ExerciseC
                                 onChange={(e) => setEditValue(e.target.value)}
                                 onBlur={saveEdit}
                                 onKeyDown={handleKeyPress}
-                                className="text-sm font-bold text-purple-800 bg-transparent focus:outline-none w-full"
+                                className="text-sm font-bold text-purple-800 dark:text-purple-200 bg-transparent focus:outline-none w-full"
                                 autoFocus
                             />
                         ) : (
                             <h4
-                                className="text-sm font-bold text-purple-800 mb-0 break-words cursor-text"
+                                className="text-sm font-bold text-purple-800 dark:text-purple-200 mb-0 break-words cursor-text"
                                 onClick={() => startEditing('name', exercise.name)}
                                 title="Click to edit name"
                             >
@@ -228,28 +228,28 @@ export default function ExerciseCard({ exercise, onDelete, onUpdate }: ExerciseC
 
             {/* Drag Handle */}
             <div
-                className="mt-0 pt-0 border-t border-purple-100 flex items-center justify-center touch-manipulation select-none cursor-grab active:cursor-grabbing"
+                className="mt-0 pt-0 border-t border-purple-100 dark:border-gray-800 flex items-center justify-center touch-manipulation select-none cursor-grab active:cursor-grabbing"
                 onContextMenu={(e) => e.preventDefault()}
             >
                 <div className="flex space-x-1.5 py-0.5">
-                    <div className="w-1.5 h-1.5 bg-purple-300/60 rounded-full"></div>
-                    <div className="w-1.5 h-1.5 bg-purple-300/60 rounded-full"></div>
-                    <div className="w-1.5 h-1.5 bg-purple-300/60 rounded-full"></div>
+                    <div className="w-1.5 h-1.5 bg-purple-300/60 dark:bg-purple-700/60 rounded-full"></div>
+                    <div className="w-1.5 h-1.5 bg-purple-300/60 dark:bg-purple-700/60 rounded-full"></div>
+                    <div className="w-1.5 h-1.5 bg-purple-300/60 dark:bg-purple-700/60 rounded-full"></div>
                 </div>
             </div>
 
             {/* Delete Confirmation Modal */}
             {showDeleteConfirm && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-2 sm:p-4">
-                    <div className="bg-white rounded-xl p-4 sm:p-6 w-full max-w-sm shadow-2xl">
-                        <h3 className="text-lg font-bold text-purple-800 mb-4">Delete Exercise</h3>
-                        <p className="text-purple-600 mb-6 text-sm sm:text-base">
+                    <div className="bg-white dark:bg-gray-900 rounded-xl p-4 sm:p-6 w-full max-w-sm shadow-2xl">
+                        <h3 className="text-lg font-bold text-purple-800 dark:text-purple-200 mb-4">Delete Exercise</h3>
+                        <p className="text-purple-600 dark:text-purple-300 mb-6 text-sm sm:text-base">
                             Are you sure you want to delete "{exercise.name}"? This action cannot be undone.
                         </p>
                         <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-3">
                             <button
                                 onClick={() => setShowDeleteConfirm(false)}
-                                className="w-full sm:flex-1 bg-purple-100 text-purple-700 py-2 px-4 rounded-lg hover:bg-purple-200 transition-colors text-sm sm:text-base"
+                                className="w-full sm:flex-1 bg-purple-100 text-purple-700 dark:bg-gray-800 dark:text-purple-300 py-2 px-4 rounded-lg hover:bg-purple-200 dark:hover:bg-gray-700 transition-colors text-sm sm:text-base"
                             >
                                 Cancel
                             </button>

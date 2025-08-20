@@ -44,25 +44,25 @@ export default function AddExerciseModal({ onClose, onAdd }: AddExerciseModalPro
             onClick={onClose}
         >
             <div
-                className="bg-white rounded-xl w-full max-w-md shadow-2xl max-h-[85vh] overflow-y-auto"
+                className="bg-white dark:bg-gray-900 rounded-xl w-full max-w-md shadow-2xl max-h-[85vh] overflow-y-auto"
                 onClick={(e) => e.stopPropagation()}
             >
                 <div className="p-2">
                     <div className="mb-2">
-                        <h2 className="text-base font-bold text-purple-800">Add New Exercise</h2>
+                        <h2 className="text-base font-bold text-purple-800 dark:text-purple-200">Add New Exercise</h2>
                     </div>
 
                     <form onSubmit={handleSubmit} className="space-y-1">
                         {/* Exercise Name */}
                         <div>
-                            <label className="block text-xs font-medium text-purple-700 mb-0.5">
+                            <label className="block text-xs font-medium text-purple-700 dark:text-purple-300 mb-0.5">
                                 Exercise Name *
                             </label>
                             <input
                                 type="text"
                                 value={formData.name}
                                 onChange={(e) => handleInputChange('name', e.target.value)}
-                                className="w-full px-2 py-1 border border-purple-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-xs"
+                                className="w-full px-2 py-1 border border-purple-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-xs dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700 dark:focus:ring-purple-700"
                                 placeholder="e.g., Bench Press, Squats"
                                 required
                             />
@@ -71,7 +71,7 @@ export default function AddExerciseModal({ onClose, onAdd }: AddExerciseModalPro
                         {/* Sets and Reps */}
                         <div className="grid grid-cols-2 gap-1">
                             <div>
-                                <label className="block text-xs font-medium text-purple-700 mb-0.5">
+                                <label className="block text-xs font-medium text-purple-700 dark:text-purple-300 mb-0.5">
                                     Sets *
                                 </label>
                                 <input
@@ -82,12 +82,12 @@ export default function AddExerciseModal({ onClose, onAdd }: AddExerciseModalPro
                                     max="99"
                                     maxLength={4}
                                     inputMode="numeric"
-                                    className="w-full px-1.5 py-1 border border-purple-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-xs"
+                                    className="w-full px-1.5 py-1 border border-purple-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-xs dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700 dark:focus:ring-purple-700"
                                     required
                                 />
                             </div>
                             <div>
-                                <label className="block text-xs font-medium text-purple-700 mb-0.5">
+                                <label className="block text-xs font-medium text-purple-700 dark:text-purple-300 mb-0.5">
                                     Reps *
                                 </label>
                                 <input
@@ -98,7 +98,7 @@ export default function AddExerciseModal({ onClose, onAdd }: AddExerciseModalPro
                                     max="999"
                                     maxLength={4}
                                     inputMode="numeric"
-                                    className="w-full px-1.5 py-1 border border-purple-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-xs"
+                                    className="w-full px-1.5 py-1 border border-purple-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-xs dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700 dark:focus:ring-purple-700"
                                     required
                                 />
                             </div>
@@ -106,7 +106,7 @@ export default function AddExerciseModal({ onClose, onAdd }: AddExerciseModalPro
 
                         {/* Weight */}
                         <div>
-                            <label className="block text-xs font-medium text-purple-700 mb-0.5">
+                            <label className="block text-xs font-medium text-purple-700 dark:text-purple-300 mb-0.5">
                                 Weight (kg)
                             </label>
                             <input
@@ -117,21 +117,21 @@ export default function AddExerciseModal({ onClose, onAdd }: AddExerciseModalPro
                                 step="0.5"
                                 maxLength={7}
                                 inputMode="decimal"
-                                className="w-full px-2 py-1 border border-purple-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-xs"
+                                className="w-full px-2 py-1 border border-purple-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-xs dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700 dark:focus:ring-purple-700"
                                 placeholder="Optional"
                             />
                         </div>
 
                         {/* Notes */}
                         <div>
-                            <label className="block text-xs font-medium text-purple-700 mb-0.5">
+                            <label className="block text-xs font-medium text-purple-700 dark:text-purple-300 mb-0.5">
                                 Notes (optional)
                             </label>
                             <textarea
                                 value={formData.notes}
                                 onChange={(e) => handleInputChange('notes', e.target.value)}
                                 rows={2}
-                                className="w-full px-2 py-1 border border-purple-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none text-xs"
+                                className="w-full px-2 py-1 border border-purple-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none text-xs dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700 dark:focus:ring-purple-700"
                                 placeholder="Any additional notes about the exercise..."
                             />
                         </div>
@@ -141,7 +141,7 @@ export default function AddExerciseModal({ onClose, onAdd }: AddExerciseModalPro
                             <button
                                 type="button"
                                 onClick={onClose}
-                                className="flex-1 bg-gray-100 text-gray-700 py-1.5 px-3 rounded-lg hover:bg-gray-200 transition-colors font-medium text-xs"
+                                className="flex-1 bg-gray-100 text-gray-700 py-1.5 px-3 rounded-lg hover:bg-gray-200 transition-colors font-medium text-xs dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
                             >
                                 Cancel
                             </button>

@@ -233,12 +233,12 @@ export default function TrainingNameDropdown({
                             onBlur={handleNameSave}
                             onKeyPress={(e) => e.key === 'Enter' && handleNameSave()}
                             maxLength={20}
-                            className="text-lg sm:text-2xl font-bold text-purple-800 bg-transparent border-b-2 border-purple-300 focus:border-purple-500 focus:outline-none text-center w-full max-w-xs"
+                            className="text-lg sm:text-2xl font-bold text-purple-800 dark:text-purple-200 bg-transparent border-b-2 border-purple-300 dark:border-gray-700 focus:border-purple-500 dark:focus:border-purple-700 focus:outline-none text-center w-full max-w-xs"
                             autoFocus
                         />
                         <button
                             onClick={handleNameSave}
-                            className="text-purple-600 hover:text-purple-700 flex-shrink-0"
+                            className="text-purple-500 hover:text-purple-700 dark:text-purple-300 dark:hover:text-purple-200 flex-shrink-0"
                         >
                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
@@ -249,13 +249,13 @@ export default function TrainingNameDropdown({
                     <div className="flex items-center space-x-2">
                         <button
                             onClick={() => setIsEditing(true)}
-                            className="text-lg sm:text-2xl font-bold text-purple-800 hover:text-purple-600 transition-colors break-words"
+                            className="text-lg sm:text-2xl font-bold text-purple-800 dark:text-purple-200 hover:text-purple-500 dark:hover:text-purple-300 transition-colors break-words"
                         >
                             {trainingName || 'Workout'}
                         </button>
                         <button
                             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                            className="text-purple-600 hover:text-purple-700 transition-colors flex-shrink-0"
+                            className="text-purple-500 hover:text-purple-700 dark:text-purple-300 dark:hover:text-purple-200 transition-colors flex-shrink-0"
                         >
                             <svg
                                 className={`w-5 h-5 transition-transform duration-200 ${isDropdownOpen ? 'rotate-180' : ''}`}
@@ -272,15 +272,15 @@ export default function TrainingNameDropdown({
 
             {/* Dropdown Menu */}
             {isDropdownOpen && (
-                <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 w-80 max-h-[28rem] bg-white rounded-lg shadow-xl border border-purple-200 z-50 overflow-hidden isolate dropdown-container">
+                <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 w-80 max-h-[28rem] bg-white dark:bg-gray-900 rounded-lg shadow-xl border border-purple-200 dark:border-gray-700 z-50 overflow-hidden isolate dropdown-container">
                     <div className="p-4">
                         <div className="flex items-center justify-center mb-3">
                             <button
                                 onClick={handleSaveAsPreset}
                                 disabled={!shouldSaveTraining(trainingName, exercises)}
                                 className={`px-12 py-2 rounded-lg transition-colors ${!shouldSaveTraining(trainingName, exercises)
-                                    ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                                    : 'bg-purple-100 hover:bg-purple-200 text-purple-700'
+                                    ? 'bg-gray-100 text-gray-400 cursor-not-allowed dark:bg-gray-800 dark:text-gray-500'
+                                    : 'bg-purple-100 hover:bg-purple-200 text-purple-700 dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-purple-300'
                                     }`}
                             >
                                 Save Preset
@@ -291,8 +291,8 @@ export default function TrainingNameDropdown({
 
                         {isLoading ? (
                             <div className="text-center py-4">
-                                <div className="w-6 h-6 border-2 border-purple-300 border-t-purple-600 rounded-full animate-spin mx-auto"></div>
-                                <p className="text-sm text-purple-600 mt-2">Loading...</p>
+                                <div className="w-6 h-6 border-2 border-purple-300 border-t-purple-500 rounded-full animate-spin mx-auto"></div>
+                                <p className="text-sm text-purple-500 mt-2">Loading...</p>
                             </div>
                         ) : (
                             <div
@@ -324,7 +324,7 @@ export default function TrainingNameDropdown({
                                                         <div className="font-medium text-purple-800 group-hover:text-purple-900">
                                                             {preset.name}
                                                         </div>
-                                                        <div className="text-xs text-purple-600 mt-1">
+                                                        <div className="text-xs text-purple-500 mt-1">
                                                             {preset.exercises.length} exercises
                                                         </div>
                                                     </button>

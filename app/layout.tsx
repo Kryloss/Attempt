@@ -29,8 +29,27 @@ export default function RootLayout({
     children: React.ReactNode
 }) {
     return (
-        <html lang="en">
+        <html lang="en" suppressHydrationWarning>
             <body className={inter.className}>
+                <script
+                    dangerouslySetInnerHTML={{
+                        __html: `
+                            (function() {
+                                try {
+                                    var stored = localStorage.getItem('theme');
+                                    var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                                    var isDark = stored ? stored === 'dark' : prefersDark;
+                                    var root = document.documentElement;
+                                    if (isDark) {
+                                        root.classList.add('dark');
+                                    } else {
+                                        root.classList.remove('dark');
+                                    }
+                                } catch (e) {}
+                            })();
+                        `,
+                    }}
+                />
                 <ModalProvider>
                     <DateProvider>
                         {children}

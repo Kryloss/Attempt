@@ -169,25 +169,25 @@ export default function EditFoodModal({ isOpen, food, onClose, onSaveFood }: Edi
             onClick={onClose}
         >
             <div
-                className="bg-white rounded-xl w-full max-w-md shadow-2xl max-h-[85vh] overflow-y-auto"
+                className="bg-white dark:bg-gray-900 rounded-xl w-full max-w-md shadow-2xl max-h-[85vh] overflow-y-auto"
                 onClick={(e) => e.stopPropagation()}
             >
                 <div className="p-2">
                     <div className="mb-2">
-                        <h2 className="text-base font-bold text-purple-800">Edit Food Item</h2>
+                        <h2 className="text-base font-bold text-purple-800 dark:text-purple-200">Edit Food Item</h2>
                     </div>
 
                     <form onSubmit={handleSubmit} className="space-y-1">
                         {/* Food Name */}
                         <div>
-                            <label className="block text-xs font-medium text-purple-700 mb-0.5">
+                            <label className="block text-xs font-medium text-purple-700 dark:text-purple-300 mb-0.5">
                                 Food Name *
                             </label>
                             <input
                                 type="text"
                                 value={formData.name}
                                 onChange={(e) => handleInputChange('name', e.target.value)}
-                                className="w-full px-2 py-1 border border-purple-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-xs"
+                                className="w-full px-2 py-1 border border-purple-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-xs dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700 dark:focus:ring-purple-700"
                                 placeholder="e.g., Grilled Chicken Breast"
                                 required
                             />
@@ -195,14 +195,14 @@ export default function EditFoodModal({ isOpen, food, onClose, onSaveFood }: Edi
 
                         {/* Calories */}
                         <div>
-                            <label className="block text-xs font-medium text-purple-700 mb-0.5">
+                            <label className="block text-xs font-medium text-purple-700 dark:text-purple-300 mb-0.5">
                                 Calories
                             </label>
                             <input
                                 type="number"
                                 value={formData.calories}
                                 onChange={(e) => handleInputChange('calories', e.target.value)}
-                                className="w-full px-2 py-1 border border-purple-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-xs"
+                                className="w-full px-2 py-1 border border-purple-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-xs dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700 dark:focus:ring-purple-700"
                                 placeholder="0"
                                 min="0"
                                 step="1"
@@ -213,14 +213,14 @@ export default function EditFoodModal({ isOpen, food, onClose, onSaveFood }: Edi
                         <div className="grid grid-cols-3 gap-1">
                             {/* Carbs and subclasses */}
                             <div>
-                                <label className="block text-xs font-medium text-green-700 mb-0.5">
+                                <label className="block text-xs font-medium text-green-700 dark:text-green-300 mb-0.5">
                                     Carbs (g)
                                 </label>
                                 <input
                                     type="number"
                                     value={formData.carbs}
                                     onChange={(e) => handleInputChange('carbs', e.target.value)}
-                                    className="w-full px-1.5 py-1 border border-green-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent text-xs"
+                                    className="w-full px-1.5 py-1 border border-green-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent text-xs dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700 dark:focus:ring-green-700"
                                     placeholder="0"
                                     min="0"
                                     step="0.1"
@@ -229,36 +229,36 @@ export default function EditFoodModal({ isOpen, food, onClose, onSaveFood }: Edi
                                     <div className="mt-0.5 space-y-0.5">
                                         <div className="grid grid-cols-3 gap-1">
                                             <div>
-                                                <label className="block text-[10px] font-medium text-green-700 mb-0.5">Simple</label>
+                                                <label className="block text-[10px] font-medium text-green-700 dark:text-green-300 mb-0.5">Simple</label>
                                                 <input
                                                     type="number"
                                                     value={formData.carbsSimple}
                                                     onChange={(e) => handleInputChange('carbsSimple', e.target.value)}
-                                                    className="w-full px-1 py-0.5 border rounded focus:outline-none focus:ring-1 focus:ring-green-500 text-[10px] border-green-300"
+                                                    className="w-full px-1 py-0.5 border rounded focus:outline-none focus:ring-1 focus:ring-green-500 text-[10px] border-green-300 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:focus:ring-green-700"
                                                     placeholder="0"
                                                     min="0"
                                                     step="0.1"
                                                 />
                                             </div>
                                             <div>
-                                                <label className="block text-[10px] font-medium text-green-700 mb-0.5">Complex</label>
+                                                <label className="block text-[10px] font-medium text-green-700 dark:text-green-300 mb-0.5">Complex</label>
                                                 <input
                                                     type="number"
                                                     value={formData.carbsComplex}
                                                     onChange={(e) => handleInputChange('carbsComplex', e.target.value)}
-                                                    className="w-full px-1 py-0.5 border rounded focus:outline-none focus:ring-1 focus:ring-green-500 text-[10px] border-green-300"
+                                                    className="w-full px-1 py-0.5 border rounded focus:outline-none focus:ring-1 focus:ring-green-500 text-[10px] border-green-300 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:focus:ring-green-700"
                                                     placeholder="0"
                                                     min="0"
                                                     step="0.1"
                                                 />
                                             </div>
                                             <div>
-                                                <label className="block text-[10px] font-medium text-green-700 mb-0.5">Fiber</label>
+                                                <label className="block text-[10px] font-medium text-green-700 dark:text-green-300 mb-0.5">Fiber</label>
                                                 <input
                                                     type="number"
                                                     value={formData.fiber}
                                                     onChange={(e) => handleInputChange('fiber', e.target.value)}
-                                                    className="w-full px-1 py-0.5 border rounded focus:outline-none focus:ring-1 focus:ring-green-500 text-[10px] border-green-300"
+                                                    className="w-full px-1 py-0.5 border rounded focus:outline-none focus:ring-1 focus:ring-green-500 text-[10px] border-green-300 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:focus:ring-green-700"
                                                     placeholder="0"
                                                     min="0"
                                                     step="0.1"
@@ -270,14 +270,14 @@ export default function EditFoodModal({ isOpen, food, onClose, onSaveFood }: Edi
                             </div>
                             {/* Protein and subclasses */}
                             <div>
-                                <label className="block text-xs font-medium text-blue-700 mb-0.5">
+                                <label className="block text-xs font-medium text-blue-700 dark:text-blue-300 mb-0.5">
                                     Protein (g)
                                 </label>
                                 <input
                                     type="number"
                                     value={formData.protein}
                                     onChange={(e) => handleInputChange('protein', e.target.value)}
-                                    className="w-full px-1.5 py-1 border border-blue-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-xs"
+                                    className="w-full px-1.5 py-1 border border-blue-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-xs dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:focus:ring-blue-700"
                                     placeholder="0"
                                     min="0"
                                     step="0.1"
@@ -286,24 +286,24 @@ export default function EditFoodModal({ isOpen, food, onClose, onSaveFood }: Edi
                                     <div className="mt-0.5 space-y-0.5">
                                         <div className="grid grid-cols-2 gap-1">
                                             <div>
-                                                <label className="block text-[10px] font-medium text-blue-700 mb-0.5">Complete</label>
+                                                <label className="block text-[10px] font-medium text-blue-700 dark:text-blue-300 mb-0.5">Complete</label>
                                                 <input
                                                     type="number"
                                                     value={formData.proteinComplete}
                                                     onChange={(e) => handleInputChange('proteinComplete', e.target.value)}
-                                                    className="w-full px-1 py-0.5 border rounded focus:outline-none focus:ring-1 focus:ring-blue-500 text-[10px] border-blue-300"
+                                                    className="w-full px-1 py-0.5 border rounded focus:outline-none focus:ring-1 focus:ring-blue-500 text-[10px] border-blue-300 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:focus:ring-blue-700"
                                                     placeholder="0"
                                                     min="0"
                                                     step="0.1"
                                                 />
                                             </div>
                                             <div>
-                                                <label className="block text-xs font-medium text-blue-700 mb-0.5">Incomplete</label>
+                                                <label className="block text-xs font-medium text-blue-700 dark:text-blue-300 mb-0.5">Incomplete</label>
                                                 <input
                                                     type="number"
                                                     value={formData.proteinIncomplete}
                                                     onChange={(e) => handleInputChange('proteinIncomplete', e.target.value)}
-                                                    className="w-full px-1 py-0.5 border rounded focus:outline-none focus:ring-1 focus:ring-blue-500 text-[10px] border-blue-300"
+                                                    className="w-full px-1 py-0.5 border rounded focus:outline-none focus:ring-1 focus:ring-blue-500 text-[10px] border-blue-300 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:focus:ring-blue-700"
                                                     placeholder="0"
                                                     min="0"
                                                     step="0.1"
@@ -315,14 +315,14 @@ export default function EditFoodModal({ isOpen, food, onClose, onSaveFood }: Edi
                             </div>
                             {/* Fats and subclasses */}
                             <div>
-                                <label className="block text-xs font-medium text-yellow-700 mb-0.5">
+                                <label className="block text-xs font-medium text-yellow-700 dark:text-yellow-300 mb-0.5">
                                     Fat (g)
                                 </label>
                                 <input
                                     type="number"
                                     value={formData.fat}
                                     onChange={(e) => handleInputChange('fat', e.target.value)}
-                                    className="w-full px-1.5 py-1 border border-yellow-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent text-xs"
+                                    className="w-full px-1.5 py-1 border border-yellow-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent text-xs dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:focus:ring-yellow-700"
                                     placeholder="0"
                                     min="0"
                                     step="0.1"
@@ -331,36 +331,36 @@ export default function EditFoodModal({ isOpen, food, onClose, onSaveFood }: Edi
                                     <div className="mt-0.5">
                                         <div className="grid grid-cols-3 gap-1">
                                             <div>
-                                                <label className="block text-[10px] font-medium text-yellow-700 mb-0.5">Unsat</label>
+                                                <label className="block text-[10px] font-medium text-yellow-700 dark:text-yellow-300 mb-0.5">Unsat</label>
                                                 <input
                                                     type="number"
                                                     value={formData.fatsUnsaturated}
                                                     onChange={(e) => handleInputChange('fatsUnsaturated', e.target.value)}
-                                                    className="w-full px-1 py-0.5 border rounded focus:outline-none focus:ring-1 focus:ring-yellow-500 text-[10px] border-yellow-300"
+                                                    className="w-full px-1 py-0.5 border rounded focus:outline-none focus:ring-1 focus:ring-yellow-500 text-[10px] border-yellow-300 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:focus:ring-yellow-700"
                                                     placeholder="0"
                                                     min="0"
                                                     step="0.1"
                                                 />
                                             </div>
                                             <div>
-                                                <label className="block text-[10px] font-medium text-yellow-700 mb-0.5">Sat</label>
+                                                <label className="block text-[10px] font-medium text-yellow-700 dark:text-yellow-300 mb-0.5">Sat</label>
                                                 <input
                                                     type="number"
                                                     value={formData.fatsSaturated}
                                                     onChange={(e) => handleInputChange('fatsSaturated', e.target.value)}
-                                                    className="w-full px-1 py-0.5 border rounded focus:outline-none focus:ring-1 focus:ring-yellow-500 text-[10px] border-yellow-300"
+                                                    className="w-full px-1 py-0.5 border rounded focus:outline-none focus:ring-1 focus:ring-yellow-500 text-[10px] border-yellow-300 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:focus:ring-yellow-700"
                                                     placeholder="0"
                                                     min="0"
                                                     step="0.1"
                                                 />
                                             </div>
                                             <div>
-                                                <label className="block text-[10px] font-medium text-yellow-700 mb-0.5">Trans</label>
+                                                <label className="block text-[10px] font-medium text-yellow-700 dark:text-yellow-300 mb-0.5">Trans</label>
                                                 <input
                                                     type="number"
                                                     value={formData.fatsTrans}
                                                     onChange={(e) => handleInputChange('fatsTrans', e.target.value)}
-                                                    className="w-full px-1 py-0.5 border rounded focus:outline-none focus:ring-1 focus:ring-yellow-500 text-[10px] border-yellow-300"
+                                                    className="w-full px-1 py-0.5 border rounded focus:outline-none focus:ring-1 focus:ring-yellow-500 text-[10px] border-yellow-300 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:focus:ring-yellow-700"
                                                     placeholder="0"
                                                     min="0"
                                                     step="0.1"
@@ -374,13 +374,13 @@ export default function EditFoodModal({ isOpen, food, onClose, onSaveFood }: Edi
 
                         {/* Notes */}
                         <div>
-                            <label className="block text-xs font-medium text-purple-700 mb-0.5">
+                            <label className="block text-xs font-medium text-purple-700 dark:text-purple-300 mb-0.5">
                                 Notes (optional)
                             </label>
                             <textarea
                                 value={formData.notes}
                                 onChange={(e) => handleInputChange('notes', e.target.value)}
-                                className="w-full px-2 py-1 border border-purple-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none text-xs"
+                                className="w-full px-2 py-1 border border-purple-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none text-xs dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:focus:ring-purple-700"
                                 placeholder="Any additional notes..."
                                 rows={2}
                             />
@@ -391,13 +391,13 @@ export default function EditFoodModal({ isOpen, food, onClose, onSaveFood }: Edi
                             <button
                                 type="button"
                                 onClick={handleCancel}
-                                className="flex-1 bg-gray-100 text-gray-700 py-1.5 px-3 rounded-lg hover:bg-gray-200 transition-colors font-medium text-xs"
+                                className="flex-1 bg-gray-100 text-gray-700 py-1.5 px-3 rounded-lg hover:bg-gray-200 transition-colors font-medium text-xs dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
                             >
                                 Cancel
                             </button>
                             <button
                                 type="submit"
-                                className="flex-1 bg-purple-500 text-white py-1.5 px-3 rounded-lg hover:bg-purple-600 transition-colors font-medium text-xs"
+                                className="flex-1 bg-purple-500 text-white py-1.5 px-3 rounded-lg hover:bg-purple-600 transition-colors font-medium text-xs dark:bg-purple-600 dark:hover:bg-purple-700"
                             >
                                 Save Changes
                             </button>

@@ -454,18 +454,18 @@ export default function AddFoodModal({ isOpen, onClose, onAddFood }: AddFoodModa
             onClick={onClose}
         >
             <div
-                className="bg-white rounded-xl w-full max-w-sm shadow-2xl max-h-[75vh] overflow-y-auto"
+                className="bg-white dark:bg-gray-900 rounded-xl w-full max-w-sm shadow-2xl max-h-[75vh] overflow-y-auto"
                 onClick={(e) => e.stopPropagation()}
             >
                 <div className="p-1.5">
                     <div className="mb-1">
-                        <h2 className="text-base font-bold text-purple-800">Add Food Item</h2>
+                        <h2 className="text-base font-bold text-purple-800 dark:text-purple-200">Add Food Item</h2>
                     </div>
 
                     <form onSubmit={handleSubmit} className="space-y-0.5">
                         {/* Search Food Database */}
                         <div>
-                            <label className="block text-xs font-medium text-blue-700 mb-0.5">
+                            <label className="block text-xs font-medium text-blue-700 dark:text-blue-300 mb-0.5">
                                 Search Food Database *
                             </label>
                             <div className="relative">
@@ -473,7 +473,7 @@ export default function AddFoodModal({ isOpen, onClose, onAddFood }: AddFoodModa
                                     type="text"
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
-                                    className="w-full px-2 py-1 pr-8 border border-blue-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-xs"
+                                    className="w-full px-2 py-1 pr-8 border border-blue-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-xs dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700 dark:focus:ring-blue-700"
                                     placeholder="Search for food..."
                                 />
                                 {isSearching && (
@@ -489,19 +489,19 @@ export default function AddFoodModal({ isOpen, onClose, onAddFood }: AddFoodModa
 
                             {/* Search Results */}
                             {searchResults.length > 0 && (
-                                <div className="mt-0.5 max-h-32 overflow-y-auto border border-blue-300 rounded-lg" style={{ scrollbarColor: '#3b82f6 #dbeafe', scrollbarWidth: 'thin' }}>
+                                <div className="mt-0.5 max-h-32 overflow-y-auto border border-blue-300 dark:border-gray-700 rounded-lg" style={{ scrollbarColor: '#3b82f6 #dbeafe', scrollbarWidth: 'thin' }}>
                                     {searchResults.map((food) => (
                                         <button
                                             key={food.fdcId}
                                             type="button"
                                             onClick={() => handleFoodSelect(food)}
-                                            className="w-full text-left p-1 hover:bg-blue-100 border-b border-blue-100 last:border-b-0 transition-colors"
+                                            className="w-full text-left p-1 hover:bg-blue-100 dark:hover:bg-gray-800 border-b border-blue-100 dark:border-gray-700 last:border-b-0 transition-colors"
                                         >
-                                            <div className="font-medium text-blue-900 text-xs">{food.description}</div>
+                                            <div className="font-medium text-blue-900 dark:text-blue-200 text-xs">{food.description}</div>
                                             {food.brandName && (
-                                                <div className="text-blue-600 text-xs mt-0.5">Brand: {food.brandName}</div>
+                                                <div className="text-blue-600 dark:text-blue-300 text-xs mt-0.5">Brand: {food.brandName}</div>
                                             )}
-                                            <div className="text-blue-500 text-xs mt-0.5">
+                                            <div className="text-blue-500 dark:text-blue-300 text-xs mt-0.5">
                                                 {food.dataType} • FDC ID: {food.fdcId}
                                             </div>
                                         </button>
@@ -516,32 +516,32 @@ export default function AddFoodModal({ isOpen, onClose, onAddFood }: AddFoodModa
 
                         {/* Selected Food Info & Serving Size */}
                         {selectedFood && (
-                            <div className="bg-blue-50 border border-blue-200 rounded-lg p-0.5">
+                            <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-gray-700 rounded-lg p-0.5">
                                 {/* Serving Size Adjustment */}
                                 <div className="flex items-center space-x-1">
-                                    <label className="text-[10px] font-medium text-blue-700">Serving:</label>
+                                    <label className="text-[10px] font-medium text-blue-700 dark:text-blue-300">Serving:</label>
                                     <input
                                         type="number"
                                         value={servingSize}
                                         onChange={(e) => setServingSize(Math.max(1, parseInt(e.target.value) || 1))}
-                                        className="w-14 h-5 px-1 py-0 text-[10px] leading-none border border-blue-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 no-spinner input-compact"
+                                        className="w-14 h-5 px-1 py-0 text-[10px] leading-none border border-blue-300 dark:border-gray-700 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 dark:focus:ring-blue-700 no-spinner input-compact dark:bg-gray-800 dark:text-gray-100"
                                         min="1"
                                     />
-                                    <span className="text-[10px] text-blue-600">g</span>
+                                    <span className="text-[10px] text-blue-600 dark:text-blue-300">g</span>
                                 </div>
                             </div>
                         )}
 
                         {/* Food Name */}
                         <div>
-                            <label className="block text-xs font-medium text-purple-700 mb-0.5">
+                            <label className="block text-xs font-medium text-purple-700 dark:text-purple-300 mb-0.5">
                                 Food Name *
                             </label>
                             <input
                                 type="text"
                                 value={formData.name}
                                 onChange={(e) => handleInputChange('name', e.target.value)}
-                                className="w-full px-2 py-1 border border-purple-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-xs"
+                                className="w-full px-2 py-1 border border-purple-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-xs dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700 dark:focus:ring-purple-700"
                                 placeholder="e.g., Grilled Chicken Breast"
                                 required
                                 readOnly={!!selectedFood}
@@ -550,8 +550,8 @@ export default function AddFoodModal({ isOpen, onClose, onAddFood }: AddFoodModa
 
                         {/* Nutrition Values Note */}
                         {selectedFood && (
-                            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-1">
-                                <p className="text-yellow-800 text-xs">
+                            <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-gray-700 rounded-lg p-1">
+                                <p className="text-yellow-800 dark:text-yellow-300 text-xs">
                                     💡 Values auto-calculated for {servingSize}g serving.
                                 </p>
                             </div>
@@ -559,7 +559,7 @@ export default function AddFoodModal({ isOpen, onClose, onAddFood }: AddFoodModa
 
                         {/* Calories */}
                         <div>
-                            <label className="block text-xs font-medium text-purple-700 mb-0.5">
+                            <label className="block text-xs font-medium text-purple-700 dark:text-purple-300 mb-0.5">
                                 Calories {selectedFood && <span className="text-xs text-purple-500">(auto)</span>}
                             </label>
                             <input
@@ -567,8 +567,8 @@ export default function AddFoodModal({ isOpen, onClose, onAddFood }: AddFoodModa
                                 value={formData.calories}
                                 onChange={(e) => handleInputChange('calories', e.target.value)}
                                 className={`w-full px-2 py-1 border rounded-lg focus:outline-none focus:ring-2 focus:border-transparent text-xs ${(selectedFood && isAutoCalculated)
-                                    ? 'border-purple-200 bg-purple-50 text-purple-700'
-                                    : 'border-purple-300 focus:ring-purple-500'
+                                    ? 'border-purple-200 bg-purple-50 text-purple-700 dark:border-purple-700 dark:bg-purple-900/20 dark:text-purple-300'
+                                    : 'border-purple-300 focus:ring-purple-500 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:focus:ring-purple-700'
                                     }`}
                                 placeholder="0"
                                 min="0"
@@ -581,7 +581,7 @@ export default function AddFoodModal({ isOpen, onClose, onAddFood }: AddFoodModa
                         <div className="grid grid-cols-3 gap-1">
                             {/* Carbs and subclasses */}
                             <div>
-                                <label className="block text-xs font-medium text-green-700 mb-0.5">
+                                <label className="block text-xs font-medium text-green-700 dark:text-green-300 mb-0.5">
                                     Carbs (g) {selectedFood && <span className="text-xs text-green-500">(auto)</span>}
                                 </label>
                                 <input
@@ -589,8 +589,8 @@ export default function AddFoodModal({ isOpen, onClose, onAddFood }: AddFoodModa
                                     value={formData.carbs}
                                     onChange={(e) => handleInputChange('carbs', e.target.value)}
                                     className={`w-full px-1.5 py-1 border rounded-lg focus:outline-none focus:ring-2 focus:border-transparent text-xs ${(selectedFood && isAutoCalculated)
-                                        ? 'border-green-200 bg-green-50 text-green-700'
-                                        : 'border-green-300 focus:ring-green-500'
+                                        ? 'border-green-200 bg-green-50 text-green-700 dark:border-green-700 dark:bg-green-900/20 dark:text-green-300'
+                                        : 'border-green-300 focus:ring-green-500 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:focus:ring-green-700'
                                         }`}
                                     placeholder="0"
                                     min="0"
@@ -601,12 +601,12 @@ export default function AddFoodModal({ isOpen, onClose, onAddFood }: AddFoodModa
                                     <div className="mt-0.5 space-y-0.5">
                                         <div className="grid grid-cols-3 gap-1">
                                             <div>
-                                                <label className="block text-[10px] font-medium text-green-700 mb-0.5">Simple</label>
+                                                <label className="block text-[10px] font-medium text-green-700 dark:text-green-300 mb-0.5">Simple</label>
                                                 <input
                                                     type="number"
                                                     value={formData.carbsSimple}
                                                     onChange={(e) => handleInputChange('carbsSimple', e.target.value)}
-                                                    className="w-full px-1 py-0.5 border rounded focus:outline-none focus:ring-1 focus:ring-green-500 text-[10px] border-green-300"
+                                                    className="w-full px-1 py-0.5 border rounded focus:outline-none focus:ring-1 focus:ring-green-500 dark:focus:ring-green-700 text-[10px] border-green-300 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100"
                                                     placeholder="0"
                                                     min="0"
                                                     step="0.1"
@@ -614,12 +614,12 @@ export default function AddFoodModal({ isOpen, onClose, onAddFood }: AddFoodModa
                                                 />
                                             </div>
                                             <div>
-                                                <label className="block text-[10px] font-medium text-green-700 mb-0.5">Complex</label>
+                                                <label className="block text-[10px] font-medium text-green-700 dark:text-green-300 mb-0.5">Complex</label>
                                                 <input
                                                     type="number"
                                                     value={formData.carbsComplex}
                                                     onChange={(e) => handleInputChange('carbsComplex', e.target.value)}
-                                                    className="w-full px-1 py-0.5 border rounded focus:outline-none focus:ring-1 focus:ring-green-500 text-[10px] border-green-300"
+                                                    className="w-full px-1 py-0.5 border rounded focus:outline-none focus:ring-1 focus:ring-green-500 dark:focus:ring-green-700 text-[10px] border-green-300 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100"
                                                     placeholder="0"
                                                     min="0"
                                                     step="0.1"
@@ -627,12 +627,12 @@ export default function AddFoodModal({ isOpen, onClose, onAddFood }: AddFoodModa
                                                 />
                                             </div>
                                             <div>
-                                                <label className="block text-[10px] font-medium text-green-700 mb-0.5">Fiber</label>
+                                                <label className="block text-[10px] font-medium text-green-700 dark:text-green-300 mb-0.5">Fiber</label>
                                                 <input
                                                     type="number"
                                                     value={formData.fiber}
                                                     onChange={(e) => handleInputChange('fiber', e.target.value)}
-                                                    className="w-full px-1 py-0.5 border rounded focus:outline-none focus:ring-1 focus:ring-green-500 text-[10px] border-green-300"
+                                                    className="w-full px-1 py-0.5 border rounded focus:outline-none focus:ring-1 focus:ring-green-500 dark:focus:ring-green-700 text-[10px] border-green-300 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100"
                                                     placeholder="0"
                                                     min="0"
                                                     step="0.1"
@@ -645,7 +645,7 @@ export default function AddFoodModal({ isOpen, onClose, onAddFood }: AddFoodModa
                             </div>
                             {/* Protein and subclasses */}
                             <div>
-                                <label className="block text-xs font-medium text-blue-700 mb-0.5">
+                                <label className="block text-xs font-medium text-blue-700 dark:text-blue-300 mb-0.5">
                                     Protein (g) {selectedFood && <span className="text-xs text-blue-500">(auto)</span>}
                                 </label>
                                 <input
@@ -653,8 +653,8 @@ export default function AddFoodModal({ isOpen, onClose, onAddFood }: AddFoodModa
                                     value={formData.protein}
                                     onChange={(e) => handleInputChange('protein', e.target.value)}
                                     className={`w-full px-1.5 py-1 border rounded-lg focus:outline-none focus:ring-2 focus:border-transparent text-xs ${(selectedFood && isAutoCalculated)
-                                        ? 'border-blue-200 bg-blue-50 text-blue-700'
-                                        : 'border-blue-300 focus:ring-blue-500'
+                                        ? 'border-blue-200 bg-blue-50 text-blue-700 dark:border-blue-700 dark:bg-blue-900/20 dark:text-blue-300'
+                                        : 'border-blue-300 focus:ring-blue-500 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:focus:ring-blue-700'
                                         }`}
                                     placeholder="0"
                                     min="0"
@@ -665,12 +665,12 @@ export default function AddFoodModal({ isOpen, onClose, onAddFood }: AddFoodModa
                                     <div className="mt-0.5 space-y-0.5">
                                         <div className="grid grid-cols-2 gap-1">
                                             <div>
-                                                <label className="block text-[10px] font-medium text-blue-700 mb-0.5">Complete</label>
+                                                <label className="block text-[10px] font-medium text-blue-700 dark:text-blue-300 mb-0.5">Complete</label>
                                                 <input
                                                     type="number"
                                                     value={formData.proteinComplete}
                                                     onChange={(e) => handleInputChange('proteinComplete', e.target.value)}
-                                                    className="w-full px-1 py-0.5 border rounded focus:outline-none focus:ring-1 focus:ring-blue-500 text-[10px] border-blue-300"
+                                                    className="w-full px-1 py-0.5 border rounded focus:outline-none focus:ring-1 focus:ring-blue-500 dark:focus:ring-blue-700 text-[10px] border-blue-300 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100"
                                                     placeholder="0"
                                                     min="0"
                                                     step="0.1"
@@ -678,12 +678,12 @@ export default function AddFoodModal({ isOpen, onClose, onAddFood }: AddFoodModa
                                                 />
                                             </div>
                                             <div>
-                                                <label className="block text-[10px] font-medium text-blue-700 mb-0.5">Incomplete</label>
+                                                <label className="block text-[10px] font-medium text-blue-700 dark:text-blue-300 mb-0.5">Incomplete</label>
                                                 <input
                                                     type="number"
                                                     value={formData.proteinIncomplete}
                                                     onChange={(e) => handleInputChange('proteinIncomplete', e.target.value)}
-                                                    className="w-full px-1 py-0.5 border rounded focus:outline-none focus:ring-1 focus:ring-blue-500 text-[10px] border-blue-300"
+                                                    className="w-full px-1 py-0.5 border rounded focus:outline-none focus:ring-1 focus:ring-blue-500 dark:focus:ring-blue-700 text-[10px] border-blue-300 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100"
                                                     placeholder="0"
                                                     min="0"
                                                     step="0.1"
@@ -696,7 +696,7 @@ export default function AddFoodModal({ isOpen, onClose, onAddFood }: AddFoodModa
                             </div>
                             {/* Fats and subclasses */}
                             <div>
-                                <label className="block text-xs font-medium text-yellow-700 mb-0.5">
+                                <label className="block text-xs font-medium text-yellow-700 dark:text-yellow-300 mb-0.5">
                                     Fat (g) {selectedFood && <span className="text-xs text-yellow-500">(auto)</span>}
                                 </label>
                                 <input
@@ -704,8 +704,8 @@ export default function AddFoodModal({ isOpen, onClose, onAddFood }: AddFoodModa
                                     value={formData.fat}
                                     onChange={(e) => handleInputChange('fat', e.target.value)}
                                     className={`w-full px-1.5 py-1 border rounded-lg focus:outline-none focus:ring-2 focus:border-transparent text-xs ${(selectedFood && isAutoCalculated)
-                                        ? 'border-yellow-200 bg-yellow-50 text-yellow-700'
-                                        : 'border-yellow-300 focus:ring-yellow-500'
+                                        ? 'border-yellow-200 bg-yellow-50 text-yellow-700 dark:border-yellow-700 dark:bg-yellow-900/20 dark:text-yellow-300'
+                                        : 'border-yellow-300 focus:ring-yellow-500 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:focus:ring-yellow-700'
                                         }`}
                                     placeholder="0"
                                     min="0"
@@ -716,12 +716,12 @@ export default function AddFoodModal({ isOpen, onClose, onAddFood }: AddFoodModa
                                     <div className="mt-0.5">
                                         <div className="grid grid-cols-3 gap-1">
                                             <div>
-                                                <label className="block text-[10px] font-medium text-yellow-700 mb-0.5">Unsat</label>
+                                                <label className="block text-[10px] font-medium text-yellow-700 dark:text-yellow-300 mb-0.5">Unsat</label>
                                                 <input
                                                     type="number"
                                                     value={formData.fatsUnsaturated}
                                                     onChange={(e) => handleInputChange('fatsUnsaturated', e.target.value)}
-                                                    className="w-full px-1 py-0.5 border rounded focus:outline-none focus:ring-1 focus:ring-yellow-500 text-[10px] border-yellow-300"
+                                                    className="w-full px-1 py-0.5 border rounded focus:outline-none focus:ring-1 focus:ring-yellow-500 dark:focus:ring-yellow-700 text-[10px] border-yellow-300 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100"
                                                     placeholder="0"
                                                     min="0"
                                                     step="0.1"
@@ -729,12 +729,12 @@ export default function AddFoodModal({ isOpen, onClose, onAddFood }: AddFoodModa
                                                 />
                                             </div>
                                             <div>
-                                                <label className="block text-[10px] font-medium text-yellow-700 mb-0.5">Sat</label>
+                                                <label className="block text-[10px] font-medium text-yellow-700 dark:text-yellow-300 mb-0.5">Sat</label>
                                                 <input
                                                     type="number"
                                                     value={formData.fatsSaturated}
                                                     onChange={(e) => handleInputChange('fatsSaturated', e.target.value)}
-                                                    className="w-full px-1 py-0.5 border rounded focus:outline-none focus:ring-1 focus:ring-yellow-500 text-[10px] border-yellow-300"
+                                                    className="w-full px-1 py-0.5 border rounded focus:outline-none focus:ring-1 focus:ring-yellow-500 dark:focus:ring-yellow-700 text-[10px] border-yellow-300 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100"
                                                     placeholder="0"
                                                     min="0"
                                                     step="0.1"
@@ -742,12 +742,12 @@ export default function AddFoodModal({ isOpen, onClose, onAddFood }: AddFoodModa
                                                 />
                                             </div>
                                             <div>
-                                                <label className="block text-[10px] font-medium text-yellow-700 mb-0.5">Trans</label>
+                                                <label className="block text-[10px] font-medium text-yellow-700 dark:text-yellow-300 mb-0.5">Trans</label>
                                                 <input
                                                     type="number"
                                                     value={formData.fatsTrans}
                                                     onChange={(e) => handleInputChange('fatsTrans', e.target.value)}
-                                                    className="w-full px-1 py-0.5 border rounded focus:outline-none focus:ring-1 focus:ring-yellow-500 text-[10px] border-yellow-300"
+                                                    className="w-full px-1 py-0.5 border rounded focus:outline-none focus:ring-1 focus:ring-yellow-500 dark:focus:ring-yellow-700 text-[10px] border-yellow-300 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100"
                                                     placeholder="0"
                                                     min="0"
                                                     step="0.1"
@@ -762,13 +762,13 @@ export default function AddFoodModal({ isOpen, onClose, onAddFood }: AddFoodModa
 
                         {/* Notes */}
                         <div>
-                            <label className="block text-xs font-medium text-purple-700 mb-0.5">
+                            <label className="block text-xs font-medium text-purple-700 dark:text-purple-300 mb-0.5">
                                 Notes (optional)
                             </label>
                             <textarea
                                 value={formData.notes}
                                 onChange={(e) => handleInputChange('notes', e.target.value)}
-                                className="w-full px-2 py-1 border border-purple-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none text-xs"
+                                className="w-full px-2 py-1 border border-purple-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none text-xs dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700 dark:focus:ring-purple-700"
                                 placeholder="Any additional notes..."
                                 rows={2}
                             />
@@ -779,7 +779,7 @@ export default function AddFoodModal({ isOpen, onClose, onAddFood }: AddFoodModa
                             <button
                                 type="button"
                                 onClick={handleCancel}
-                                className="flex-1 bg-gray-100 text-gray-700 py-1.5 px-3 rounded-lg hover:bg-gray-200 transition-colors font-medium text-xs"
+                                className="flex-1 bg-gray-100 text-gray-700 py-1.5 px-3 rounded-lg hover:bg-gray-200 transition-colors font-medium text-xs dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
                             >
                                 Cancel
                             </button>

@@ -997,14 +997,14 @@ export default function TrainingTab({ user }: TrainingTabProps) {
     return (
         <div className="space-y-2 sm:space-y-3">
             {/* Date Navigation */}
-            <div className="bg-white rounded-2xl p-1 sm:p-2 shadow-lg border border-purple-100">
+            <div className="bg-white dark:bg-gray-900 rounded-2xl p-1 sm:p-2 shadow-lg border border-purple-100 dark:border-gray-700">
                 <div className="flex items-center justify-between mb-0">
                     <button
                         onClick={() => navigateDate('prev')}
                         disabled={isDateSwitchBlocked}
                         className={`perfect-circle circle-md flex items-center justify-center transition-colors ${isDateSwitchBlocked
-                            ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                            : 'bg-purple-100 hover:bg-purple-200 text-purple-600'
+                            ? 'bg-gray-50 text-gray-400 cursor-not-allowed border border-gray-200'
+                            : 'text-purple-600 border-2 border-purple-400 hover:border-purple-500 bg-purple-500/10 shadow-[0_0_18px_rgba(168,85,247,0.35)]'
                             }`}
                     >
                         {isDateSwitchBlocked && dateSwitchDelay >= 3000 ? (
@@ -1024,7 +1024,7 @@ export default function TrainingTab({ user }: TrainingTabProps) {
                             className="hover:bg-purple-50 rounded-lg px-2 py-0.5 transition-colors cursor-pointer group"
                         >
                             <div className="flex items-center justify-center space-x-1">
-                                <h2 className={`text-sm sm:text-base font-bold ${isToday(currentDate) ? 'text-purple-600/70' : 'text-purple-800/60'}`}>
+                                <h2 className={`text-sm sm:text-base font-bold ${isToday(currentDate) ? 'text-purple-500/80 dark:text-purple-300/80' : 'text-purple-800/60 dark:text-purple-200/60'}`}>
                                     {formatDate(currentDate)}
                                 </h2>
                                 <svg className="w-4 h-4 text-purple-400 group-hover:text-purple-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1044,7 +1044,7 @@ export default function TrainingTab({ user }: TrainingTabProps) {
                         {showCalendar && (
                             <div
                                 ref={calendarRef}
-                                className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 z-50 bg-white rounded-lg shadow-xl border border-purple-200 p-4 min-w-[280px]"
+                                className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 z-50 bg-white dark:bg-gray-900 rounded-lg shadow-xl border border-purple-200 dark:border-gray-700 p-4 min-w-[280px]"
                             >
                                 <div className="flex items-center justify-center mb-3">
                                     <div className="flex items-center space-x-2">
@@ -1052,7 +1052,7 @@ export default function TrainingTab({ user }: TrainingTabProps) {
                                             onClick={() => navigateCalendarMonth('prev')}
                                             className="p-1 hover:bg-purple-50 rounded transition-colors"
                                         >
-                                            <svg className="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <svg className="w-4 h-4 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                                             </svg>
                                         </button>
@@ -1061,7 +1061,7 @@ export default function TrainingTab({ user }: TrainingTabProps) {
                                             onClick={() => navigateCalendarMonth('next')}
                                             className="p-1 hover:bg-purple-50 rounded transition-colors"
                                         >
-                                            <svg className="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <svg className="w-4 h-4 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                                             </svg>
                                         </button>
@@ -1071,7 +1071,7 @@ export default function TrainingTab({ user }: TrainingTabProps) {
                                 {/* Calendar Grid */}
                                 <div className="grid grid-cols-7 gap-1 mb-2">
                                     {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
-                                        <div key={day} className="text-xs text-center text-gray-500 font-medium py-1">
+                                        <div key={day} className="text-xs text-center text-gray-500 dark:text-gray-400 font-medium py-1">
                                             {day}
                                         </div>
                                     ))}
@@ -1083,19 +1083,19 @@ export default function TrainingTab({ user }: TrainingTabProps) {
                                             <button
                                                 onClick={() => handleDateSelect(date)}
                                                 className={`w-8 h-8 text-xs rounded-full transition-colors flex items-center justify-center min-w-[32px] min-h-[32px] max-w-[32px] max-h-[32px] ${isSameDay(date, currentDate)
-                                                    ? 'bg-purple-600 text-white'
+                                                    ? 'bg-purple-500 text-white'
                                                     : isSameDay(date, new Date())
                                                         ? 'bg-purple-100 text-purple-800 border-2 border-purple-300'
                                                         : isCurrentMonth(date)
-                                                            ? 'text-gray-800 hover:bg-purple-50'
-                                                            : 'text-gray-400 hover:bg-gray-50'
+                                                            ? 'text-gray-800 dark:text-gray-200 hover:bg-purple-50 dark:hover:bg-gray-800'
+                                                            : 'text-gray-400 dark:text-gray-500 hover:bg-gray-50 dark:hover:bg-gray-800'
                                                     }`}
                                             >
                                                 {date.getDate()}
                                             </button>
                                             {/* Purple dot indicator for dates with workouts */}
                                             {hasWorkoutOnDate(date) && (
-                                                <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-purple-600 rounded-full shadow-sm border border-white"></div>
+                                                <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-purple-500 rounded-full shadow-sm border border-white dark:border-gray-900"></div>
                                             )}
                                         </div>
                                     ))}
@@ -1107,8 +1107,8 @@ export default function TrainingTab({ user }: TrainingTabProps) {
                         {isDateSwitchBlocked && (
                             <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2">
                                 {dateSwitchDelay < 3000 ? (
-                                    <div className="flex items-center space-x-1 text-xs text-purple-600 font-medium bg-purple-50 px-2 py-1 rounded-full border border-purple-200">
-                                        <div className="w-3 h-3 border-2 border-purple-300 border-t-purple-600 rounded-full animate-spin"></div>
+                                    <div className="flex items-center space-x-1 text-xs text-purple-500 dark:text-purple-300 font-medium bg-purple-50 dark:bg-gray-800 px-2 py-1 rounded-full border border-purple-200 dark:border-gray-700">
+                                        <div className="w-3 h-3 border-2 border-purple-300 border-t-purple-500 rounded-full animate-spin"></div>
                                         <span>Saving... ({Math.ceil((3000 - dateSwitchDelay) / 1000)}s)</span>
                                     </div>
                                 ) : (
@@ -1127,8 +1127,8 @@ export default function TrainingTab({ user }: TrainingTabProps) {
                         onClick={() => navigateDate('next')}
                         disabled={isDateSwitchBlocked}
                         className={`perfect-circle circle-md flex items-center justify-center transition-colors ${isDateSwitchBlocked
-                            ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                            : 'bg-purple-100 hover:bg-purple-200 text-purple-600'
+                            ? 'bg-gray-50 text-gray-400 cursor-not-allowed border border-gray-200'
+                            : 'text-purple-600 border-2 border-purple-400 hover:border-purple-500 bg-purple-500/10 shadow-[0_0_18px_rgba(168,85,247,0.35)]'
                             }`}
                     >
                         {isDateSwitchBlocked && dateSwitchDelay >= 3000 ? (
@@ -1172,9 +1172,9 @@ export default function TrainingTab({ user }: TrainingTabProps) {
             </div>
 
             {/* Exercises Section */}
-            <div className="bg-white rounded-2xl p-1 sm:p-2 shadow-lg border border-purple-100">
+            <div className="bg-white dark:bg-gray-900 rounded-2xl p-1 sm:p-2 shadow-lg border border-purple-100 dark:border-gray-700">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-1 sm:mb-2 space-y-1 sm:space-y-0">
-                    <h3 className="text-lg sm:text-xl font-bold text-purple-800 pl-1">Exercises</h3>
+                    <h3 className="text-lg sm:text-xl font-bold text-purple-800 dark:text-purple-200 pl-1">Exercises</h3>
                     <div className="flex items-center space-x-3">
 
                         <button
@@ -1197,22 +1197,22 @@ export default function TrainingTab({ user }: TrainingTabProps) {
 
                 {isLoading ? (
                     <div className="text-center py-2 sm:py-3">
-                        <div className="w-16 h-16 sm:w-20 sm:h-20 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full flex items-center justify-center mx-auto mb-4 border-2 border-purple-300 bg-purple-500/5 shadow-[0_0_16px_rgba(168,85,247,0.25)]">
                             <div className="w-6 h-6 sm:w-8 sm:h-8 border-4 border-purple-300 border-t-purple-600 rounded-full animate-spin"></div>
                         </div>
-                        <p className="text-purple-600 text-base sm:text-lg">Loading workout data...</p>
+                        <p className="text-purple-600 dark:text-purple-300 text-base sm:text-lg">Loading workout data...</p>
                     </div>
                 ) : (
                     <>
                         {currentTraining?.exercises.length === 0 ? (
                             <div className="text-center py-2 sm:py-3">
-                                <div className="w-16 h-16 sm:w-20 sm:h-20 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full flex items-center justify-center mx-auto mb-4 border-2 border-purple-300 bg-purple-500/5 shadow-[0_0_16px_rgba(168,85,247,0.25)]">
                                     <svg className="w-8 h-8 sm:w-10 sm:h-10 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                                     </svg>
                                 </div>
-                                <p className="text-purple-600 text-base sm:text-lg">No exercises yet</p>
-                                <p className="text-purple-400 text-sm sm:text-base">Add your first exercise to get started!</p>
+                                <p className="text-purple-600 dark:text-purple-300 text-base sm:text-lg">No exercises yet</p>
+                                <p className="text-purple-400 dark:text-purple-300/70 text-sm sm:text-base">Add your first exercise to get started!</p>
                             </div>
                         ) : (
                             <div className="space-y-1 sm:space-y-1">
