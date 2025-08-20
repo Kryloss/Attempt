@@ -587,17 +587,17 @@ export default function NutritionTab({ user }: NutritionTabProps) {
                             <div className="text-xs text-green-500">Carbs</div>
                             <div className="text-lg font-bold text-green-600">{dailyTotals.carbs.toFixed(1)}g</div>
                             {advancedNutritionEnabled && (
-                                <div className="mt-0.5 grid grid-cols-3 gap-1 text-[10px] text-green-600">
+                                <div className="mt-0.5 grid grid-cols-3 gap-0.5 sm:gap-1 text-[9px] sm:text-[10px] text-green-600 leading-3 sm:leading-4 scale-90 sm:scale-100 origin-top">
                                     <div>
-                                        <div className="text-[9px] text-green-700/80">Simple</div>
+                                        <div className="text-[8px] sm:text-[9px] text-green-700/80">Simple</div>
                                         <div className="font-semibold">{advancedTotals.carbsSimple.toFixed(1)}g</div>
                                     </div>
                                     <div>
-                                        <div className="text-[9px] text-green-700/80">Complex</div>
+                                        <div className="text-[8px] sm:text-[9px] text-green-700/80">Complex</div>
                                         <div className="font-semibold">{advancedTotals.carbsComplex.toFixed(1)}g</div>
                                     </div>
                                     <div>
-                                        <div className="text-[9px] text-green-700/80">Fiber</div>
+                                        <div className="text-[8px] sm:text-[9px] text-green-700/80">Fiber</div>
                                         <div className="font-semibold">{advancedTotals.fiber.toFixed(1)}g</div>
                                     </div>
                                 </div>
@@ -607,13 +607,13 @@ export default function NutritionTab({ user }: NutritionTabProps) {
                             <div className="text-xs text-blue-500">Protein</div>
                             <div className="text-lg font-bold text-blue-600">{dailyTotals.protein.toFixed(1)}g</div>
                             {advancedNutritionEnabled && (
-                                <div className="mt-0.5 grid grid-cols-2 gap-1 text-[10px] text-blue-600">
+                                <div className="mt-0.5 grid grid-cols-2 gap-0.5 sm:gap-1 text-[9px] sm:text-[10px] text-blue-600 leading-3 sm:leading-4 scale-90 sm:scale-100 origin-top">
                                     <div>
-                                        <div className="text-[9px] text-blue-700/80">Complete</div>
+                                        <div className="text-[8px] sm:text-[9px] text-blue-700/80">Complete</div>
                                         <div className="font-semibold">{advancedTotals.proteinComplete.toFixed(1)}g</div>
                                     </div>
                                     <div>
-                                        <div className="text-[9px] text-blue-700/80">Incomplete</div>
+                                        <div className="text-[8px] sm:text-[9px] text-blue-700/80">Incomplete</div>
                                         <div className="font-semibold">{advancedTotals.proteinIncomplete.toFixed(1)}g</div>
                                     </div>
                                 </div>
@@ -623,17 +623,17 @@ export default function NutritionTab({ user }: NutritionTabProps) {
                             <div className="text-xs text-yellow-500">Fat</div>
                             <div className="text-lg font-bold text-yellow-600">{dailyTotals.fat.toFixed(1)}g</div>
                             {advancedNutritionEnabled && (
-                                <div className="mt-0.5 grid grid-cols-3 gap-1 text-[10px] text-yellow-600">
+                                <div className="mt-0.5 grid grid-cols-3 gap-0.5 sm:gap-1 text-[9px] sm:text-[10px] text-yellow-600 leading-3 sm:leading-4 scale-90 sm:scale-100 origin-top">
                                     <div>
-                                        <div className="text-[9px] text-yellow-700/80">Unsat</div>
+                                        <div className="text-[8px] sm:text-[9px] text-yellow-700/80">Unsat</div>
                                         <div className="font-semibold">{advancedTotals.fatsUnsaturated.toFixed(1)}g</div>
                                     </div>
                                     <div>
-                                        <div className="text-[9px] text-yellow-700/80">Sat</div>
+                                        <div className="text-[8px] sm:text-[9px] text-yellow-700/80">Sat</div>
                                         <div className="font-semibold">{advancedTotals.fatsSaturated.toFixed(1)}g</div>
                                     </div>
                                     <div>
-                                        <div className="text-[9px] text-yellow-700/80">Trans</div>
+                                        <div className="text-[8px] sm:text-[9px] text-yellow-700/80">Trans</div>
                                         <div className="font-semibold">{advancedTotals.fatsTrans.toFixed(1)}g</div>
                                     </div>
                                 </div>
