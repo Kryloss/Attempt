@@ -54,8 +54,8 @@ export default function NutritionPageClient() {
             onTabChange={() => { }}
         >
             <div className="container mx-auto px-4 sm:px-6">
-                <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
-                    Nutrition Dashboard
+                <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">
+
                 </h1>
                 <NutritionTab user={user} />
             </div>

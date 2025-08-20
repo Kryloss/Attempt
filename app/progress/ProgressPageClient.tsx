@@ -54,8 +54,8 @@ export default function ProgressPageClient() {
             onTabChange={() => { }}
         >
             <div className="container mx-auto px-4 sm:px-6">
-                <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
-                    Progress Dashboard
+                <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">
+
                 </h1>
                 <ProgressTab />
             </div>
