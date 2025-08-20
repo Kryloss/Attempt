@@ -235,7 +235,7 @@ export default function MealCard({ meal, onDelete, onUpdate, onAddFood, onRemove
                     {/* Foods List */}
                     <div className="px-2 py-2 space-y-1">
                         {(meal?.foods || []).length === 0 ? (
-                            <p className="text-xs text-purple-400 dark:text-purple-300/70 italic text-center py-2">
+                            <p className="text-xs text-purple-400 dark:text-purple-400/60 italic text-center py-2">
                                 No foods added yet. Drag foods here or use Add Food button.
                             </p>
                         ) : (
@@ -244,41 +244,45 @@ export default function MealCard({ meal, onDelete, onUpdate, onAddFood, onRemove
                                     key={food.id}
                                     draggable
                                     onDragStart={(e) => handleFoodDragStart(e, food)}
-                                    className="flex items-center justify-between bg-purple-50 dark:bg-gray-800 rounded p-1.5 border border-purple-100 dark:border-gray-700 cursor-grab active:cursor-grabbing hover:bg-purple-100 dark:hover:bg-gray-700 transition-colors"
+                                    className="relative flex items-start bg-purple-50 dark:bg-gray-800 rounded p-1.5 border border-purple-100 dark:border-gray-700 cursor-grab active:cursor-grabbing hover:bg-purple-100 dark:hover:bg-gray-700 transition-colors"
                                 >
                                     <div className="flex-1 min-w-0">
-                                        <div className="text-xs font-medium text-purple-800 dark:text-purple-200 truncate">{food.name}</div>
-                                        <div className="text-xs text-purple-600 dark:text-purple-300">
-                                            {food.calories}cal • {food.carbs}c • {food.protein}p • {food.fat}f
-                                        </div>
+                                        <div className="text-xs font-medium text-purple-500 dark:text-purple-50 truncate text-center">{food.name}</div>
+                                        {/* per-food inline macros removed per request */}
                                         {showAdvanced && (
                                             <div className="mt-0.5">
                                                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-1 text-[10px]">
-                                                    <div className="text-xs text-blue-700 dark:text-blue-300">
-                                                        <span className="font-medium">Proteins:</span>
-                                                        <span className="ml-1">Complete {food.proteinComplete ?? 0}g</span>
-                                                        <span className="ml-1">Incomplete {food.proteinIncomplete ?? 0}g</span>
+                                                    <div className="text-xs text-blue-500 dark:text-blue-500 text-center">
+                                                        <div className="font-medium">Proteins: {Number(food.protein ?? 0).toFixed(1)}g</div>
+                                                        <div className="mt-0.5 flex items-center justify-center gap-2">
+                                                            <span>Complete {Number(food.proteinComplete ?? 0).toFixed(1)}g</span>
+                                                            <span>Incomplete {Number(food.proteinIncomplete ?? 0).toFixed(1)}g</span>
+                                                        </div>
                                                     </div>
-                                                    <div className="text-xs text-green-700 dark:text-green-300">
-                                                        <span className="font-medium">Carbs:</span>
-                                                        <span className="ml-1">Simple {food.carbsSimple ?? 0}g</span>
-                                                        <span className="ml-1">Complex {food.carbsComplex ?? 0}g</span>
-                                                        <span className="ml-1">Fiber {food.fiber ?? 0}g</span>
+                                                    <div className="text-xs text-green-500 dark:text-green-500 text-center">
+                                                        <div className="font-medium">Carbs: {Number(food.carbs ?? 0).toFixed(1)}g</div>
+                                                        <div className="mt-0.5 flex items-center justify-center gap-2">
+                                                            <span>Simple {Number(food.carbsSimple ?? 0).toFixed(1)}g</span>
+                                                            <span>Complex {Number(food.carbsComplex ?? 0).toFixed(1)}g</span>
+                                                            <span>Fiber {Number(food.fiber ?? 0).toFixed(1)}g</span>
+                                                        </div>
                                                     </div>
-                                                    <div className="text-xs text-yellow-700 dark:text-yellow-300">
-                                                        <span className="font-medium">Fats:</span>
-                                                        <span className="ml-1">Unsat {food.fatsUnsaturated ?? 0}g</span>
-                                                        <span className="ml-1">Sat {food.fatsSaturated ?? 0}g</span>
-                                                        <span className="ml-1">Trans {food.fatsTrans ?? 0}g</span>
+                                                    <div className="text-xs text-yellow-500 dark:text-yellow-500 text-center">
+                                                        <div className="font-medium">Fats: {Number(food.fat ?? 0).toFixed(1)}g</div>
+                                                        <div className="mt-0.5 flex items-center justify-center gap-2">
+                                                            <span>Unsat {Number(food.fatsUnsaturated ?? 0).toFixed(1)}g</span>
+                                                            <span>Sat {Number(food.fatsSaturated ?? 0).toFixed(1)}g</span>
+                                                            <span>Trans {Number(food.fatsTrans ?? 0).toFixed(1)}g</span>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
                                         )}
                                         {food.notes && (
-                                            <div className="text-xs text-purple-500 dark:text-purple-300 italic break-words whitespace-normal">{food.notes}</div>
+                                            <div className="text-xs text-purple-500 dark:text-purple-300 italic break-words whitespace-normal mt-1 px-2 py-1 rounded border-2 border-purple-400/20 dark:border-purple-500/20 bg-purple-500/5 shadow-[0_0_12px_rgba(168,85,247,0.35)]">{food.notes}</div>
                                         )}
                                     </div>
-                                    <div className="flex items-center space-x-2">
+                                    <div className="absolute right-1 top-1 flex items-center space-x-2">
                                         <button
                                             onClick={() => onEditFood(food)}
                                             className="perfect-circle bg-blue-100 hover:bg-blue-200 text-blue-600 dark:bg-blue-900/30 dark:hover:bg-blue-900/50 dark:text-blue-300 flex items-center justify-center transition-colors"

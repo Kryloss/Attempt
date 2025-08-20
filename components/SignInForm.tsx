@@ -56,7 +56,7 @@ export default function SignInForm({ onSuccess, onSwitchToSignUp, onSwitchToForg
 
     return (
         <div className="w-full">
-            <h2 className="text-xl sm:text-2xl font-bold text-purple-800 mb-4 text-center">Sign In</h2>
+            <h2 className="text-xl sm:text-2xl font-bold text-purple-800 dark:text-purple-200 mb-4 text-center">Sign In</h2>
 
             {error && (
                 <div className="mb-3 p-2 bg-red-100 border border-red-400 text-red-700 rounded-lg text-sm">
@@ -66,7 +66,7 @@ export default function SignInForm({ onSuccess, onSwitchToSignUp, onSwitchToForg
 
             <form onSubmit={handleSubmit} className="space-y-3">
                 <div>
-                    <label htmlFor="emailOrUsername" className="block text-sm font-medium text-purple-700 mb-1">
+                    <label htmlFor="emailOrUsername" className="block text-sm font-medium text-purple-700 dark:text-purple-300 mb-1">
                         Email or Username
                     </label>
                     <input
@@ -76,13 +76,13 @@ export default function SignInForm({ onSuccess, onSwitchToSignUp, onSwitchToForg
                         value={formData.emailOrUsername}
                         onChange={handleChange}
                         required
-                        className="w-full px-3 py-2 border border-purple-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                        className="w-full px-3 py-2 border border-purple-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700 dark:focus:ring-purple-700"
                         placeholder="Enter email or username"
                     />
                 </div>
 
                 <div>
-                    <label htmlFor="password" className="block text-sm font-medium text-purple-700 mb-1">
+                    <label htmlFor="password" className="block text-sm font-medium text-purple-700 dark:text-purple-300 mb-1">
                         Password
                     </label>
                     <input
@@ -92,14 +92,14 @@ export default function SignInForm({ onSuccess, onSwitchToSignUp, onSwitchToForg
                         value={formData.password}
                         onChange={handleChange}
                         required
-                        className="w-full px-3 py-2 border border-purple-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                        className="w-full px-3 py-2 border border-purple-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700 dark:focus:ring-purple-700"
                         placeholder="Enter password"
                     />
                     <div className="mt-1 text-right">
                         <button
                             type="button"
                             onClick={() => onSwitchToForgotPassword()}
-                            className="text-sm text-purple-600 hover:underline focus:outline-none"
+                            className="text-sm text-purple-500 hover:underline focus:outline-none"
                         >
                             Forgot Password?
                         </button>
@@ -109,14 +109,14 @@ export default function SignInForm({ onSuccess, onSwitchToSignUp, onSwitchToForg
                 <button
                     type="submit"
                     disabled={isLoading}
-                    className="w-full bg-purple-600 text-white py-2 px-4 rounded-lg hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    className="w-full bg-purple-500 text-white py-2 px-4 rounded-lg hover:bg-purple-600 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
                     {isLoading ? 'Signing In...' : 'Sign In'}
                 </button>
             </form>
 
             <div className="mt-4 text-center">
-                <p className="text-sm text-purple-600">
+                <p className="text-sm text-purple-500 dark:text-purple-300">
                     Don't have an account?{' '}
                     <button
                         onClick={onSwitchToSignUp}
@@ -129,7 +129,7 @@ export default function SignInForm({ onSuccess, onSwitchToSignUp, onSwitchToForg
                 <div className="mt-3 pt-3 border-t border-purple-200">
                     <button
                         onClick={onGuestMode}
-                        className="w-full bg-gray-100 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors border border-gray-300"
+                        className="w-full text-purple-500 dark:text-purple-300 py-2 px-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-colors border-2 border-purple-400 hover:border-purple-500 bg-purple-500/10 shadow-[0_0_16px_rgba(168,85,247,0.35)]"
                     >
                         Proceed as Guest
                     </button>

@@ -581,7 +581,7 @@ export default function NutritionTab({ user }: NutritionTabProps) {
                     <div className="grid grid-cols-4 gap-1">
                         <div className="rounded-lg p-1.5 text-center border-2 border-purple-300 bg-purple-500/5 shadow-[0_0_18px_rgba(168,85,247,0.25)]">
                             <div className="text-xs text-purple-500">Calories</div>
-                            <div className="text-lg font-bold text-purple-600">{dailyTotals.calories}</div>
+                            <div className="text-lg font-bold text-purple-500">{dailyTotals.calories}</div>
                         </div>
                         <div className="rounded-lg p-1.5 text-center border-2 border-green-300 bg-green-500/5 shadow-[0_0_18px_rgba(16,185,129,0.25)]">
                             <div className="text-xs text-green-500">Carbs</div>
