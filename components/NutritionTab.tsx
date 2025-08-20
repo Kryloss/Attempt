@@ -58,6 +58,7 @@ export default function NutritionTab({ user }: NutritionTabProps) {
     const [foods, setFoods] = useState<Food[]>([])
     const [showAddMealModal, setShowAddMealModal] = useState(false)
     const [showAddFoodModal, setShowAddFoodModal] = useState(false)
+    const [targetMealId, setTargetMealId] = useState<string | null>(null)
     const [showEditFoodModal, setShowEditFoodModal] = useState(false)
     const [editingFood, setEditingFood] = useState<Food | null>(null)
     const [isLoading, setIsLoading] = useState(false)
@@ -132,6 +133,10 @@ export default function NutritionTab({ user }: NutritionTabProps) {
         })
         return acc
     }, { proteinComplete: 0, proteinIncomplete: 0, carbsSimple: 0, carbsComplex: 0, fiber: 0, fatsUnsaturated: 0, fatsSaturated: 0, fatsTrans: 0 })
+
+    // Show summary only when more than one meal has at least one food
+    const mealsWithFoodsCount = (meals || []).filter(m => (m?.foods?.length || 0) > 0).length
+    const showDailySummary = mealsWithFoodsCount > 1
 
     // Initialize nutrition data for current date
     useEffect(() => {
@@ -440,7 +445,15 @@ export default function NutritionTab({ user }: NutritionTabProps) {
             ...foodData,
             id: generateId()
         }
-        setFoods(prev => [...prev, newFood])
+
+        if (targetMealId) {
+            // Add directly into the targeted meal
+            setMeals(prev => prev.map(meal =>
+                meal.id === targetMealId ? { ...meal, foods: [...meal.foods, newFood] } : meal
+            ))
+        } else {
+            // No target meal: do nothing (Available Foods card removed)
+        }
         setHasUnsavedChanges(true)
     }
 
@@ -485,26 +498,7 @@ export default function NutritionTab({ user }: NutritionTabProps) {
     }
 
     const handleRemoveFoodFromMeal = (mealId: string, foodId: string) => {
-        // Find the food being removed and add it back to available foods
-        const mealWithFood = meals.find(meal => meal.id === mealId)
-        const foodToRemove = mealWithFood?.foods.find(food => food.id === foodId)
-
-        if (foodToRemove) {
-            // Clean the food data to remove any meal-specific properties
-            const cleanFood: Food = {
-                id: foodToRemove.id,
-                name: foodToRemove.name,
-                calories: foodToRemove.calories,
-                carbs: foodToRemove.carbs,
-                protein: foodToRemove.protein,
-                fat: foodToRemove.fat,
-                notes: foodToRemove.notes
-            }
-            // Add back to available foods
-            setFoods(prev => [...prev, cleanFood])
-        }
-
-        // Remove from meal
+        // Fully delete: remove from the specified meal without adding to available foods
         setMeals(prev => prev.map(meal =>
             meal.id === mealId
                 ? { ...meal, foods: meal.foods.filter(food => food.id !== foodId) }
@@ -580,127 +574,78 @@ export default function NutritionTab({ user }: NutritionTabProps) {
             {/* Date Navigation */}
             <DateCard user={user} />
 
-            {/* Daily Summary */}
-            <div className="bg-white rounded-2xl p-2 shadow-lg border border-purple-100">
-                <h3 className="text-base font-bold text-purple-800 mb-1 text-center">Daily Summary</h3>
-                <div className="grid grid-cols-4 gap-1">
-                    <div className="bg-purple-50 rounded-lg p-1.5 text-center">
-                        <div className="text-lg font-bold text-purple-600">{dailyTotals.calories}</div>
-                        <div className="text-xs text-purple-500">Calories</div>
-                    </div>
-                    <div className="bg-green-50 rounded-lg p-1.5 text-center">
-                        <div className="text-lg font-bold text-green-600">{dailyTotals.carbs.toFixed(1)}g</div>
-                        <div className="text-xs text-green-500">Carbs</div>
-                        {advancedNutritionEnabled && (
-                            <div className="mt-0.5 text-[10px] text-green-600">
-                                <div>Simple: {advancedTotals.carbsSimple.toFixed(1)}g</div>
-                                <div>Complex: {advancedTotals.carbsComplex.toFixed(1)}g</div>
-                                <div>Fiber: {advancedTotals.fiber.toFixed(1)}g</div>
-                            </div>
-                        )}
-                    </div>
-                    <div className="bg-blue-50 rounded-lg p-1.5 text-center">
-                        <div className="text-lg font-bold text-blue-600">{dailyTotals.protein.toFixed(1)}g</div>
-                        <div className="text-xs text-blue-500">Protein</div>
-                        {advancedNutritionEnabled && (
-                            <div className="mt-0.5 text-[10px] text-blue-600">
-                                <div>Complete: {advancedTotals.proteinComplete.toFixed(1)}g</div>
-                                <div>Incomplete: {advancedTotals.proteinIncomplete.toFixed(1)}g</div>
-                            </div>
-                        )}
-                    </div>
-                    <div className="bg-yellow-50 rounded-lg p-1.5 text-center">
-                        <div className="text-lg font-bold text-yellow-600">{dailyTotals.fat.toFixed(1)}g</div>
-                        <div className="text-xs text-yellow-500">Fat</div>
-                        {advancedNutritionEnabled && (
-                            <div className="mt-0.5 text-[10px] text-yellow-600">
-                                <div>Unsat: {advancedTotals.fatsUnsaturated.toFixed(1)}g</div>
-                                <div>Sat: {advancedTotals.fatsSaturated.toFixed(1)}g</div>
-                                <div>Trans: {advancedTotals.fatsTrans.toFixed(1)}g</div>
-                            </div>
-                        )}
-                    </div>
-                </div>
-            </div>
-
-            {/* Action Buttons */}
-            <div className="flex space-x-3">
-                <button
-                    onClick={() => {
-                        setShowAddFoodModal(true)
-                        openModal('addFood')
-                    }}
-                    className="bg-purple-500/90 text-white px-4 py-2 rounded-lg hover:bg-purple-600/90 transition-colors font-medium text-sm flex-1"
-                >
-                    Add Food
-                </button>
-                <button
-                    onClick={() => {
-                        setShowAddMealModal(true)
-                        openModal('addMeal')
-                    }}
-                    className="bg-purple-500/90 text-white px-4 py-2 rounded-lg hover:bg-purple-600/90 transition-colors font-medium text-sm flex-1"
-                >
-                    Add Meal
-                </button>
-            </div>
-
-            {/* Available Foods (for dragging) - Only show if foods exist */}
-            {foods.length > 0 && (
-                <div className="bg-white rounded-2xl p-4 shadow-lg border border-purple-100">
-                    <div className="flex items-center justify-between mb-3">
-                        <h3 className="text-lg font-bold text-purple-800">Available Foods</h3>
-                        <span className="text-sm text-purple-600 bg-purple-100 px-2 py-1 rounded-full">
-                            {foods.length} {foods.length === 1 ? 'item' : 'items'}
-                        </span>
-                    </div>
-                    <p className="text-xs text-purple-600 mb-3 italic">
-                        Drag foods to meals, hover to delete, or remove from meals to return them here
-                    </p>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                        {foods.map((food) => (
-                            <div
-                                key={food.id}
-                                draggable
-                                onDragStart={(e) => handleDragStart(e, food)}
-                                className="bg-purple-50 border border-purple-200 rounded-lg p-3 hover:bg-purple-100 transition-colors relative group cursor-grab active:cursor-grabbing select-none"
-                            >
-                                <div>
-                                    <div className="font-medium text-purple-800 text-sm pr-6">{food.name}</div>
-                                    <div className="text-xs text-purple-600">
-                                        {food.calories}cal • {food.carbs}c • {food.protein}p • {food.fat}f
+            {/* Daily Summary (visible only when more than one meal has foods) */}
+            {showDailySummary && (
+                <div className="bg-white rounded-2xl p-2 shadow-lg border border-purple-100">
+                    <h3 className="text-base font-bold text-purple-800 mb-1 text-center">Daily Summary</h3>
+                    <div className="grid grid-cols-4 gap-1">
+                        <div className="bg-purple-50 rounded-lg p-1.5 text-center">
+                            <div className="text-xs text-purple-500">Calories</div>
+                            <div className="text-lg font-bold text-purple-600">{dailyTotals.calories}</div>
+                        </div>
+                        <div className="bg-green-50 rounded-lg p-1.5 text-center">
+                            <div className="text-xs text-green-500">Carbs</div>
+                            <div className="text-lg font-bold text-green-600">{dailyTotals.carbs.toFixed(1)}g</div>
+                            {advancedNutritionEnabled && (
+                                <div className="mt-0.5 grid grid-cols-3 gap-1 text-[10px] text-green-600">
+                                    <div>
+                                        <div className="text-[9px] text-green-700/80">Simple</div>
+                                        <div className="font-semibold">{advancedTotals.carbsSimple.toFixed(1)}g</div>
                                     </div>
-                                    {food.notes && (
-                                        <div className="text-xs text-purple-500 italic mt-1 break-words whitespace-normal">{food.notes}</div>
-                                    )}
+                                    <div>
+                                        <div className="text-[9px] text-green-700/80">Complex</div>
+                                        <div className="font-semibold">{advancedTotals.carbsComplex.toFixed(1)}g</div>
+                                    </div>
+                                    <div>
+                                        <div className="text-[9px] text-green-700/80">Fiber</div>
+                                        <div className="font-semibold">{advancedTotals.fiber.toFixed(1)}g</div>
+                                    </div>
                                 </div>
-                                <div className="absolute top-1/2 right-2 transform -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity flex space-x-2">
-                                    <button
-                                        onClick={() => handleEditFood(food)}
-                                        className="perfect-circle bg-blue-100 hover:bg-blue-200 text-blue-600 flex items-center justify-center"
-                                        style={{ '--circle-size': '28px' } as React.CSSProperties}
-                                        title="Edit food"
-                                    >
-                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                        </svg>
-                                    </button>
-                                    <button
-                                        onClick={() => handleDeleteFood(food.id)}
-                                        className="perfect-circle bg-red-100 hover:bg-red-200 text-red-600 flex items-center justify-center"
-                                        style={{ '--circle-size': '28px' } as React.CSSProperties}
-                                        title="Delete food"
-                                    >
-                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                        </svg>
-                                    </button>
+                            )}
+                        </div>
+                        <div className="bg-blue-50 rounded-lg p-1.5 text-center">
+                            <div className="text-xs text-blue-500">Protein</div>
+                            <div className="text-lg font-bold text-blue-600">{dailyTotals.protein.toFixed(1)}g</div>
+                            {advancedNutritionEnabled && (
+                                <div className="mt-0.5 grid grid-cols-2 gap-1 text-[10px] text-blue-600">
+                                    <div>
+                                        <div className="text-[9px] text-blue-700/80">Complete</div>
+                                        <div className="font-semibold">{advancedTotals.proteinComplete.toFixed(1)}g</div>
+                                    </div>
+                                    <div>
+                                        <div className="text-[9px] text-blue-700/80">Incomplete</div>
+                                        <div className="font-semibold">{advancedTotals.proteinIncomplete.toFixed(1)}g</div>
+                                    </div>
                                 </div>
-                            </div>
-                        ))}
+                            )}
+                        </div>
+                        <div className="bg-yellow-50 rounded-lg p-1.5 text-center">
+                            <div className="text-xs text-yellow-500">Fat</div>
+                            <div className="text-lg font-bold text-yellow-600">{dailyTotals.fat.toFixed(1)}g</div>
+                            {advancedNutritionEnabled && (
+                                <div className="mt-0.5 grid grid-cols-3 gap-1 text-[10px] text-yellow-600">
+                                    <div>
+                                        <div className="text-[9px] text-yellow-700/80">Unsat</div>
+                                        <div className="font-semibold">{advancedTotals.fatsUnsaturated.toFixed(1)}g</div>
+                                    </div>
+                                    <div>
+                                        <div className="text-[9px] text-yellow-700/80">Sat</div>
+                                        <div className="font-semibold">{advancedTotals.fatsSaturated.toFixed(1)}g</div>
+                                    </div>
+                                    <div>
+                                        <div className="text-[9px] text-yellow-700/80">Trans</div>
+                                        <div className="font-semibold">{advancedTotals.fatsTrans.toFixed(1)}g</div>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
                     </div>
                 </div>
             )}
+
+            {/* Action Buttons moved under Existing Meals */}
+
+            {/* Available Foods removed as per requirement */}
 
             {/* Meals List */}
             <div className="space-y-3">
@@ -731,58 +676,77 @@ export default function NutritionTab({ user }: NutritionTabProps) {
                         </button>
                     </div>
                 ) : (
-                    meals.map((meal, index) => (
-                        <div
-                            key={meal.id}
-                            onDragOver={(e) => {
-                                // Accept dragging of foods and meals onto meal body
-                                handleDragOver(e)
-                            }}
-                            onDrop={(e) => {
-                                e.preventDefault()
-                                try {
-                                    const mealTransfer = e.dataTransfer.getData('application/x-meal')
-                                    if (mealTransfer) {
-                                        const { fromIndex } = JSON.parse(mealTransfer)
-                                        if (typeof fromIndex === 'number' && fromIndex !== index) {
-                                            setMeals(prev => {
-                                                const updated = [...prev]
-                                                const [moved] = updated.splice(fromIndex, 1)
-                                                updated.splice(index, 0, moved)
-                                                return updated
-                                            })
-                                            setHasUnsavedChanges(true)
-                                            return
-                                        }
-                                    }
-                                } catch { }
-                                // Fallback: treat as dropping a food item
-                                handleDrop(e, meal.id)
-                            }}
-                            className="relative"
-                        >
-                            <MealCard
-                                meal={meal}
-                                onDelete={handleDeleteMeal}
-                                onUpdate={handleUpdateMeal}
-                                onAddFood={handleAddFoodToMeal}
-                                onRemoveFood={handleRemoveFoodFromMeal}
-                                onMoveFood={handleMoveFoodBetweenMeals}
-                                onEditFood={handleEditFood}
-                                dragHandleProps={{
-                                    draggable: true,
-                                    onDragStart: (e: React.DragEvent) => {
-                                        // Mark that we are dragging a meal (not food)
-                                        e.dataTransfer.setData('application/x-meal', JSON.stringify({ id: meal.id, fromIndex: index }))
-                                        try { e.dataTransfer.setData('text/plain', meal.name || 'meal') } catch { }
-                                        e.dataTransfer.effectAllowed = 'move'
-                                    },
-                                    onDragEnd: () => { }
+                    <>
+                        {meals.map((meal, index) => (
+                            <div
+                                key={meal.id}
+                                onDragOver={(e) => {
+                                    // Accept dragging of foods and meals onto meal body
+                                    handleDragOver(e)
                                 }}
-                                showAdvanced={advancedNutritionEnabled}
-                            />
+                                onDrop={(e) => {
+                                    e.preventDefault()
+                                    try {
+                                        const mealTransfer = e.dataTransfer.getData('application/x-meal')
+                                        if (mealTransfer) {
+                                            const { fromIndex } = JSON.parse(mealTransfer)
+                                            if (typeof fromIndex === 'number' && fromIndex !== index) {
+                                                setMeals(prev => {
+                                                    const updated = [...prev]
+                                                    const [moved] = updated.splice(fromIndex, 1)
+                                                    updated.splice(index, 0, moved)
+                                                    return updated
+                                                })
+                                                setHasUnsavedChanges(true)
+                                                return
+                                            }
+                                        }
+                                    } catch { }
+                                    // Fallback: treat as dropping a food item
+                                    handleDrop(e, meal.id)
+                                }}
+                                className="relative"
+                            >
+                                <MealCard
+                                    meal={meal}
+                                    onDelete={handleDeleteMeal}
+                                    onUpdate={handleUpdateMeal}
+                                    onAddFood={handleAddFoodToMeal}
+                                    onRemoveFood={handleRemoveFoodFromMeal}
+                                    onMoveFood={handleMoveFoodBetweenMeals}
+                                    onEditFood={handleEditFood}
+                                    onOpenAddFood={(mealId: string) => {
+                                        setTargetMealId(mealId)
+                                        setShowAddFoodModal(true)
+                                        openModal('addFood')
+                                    }}
+                                    dragHandleProps={{
+                                        draggable: true,
+                                        onDragStart: (e: React.DragEvent) => {
+                                            // Mark that we are dragging a meal (not food)
+                                            e.dataTransfer.setData('application/x-meal', JSON.stringify({ id: meal.id, fromIndex: index }))
+                                            try { e.dataTransfer.setData('text/plain', meal.name || 'meal') } catch { }
+                                            e.dataTransfer.effectAllowed = 'move'
+                                        },
+                                        onDragEnd: () => { }
+                                    }}
+                                    showAdvanced={advancedNutritionEnabled}
+                                    showTotals={mealsWithFoodsCount === 1 && (meal?.foods?.length || 0) > 0}
+                                />
+                            </div>
+                        ))}
+                        <div className="pt-1 flex justify-center">
+                            <button
+                                onClick={() => {
+                                    setShowAddMealModal(true)
+                                    openModal('addMeal')
+                                }}
+                                className="bg-purple-500/90 text-white px-6 py-2 rounded-lg hover:bg-purple-600/90 transition-colors font-medium text-sm w-full max-w-xs"
+                            >
+                                Add Meal
+                            </button>
                         </div>
-                    ))
+                    </>
                 )}
             </div>
 
@@ -805,11 +769,13 @@ export default function NutritionTab({ user }: NutritionTabProps) {
                 onClose={() => {
                     setShowAddFoodModal(false)
                     closeModal('addFood')
+                    setTargetMealId(null)
                 }}
                 onAddFood={(foodData) => {
                     handleAddFood(foodData)
                     setShowAddFoodModal(false)
                     closeModal('addFood')
+                    setTargetMealId(null)
                 }}
             />
 

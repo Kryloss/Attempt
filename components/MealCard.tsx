@@ -36,15 +36,17 @@ interface MealCardProps {
     onRemoveFood: (mealId: string, foodId: string) => void
     onMoveFood?: (fromMealId: string, toMealId: string, food: Food) => void
     onEditFood: (food: Food) => void
+    onOpenAddFood?: (mealId: string) => void
     dragHandleProps?: {
         draggable?: boolean
         onDragStart?: (e: React.DragEvent) => void
         onDragEnd?: (e: React.DragEvent) => void
     }
     showAdvanced?: boolean
+    showTotals?: boolean
 }
 
-export default function MealCard({ meal, onDelete, onUpdate, onAddFood, onRemoveFood, onMoveFood, onEditFood, dragHandleProps, showAdvanced = false }: MealCardProps) {
+export default function MealCard({ meal, onDelete, onUpdate, onAddFood, onRemoveFood, onMoveFood, onEditFood, onOpenAddFood, dragHandleProps, showAdvanced = false, showTotals = true }: MealCardProps) {
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
     const [editingField, setEditingField] = useState<string | null>(null)
     const [editValue, setEditValue] = useState<string>('')
@@ -56,6 +58,19 @@ export default function MealCard({ meal, onDelete, onUpdate, onAddFood, onRemove
         protein: acc.protein + (food?.protein || 0),
         fat: acc.fat + (food?.fat || 0)
     }), { calories: 0, carbs: 0, protein: 0, fat: 0 })
+
+    // Advanced subclass totals for the meal
+    const advancedTotals = (meal?.foods || []).reduce((acc, food) => {
+        acc.proteinComplete += food.proteinComplete || 0
+        acc.proteinIncomplete += food.proteinIncomplete || 0
+        acc.carbsSimple += food.carbsSimple || 0
+        acc.carbsComplex += food.carbsComplex || 0
+        acc.fiber += food.fiber || 0
+        acc.fatsUnsaturated += food.fatsUnsaturated || 0
+        acc.fatsSaturated += food.fatsSaturated || 0
+        acc.fatsTrans += food.fatsTrans || 0
+        return acc
+    }, { proteinComplete: 0, proteinIncomplete: 0, carbsSimple: 0, carbsComplex: 0, fiber: 0, fatsUnsaturated: 0, fatsSaturated: 0, fatsTrans: 0 })
 
     const handleDelete = () => {
         onDelete(meal.id)
@@ -151,24 +166,70 @@ export default function MealCard({ meal, onDelete, onUpdate, onAddFood, onRemove
                         </div>
 
                         {/* Meal Totals */}
-                        <div className="grid grid-cols-4 gap-1 text-center">
-                            <div className="bg-purple-50 rounded px-2 py-1">
-                                <div className="text-sm font-bold text-purple-600">{totals.calories}</div>
-                                <div className="text-xs text-purple-500">Cal</div>
+                        {showTotals && (
+                            <div className="grid grid-cols-4 gap-1 text-center">
+                                <div className="bg-purple-50 rounded px-2 py-1">
+                                    <div className="text-sm font-bold text-purple-600">{totals.calories}</div>
+                                    <div className="text-xs text-purple-500">Cal</div>
+                                </div>
+                                <div className="bg-green-50 rounded px-2 py-1">
+                                    <div className="text-sm font-bold text-green-600">{totals.carbs}g</div>
+                                    <div className="text-xs text-green-500">Carbs</div>
+                                    {showAdvanced && (
+                                        <div className="mt-0.5 grid grid-cols-3 gap-1 text-[10px] text-green-600">
+                                            <div>
+                                                <div className="text-[9px] text-green-700/80">Simple</div>
+                                                <div className="font-semibold">{advancedTotals.carbsSimple.toFixed(1)}g</div>
+                                            </div>
+                                            <div>
+                                                <div className="text-[9px] text-green-700/80">Complex</div>
+                                                <div className="font-semibold">{advancedTotals.carbsComplex.toFixed(1)}g</div>
+                                            </div>
+                                            <div>
+                                                <div className="text-[9px] text-green-700/80">Fiber</div>
+                                                <div className="font-semibold">{advancedTotals.fiber.toFixed(1)}g</div>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                                <div className="bg-blue-50 rounded px-2 py-1">
+                                    <div className="text-sm font-bold text-blue-600">{totals.protein}g</div>
+                                    <div className="text-xs text-blue-500">Protein</div>
+                                    {showAdvanced && (
+                                        <div className="mt-0.5 grid grid-cols-2 gap-1 text-[10px] text-blue-600">
+                                            <div>
+                                                <div className="text-[9px] text-blue-700/80">Complete</div>
+                                                <div className="font-semibold">{advancedTotals.proteinComplete.toFixed(1)}g</div>
+                                            </div>
+                                            <div>
+                                                <div className="text-[9px] text-blue-700/80">Incomplete</div>
+                                                <div className="font-semibold">{advancedTotals.proteinIncomplete.toFixed(1)}g</div>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                                <div className="bg-yellow-50 rounded px-2 py-1">
+                                    <div className="text-sm font-bold text-yellow-600">{totals.fat}g</div>
+                                    <div className="text-xs text-yellow-500">Fat</div>
+                                    {showAdvanced && (
+                                        <div className="mt-0.5 grid grid-cols-3 gap-1 text-[10px] text-yellow-600">
+                                            <div>
+                                                <div className="text-[9px] text-yellow-700/80">Unsat</div>
+                                                <div className="font-semibold">{advancedTotals.fatsUnsaturated.toFixed(1)}g</div>
+                                            </div>
+                                            <div>
+                                                <div className="text-[9px] text-yellow-700/80">Sat</div>
+                                                <div className="font-semibold">{advancedTotals.fatsSaturated.toFixed(1)}g</div>
+                                            </div>
+                                            <div>
+                                                <div className="text-[9px] text-yellow-700/80">Trans</div>
+                                                <div className="font-semibold">{advancedTotals.fatsTrans.toFixed(1)}g</div>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
                             </div>
-                            <div className="bg-green-50 rounded px-2 py-1">
-                                <div className="text-sm font-bold text-green-600">{totals.carbs}g</div>
-                                <div className="text-xs text-green-500">Carbs</div>
-                            </div>
-                            <div className="bg-blue-50 rounded px-2 py-1">
-                                <div className="text-sm font-bold text-blue-600">{totals.protein}g</div>
-                                <div className="text-xs text-blue-500">Protein</div>
-                            </div>
-                            <div className="bg-yellow-50 rounded px-2 py-1">
-                                <div className="text-sm font-bold text-yellow-600">{totals.fat}g</div>
-                                <div className="text-xs text-yellow-500">Fat</div>
-                            </div>
-                        </div>
+                        )}
                     </div>
 
                     {/* Foods List */}
@@ -232,7 +293,7 @@ export default function MealCard({ meal, onDelete, onUpdate, onAddFood, onRemove
                                             onClick={() => handleRemoveFood(food.id)}
                                             className="perfect-circle bg-red-100 hover:bg-red-200 text-red-600 flex items-center justify-center transition-colors"
                                             style={{ '--circle-size': '24px' } as React.CSSProperties}
-                                            title="Remove from meal"
+                                            title="Delete food"
                                         >
                                             <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -245,7 +306,17 @@ export default function MealCard({ meal, onDelete, onUpdate, onAddFood, onRemove
                     </div>
                 </div>
 
-                <div className="absolute top-1 right-1 flex flex-col items-end">
+                <div className="absolute top-1 right-1 flex items-center space-x-1">
+                    <button
+                        onClick={() => onOpenAddFood && onOpenAddFood(meal.id)}
+                        className="perfect-circle bg-purple-100 hover:bg-purple-200 text-purple-600 flex items-center justify-center transition-colors"
+                        style={{ '--circle-size': '28px' } as React.CSSProperties}
+                        title="Add food"
+                    >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                        </svg>
+                    </button>
                     <button
                         onClick={() => setShowDeleteConfirm(true)}
                         className="perfect-circle bg-red-100 hover:bg-red-200 text-red-600 flex items-center justify-center transition-colors"
