@@ -256,7 +256,7 @@ function MealCard({ meal, onDelete, onUpdate, onAddFood, onRemoveFood, onMoveFoo
                                     onDragStart={(e) => handleFoodDragStart(e, food)}
                                     className="relative flex items-start bg-purple-50 dark:bg-gray-800 rounded p-1.5 border border-purple-100 dark:border-gray-700 cursor-grab active:cursor-grabbing hover:bg-purple-100 dark:hover:bg-gray-700 transition-colors"
                                 >
-                                    <div className="flex-1 min-w-0 pr-16 sm:pr-20">
+                                    <div className="flex-1 min-w-0">
                                         <div className="text-xs font-medium text-purple-500 dark:text-purple-50 break-words text-center">
                                             {food.name} <span className="text-purple-400 dark:text-purple-300">• {food.calories} cal</span>
                                         </div>
@@ -294,7 +294,7 @@ function MealCard({ meal, onDelete, onUpdate, onAddFood, onRemoveFood, onMoveFoo
                                             <div className="text-xs text-purple-500 dark:text-purple-300 italic break-words whitespace-normal mt-1 px-2 py-1 rounded border-2 border-purple-400/20 dark:border-purple-500/20 bg-purple-500/5 shadow-[0_0_12px_rgba(168,85,247,0.35)]">{food.notes}</div>
                                         )}
                                     </div>
-                                    <div className="absolute right-1 top-1 flex items-center space-x-1 sm:space-x-2">
+                                    <div className="absolute right-1 top-1 sm:top-1 flex items-center space-x-1 sm:space-x-2 z-10 transform -translate-y-1 sm:translate-y-0">
                                         <button
                                             onClick={() => onEditFood(food)}
                                             className="perfect-circle bg-blue-100 hover:bg-blue-200 text-blue-600 dark:bg-blue-900/30 dark:hover:bg-blue-900/50 dark:text-blue-300 flex items-center justify-center transition-colors"
