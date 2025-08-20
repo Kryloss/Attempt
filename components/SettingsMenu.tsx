@@ -2,6 +2,7 @@
 
 import { User } from '@/types/auth'
 import { useEffect, useRef, useState } from 'react'
+import { useWeightUnit } from './WeightUnitContext'
 
 interface SettingsMenuProps {
     user: User
@@ -15,6 +16,7 @@ export default function SettingsMenu({ user, onSignOut, onSignIn, onClose }: Set
     const [headerOffset, setHeaderOffset] = useState<number>(64)
     const [advancedNutrition, setAdvancedNutrition] = useState(false)
     const [darkMode, setDarkMode] = useState(false)
+    const { weightUnit, setWeightUnit } = useWeightUnit()
 
     // Load and persist Advanced Nutrition setting
     useEffect(() => {
@@ -179,6 +181,26 @@ export default function SettingsMenu({ user, onSignOut, onSignIn, onClose }: Set
                             />
                             <span className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${advancedNutrition ? 'bg-purple-500' : 'bg-purple-200'}`}>
                                 <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${advancedNutrition ? 'translate-x-6' : 'translate-x-1'}`} />
+                            </span>
+                        </label>
+                    </div>
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <h4 className="font-semibold text-purple-800 dark:text-purple-200 text-xs sm:text-sm">Weight unit</h4>
+                            <p className="text-purple-500 dark:text-purple-300 text-[11px] sm:text-xs">Switch between kg and lbs for workouts</p>
+                        </div>
+                        <label className="relative inline-flex items-center cursor-pointer">
+                            <input
+                                type="checkbox"
+                                checked={weightUnit === 'lbs'}
+                                onChange={() => setWeightUnit(weightUnit === 'kg' ? 'lbs' : 'kg')}
+                                className="sr-only"
+                            />
+                            <span className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${weightUnit === 'lbs' ? 'bg-purple-500' : 'bg-purple-200'}`}>
+                                <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${weightUnit === 'lbs' ? 'translate-x-6' : 'translate-x-1'}`} />
+                                <span className={`absolute text-[10px] font-bold transition-all duration-200 ${weightUnit === 'kg' ? 'right-1 text-purple-600' : 'left-1 text-white'} top-1.5`}>
+                                    {weightUnit === 'kg' ? 'KG' : 'LBS'}
+                                </span>
                             </span>
                         </label>
                     </div>

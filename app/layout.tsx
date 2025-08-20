@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google'
 import './globals.css'
 import { DateProvider } from '@/components/DateContext'
 import { ModalProvider } from '@/components/ModalContext'
+import { WeightUnitProvider } from '@/components/WeightUnitContext'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -70,7 +71,9 @@ export default function RootLayout({
                 />
                 <ModalProvider>
                     <DateProvider>
-                        {children}
+                        <WeightUnitProvider>
+                            {children}
+                        </WeightUnitProvider>
                     </DateProvider>
                 </ModalProvider>
             </body>

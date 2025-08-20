@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useWeightUnit } from './WeightUnitContext'
 
 interface Exercise {
     name: string
@@ -16,6 +17,7 @@ interface AddExerciseModalProps {
 }
 
 export default function AddExerciseModal({ onClose, onAdd }: AddExerciseModalProps) {
+    const { weightUnit, convertWeight } = useWeightUnit()
     const [formData, setFormData] = useState<Exercise>({
         name: '',
         sets: 3,
@@ -27,7 +29,12 @@ export default function AddExerciseModal({ onClose, onAdd }: AddExerciseModalPro
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault()
         if (formData.name.trim() && formData.sets > 0 && formData.reps > 0) {
-            onAdd(formData)
+            // Convert weight from display unit to kg for storage if weight is provided
+            const exerciseData = { ...formData }
+            if (exerciseData.weight !== undefined && weightUnit === 'lbs') {
+                exerciseData.weight = convertWeight(exerciseData.weight, 'lbs', 'kg')
+            }
+            onAdd(exerciseData)
         }
     }
 
@@ -107,17 +114,40 @@ export default function AddExerciseModal({ onClose, onAdd }: AddExerciseModalPro
                         {/* Weight */}
                         <div>
                             <label className="block text-xs font-medium text-purple-700 dark:text-purple-300 mb-0.5">
-                                Weight (kg)
+                                Weight ({weightUnit})
                             </label>
                             <input
-                                type="number"
+                                type="text"
                                 value={formData.weight || ''}
-                                onChange={(e) => handleInputChange('weight', e.target.value ? parseFloat(e.target.value.slice(0, 7)) : undefined)}
-                                min="0"
-                                step="0.5"
+                                onChange={(e) => {
+                                    let value = e.target.value
+
+                                    // Allow only numbers and one decimal point
+                                    value = value.replace(/[^0-9.]/g, '')
+                                    // Ensure only one decimal point
+                                    const parts = value.split('.')
+                                    if (parts.length > 2) {
+                                        value = parts[0] + '.' + parts.slice(1).join('')
+                                    }
+
+                                    // Limit to max 4 digits before decimal and 2 after
+                                    if (parts.length === 2) {
+                                        const beforeDecimal = parts[0].slice(0, 4)
+                                        const afterDecimal = parts[1].slice(0, 2)
+                                        value = beforeDecimal + '.' + afterDecimal
+                                    } else if (parts.length === 1) {
+                                        value = parts[0].slice(0, 4)
+                                    }
+
+                                    // Store the raw string value temporarily, will be converted to number on submit
+                                    setFormData(prev => ({
+                                        ...prev,
+                                        weight: value ? parseFloat(value) : undefined
+                                    }))
+                                }}
                                 maxLength={7}
                                 inputMode="decimal"
-                                className="w-full px-2 py-1 border border-purple-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-xs dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700 dark:focus:ring-purple-700"
+                                className="w-full px-2 py-1 border border-purple-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-xs dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700 dark:focus:ring-purple-500"
                                 placeholder="Optional"
                             />
                         </div>

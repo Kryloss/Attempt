@@ -263,25 +263,25 @@ function MealCard({ meal, onDelete, onUpdate, onAddFood, onRemoveFood, onMoveFoo
                                         {/* per-food inline macros removed per request */}
                                         {showAdvanced && (
                                             <div className="mt-0.5">
-                                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-1 text-[10px]">
-                                                    <div className="text-xs text-green-500 dark:text-green-500 text-center">
+                                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-0.5 text-[10px]">
+                                                    <div className="text-xs text-green-500 dark:text-green-500 text-center rounded p-0.5 border border-green-300/30 bg-green-500/2 shadow-[0_0_6px_rgba(16,185,129,0.15)]">
                                                         <div className="font-medium">Carbs: {Number(food.carbs ?? 0).toFixed(1)}g</div>
-                                                        <div className="mt-0.5 flex items-center justify-center gap-2">
+                                                        <div className="mt-0.5 flex items-center justify-center gap-1">
                                                             <span>Simple {Number(food.carbsSimple ?? 0).toFixed(1)}g</span>
                                                             <span>Complex {Number(food.carbsComplex ?? 0).toFixed(1)}g</span>
                                                             <span>Fiber {Number(food.fiber ?? 0).toFixed(1)}g</span>
                                                         </div>
                                                     </div>
-                                                    <div className="text-xs text-blue-500 dark:text-blue-500 text-center">
+                                                    <div className="text-xs text-blue-500 dark:text-blue-500 text-center rounded p-0.5 border border-blue-300/30 bg-blue-500/2 shadow-[0_0_6px_rgba(59,130,246,0.15)]">
                                                         <div className="font-medium">Proteins: {Number(food.protein ?? 0).toFixed(1)}g</div>
-                                                        <div className="mt-0.5 flex items-center justify-center gap-2">
+                                                        <div className="mt-0.5 flex items-center justify-center gap-1">
                                                             <span>Complete {Number(food.proteinComplete ?? 0).toFixed(1)}g</span>
                                                             <span>Incomplete {Number(food.proteinIncomplete ?? 0).toFixed(1)}g</span>
                                                         </div>
                                                     </div>
-                                                    <div className="text-xs text-yellow-500 dark:text-yellow-500 text-center">
+                                                    <div className="text-xs text-yellow-500 dark:text-yellow-500 text-center rounded p-0.5 border border-yellow-300/30 bg-yellow-500/2 shadow-[0_0_6px_rgba(234,179,8,0.15)]">
                                                         <div className="font-medium">Fats: {Number(food.fat ?? 0).toFixed(1)}g</div>
-                                                        <div className="mt-0.5 flex items-center justify-center gap-2">
+                                                        <div className="mt-0.5 flex items-center justify-center gap-1">
                                                             <span>Unsat {Number(food.fatsUnsaturated ?? 0).toFixed(1)}g</span>
                                                             <span>Sat {Number(food.fatsSaturated ?? 0).toFixed(1)}g</span>
                                                             <span>Trans {Number(food.fatsTrans ?? 0).toFixed(1)}g</span>
@@ -296,16 +296,6 @@ function MealCard({ meal, onDelete, onUpdate, onAddFood, onRemoveFood, onMoveFoo
                                     </div>
                                     <div className="flex flex-col items-center space-y-1 ml-2 flex-shrink-0">
                                         <button
-                                            onClick={() => onEditFood(food)}
-                                            className="perfect-circle bg-blue-100 hover:bg-blue-200 text-blue-600 dark:bg-blue-900/30 dark:hover:bg-blue-900/50 dark:text-blue-300 flex items-center justify-center transition-colors"
-                                            style={{ '--circle-size': '20px' } as React.CSSProperties}
-                                            title="Edit food"
-                                        >
-                                            <svg className="w-2.5 h-2.5 sm:w-3 sm:h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                            </svg>
-                                        </button>
-                                        <button
                                             onClick={() => handleRemoveFood(food.id)}
                                             className="perfect-circle bg-red-100 hover:bg-red-200 text-red-600 dark:bg-red-900/30 dark:hover:bg-red-900/50 dark:text-red-300 flex items-center justify-center transition-colors"
                                             style={{ '--circle-size': '20px' } as React.CSSProperties}
@@ -313,6 +303,16 @@ function MealCard({ meal, onDelete, onUpdate, onAddFood, onRemoveFood, onMoveFoo
                                         >
                                             <svg className="w-2.5 h-2.5 sm:w-3 sm:h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                            </svg>
+                                        </button>
+                                        <button
+                                            onClick={() => onEditFood(food)}
+                                            className="perfect-circle bg-blue-100 hover:bg-blue-200 text-blue-600 dark:bg-blue-900/30 dark:hover:bg-blue-900/50 dark:text-blue-300 flex items-center justify-center transition-colors"
+                                            style={{ '--circle-size': '20px' } as React.CSSProperties}
+                                            title="Edit food"
+                                        >
+                                            <svg className="w-2.5 h-2.5 sm:w-3 sm:h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                             </svg>
                                         </button>
                                     </div>

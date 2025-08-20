@@ -8,6 +8,7 @@ import TrainingNameDropdown from './TrainingNameDropdown'
 import { TrainingService, TrainingData, TrainingPresetData } from '@/lib/training-service'
 import { User } from '@/types/auth'
 import { useModal } from './ModalContext'
+import { useWeightUnit } from './WeightUnitContext'
 
 interface Exercise {
     id: string
@@ -40,6 +41,8 @@ export default function TrainingTab({ user }: TrainingTabProps) {
         workoutDates,
         setWorkoutDates
     } = useDateContext()
+
+    const { weightUnit } = useWeightUnit()
 
     const { openModal, closeModal, openModals } = useModal()
 
@@ -993,6 +996,12 @@ export default function TrainingTab({ user }: TrainingTabProps) {
 
         loadWorkoutDates()
     }, [user, currentTraining])
+
+    // Force re-render when weight unit changes to update weight displays
+    useEffect(() => {
+        // This will trigger a re-render of ExerciseCard components
+        // to show weights in the new unit
+    }, [weightUnit])
 
     return (
         <div className="space-y-2 sm:space-y-3">

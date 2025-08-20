@@ -105,7 +105,7 @@ export default function AppLayout({ children, user, onSignOut, activeTab, onTabC
             )}
 
             {/* Main Content */}
-            <div className="relative z-10 pt-12 sm:pt-16 pb-12 sm:pb-16 text-gray-900 dark:text-gray-100">
+            <div key={pathname} className="route-anim relative z-10 pt-12 sm:pt-16 pb-12 sm:pb-16 text-gray-900 dark:text-gray-100">
                 {children}
             </div>
 
@@ -120,6 +120,7 @@ export default function AppLayout({ children, user, onSignOut, activeTab, onTabC
                                 <Link
                                     key={tab.id}
                                     href={tab.path}
+                                    prefetch
                                     className={`flex flex-col items-center py-0.5 px-2 sm:px-4 transition-all duration-200 ${isActive
                                         ? 'text-purple-500 transform scale-110'
                                         : 'text-purple-400 hover:text-purple-500'

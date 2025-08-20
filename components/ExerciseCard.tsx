@@ -1,6 +1,7 @@
 'use client'
 
 import { memo, useState } from 'react'
+import { useWeightUnit } from './WeightUnitContext'
 
 interface Exercise {
     id: string
@@ -21,6 +22,7 @@ function ExerciseCard({ exercise, onDelete, onUpdate }: ExerciseCardProps) {
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
     const [editingField, setEditingField] = useState<string | null>(null)
     const [editValue, setEditValue] = useState<string>('')
+    const { weightUnit, convertWeight, formatWeight } = useWeightUnit()
 
     const handleDelete = () => {
         onDelete(exercise.id)
@@ -81,7 +83,8 @@ function ExerciseCard({ exercise, onDelete, onUpdate }: ExerciseCardProps) {
         } else if (editingField === 'weight') {
             const numValue = parseFloat(editValue)
             if (!isNaN(numValue) && numValue >= 0) {
-                parsedValue = numValue
+                // Convert from display unit to kg for storage
+                parsedValue = convertWeight(numValue, weightUnit, 'kg')
             } else {
                 setEditingField(null)
                 setEditValue('')
@@ -116,12 +119,34 @@ function ExerciseCard({ exercise, onDelete, onUpdate }: ExerciseCardProps) {
                         value={editValue}
                         onChange={(e) => {
                             const maxLen = field === 'weight' ? 7 : 4
-                            setEditValue(e.target.value.slice(0, maxLen))
+                            let value = e.target.value
+
+                            // Allow decimal input for weight field
+                            if (field === 'weight') {
+                                // Allow only numbers and one decimal point
+                                value = value.replace(/[^0-9.]/g, '')
+                                // Ensure only one decimal point
+                                const parts = value.split('.')
+                                if (parts.length > 2) {
+                                    value = parts[0] + '.' + parts.slice(1).join('')
+                                }
+
+                                // Limit to max 4 digits before decimal and 2 after
+                                if (parts.length === 2) {
+                                    const beforeDecimal = parts[0].slice(0, 4)
+                                    const afterDecimal = parts[1].slice(0, 2)
+                                    value = beforeDecimal + '.' + afterDecimal
+                                } else if (parts.length === 1) {
+                                    value = parts[0].slice(0, 4)
+                                }
+                            }
+
+                            setEditValue(value.slice(0, maxLen))
                         }}
                         onBlur={saveEdit}
                         onKeyDown={handleKeyPress}
                         maxLength={field === 'weight' ? 7 : 4}
-                        inputMode="numeric"
+                        inputMode={field === 'weight' ? 'decimal' : 'numeric'}
                         className={`text-lg font-bold text-purple-500 bg-purple-50 border border-purple-300 rounded px-1 py-0.5 text-center ${field === 'weight' ? 'w-20' : 'w-16'} focus:outline-none focus:border-purple-500`}
                         autoFocus
                     />
@@ -131,10 +156,18 @@ function ExerciseCard({ exercise, onDelete, onUpdate }: ExerciseCardProps) {
         }
 
         return (
-            <div className="text-center" onClick={() => startEditing(field, value)}>
+            <div className="text-center" onClick={() => {
+                if (field === 'weight' && exercise.weight) {
+                    // Convert from kg to display unit for editing
+                    const displayWeight = convertWeight(exercise.weight, 'kg', weightUnit)
+                    startEditing(field, displayWeight)
+                } else {
+                    startEditing(field, value)
+                }
+            }}>
                 <div className="inline-block rounded px-5 py-0.5 cursor-pointer hover:bg-purple-50 transition-colors">
                     <div className="text-lg font-bold text-purple-500">
-                        {field === 'weight' && value ? `${value}${unit || 'kg'}` : value || '-'}
+                        {field === 'weight' && exercise.weight ? convertWeight(exercise.weight, 'kg', weightUnit) : value || '-'}
                     </div>
                     <div className="text-sm text-purple-500 font-medium">{label}</div>
                 </div>
@@ -203,7 +236,7 @@ function ExerciseCard({ exercise, onDelete, onUpdate }: ExerciseCardProps) {
                     <div className="grid grid-cols-3 gap-0.5 mb-0">
                         {renderEditableValue('sets', exercise.sets, 'Sets')}
                         {renderEditableValue('reps', exercise.reps, 'Reps')}
-                        {renderEditableValue('weight', exercise.weight || 0, 'Weight', 'kg')}
+                        {renderEditableValue('weight', exercise.weight || 0, weightUnit.toUpperCase(), weightUnit)}
                     </div>
 
                     <div className="px-0">

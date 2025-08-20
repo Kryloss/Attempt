@@ -6,6 +6,7 @@ import AppLayout from '@/components/AppLayout'
 import TrainingTab from '@/components/TrainingTab'
 import LoadingSpinner from '@/components/LoadingSpinner'
 import { useRouter } from 'next/navigation'
+import { WeightUnitProvider } from '@/components/WeightUnitContext'
 
 export default function WorkoutsPageClient() {
     const [user, setUser] = useState<User | null>(null)
@@ -47,18 +48,20 @@ export default function WorkoutsPageClient() {
     }
 
     return (
-        <AppLayout
-            user={user}
-            onSignOut={handleSignOut}
-            activeTab="workouts"
-            onTabChange={() => { }}
-        >
-            <div className="container mx-auto px-4 sm:px-6">
-                <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">
+        <WeightUnitProvider>
+            <AppLayout
+                user={user}
+                onSignOut={handleSignOut}
+                activeTab="workouts"
+                onTabChange={() => { }}
+            >
+                <div className="container mx-auto px-4 sm:px-6">
+                    <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">
 
-                </h1>
-                <TrainingTab user={user} />
-            </div>
-        </AppLayout>
+                    </h1>
+                    <TrainingTab user={user} />
+                </div>
+            </AppLayout>
+        </WeightUnitProvider>
     )
 }
