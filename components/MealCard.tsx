@@ -256,8 +256,8 @@ function MealCard({ meal, onDelete, onUpdate, onAddFood, onRemoveFood, onMoveFoo
                                     onDragStart={(e) => handleFoodDragStart(e, food)}
                                     className="relative flex items-start bg-purple-50 dark:bg-gray-800 rounded p-1.5 border border-purple-100 dark:border-gray-700 cursor-grab active:cursor-grabbing hover:bg-purple-100 dark:hover:bg-gray-700 transition-colors"
                                 >
-                                    <div className="flex-1 min-w-0">
-                                        <div className="text-xs font-medium text-purple-500 dark:text-purple-50 truncate text-center">
+                                    <div className="flex-1 min-w-0 pr-16 sm:pr-20">
+                                        <div className="text-xs font-medium text-purple-500 dark:text-purple-50 break-words text-center">
                                             {food.name} <span className="text-purple-400 dark:text-purple-300">• {food.calories} cal</span>
                                         </div>
                                         {/* per-food inline macros removed per request */}
@@ -294,24 +294,24 @@ function MealCard({ meal, onDelete, onUpdate, onAddFood, onRemoveFood, onMoveFoo
                                             <div className="text-xs text-purple-500 dark:text-purple-300 italic break-words whitespace-normal mt-1 px-2 py-1 rounded border-2 border-purple-400/20 dark:border-purple-500/20 bg-purple-500/5 shadow-[0_0_12px_rgba(168,85,247,0.35)]">{food.notes}</div>
                                         )}
                                     </div>
-                                    <div className="absolute right-1 top-1 flex items-center space-x-2">
+                                    <div className="absolute right-1 top-1 flex items-center space-x-1 sm:space-x-2">
                                         <button
                                             onClick={() => onEditFood(food)}
                                             className="perfect-circle bg-blue-100 hover:bg-blue-200 text-blue-600 dark:bg-blue-900/30 dark:hover:bg-blue-900/50 dark:text-blue-300 flex items-center justify-center transition-colors"
-                                            style={{ '--circle-size': '24px' } as React.CSSProperties}
+                                            style={{ '--circle-size': '20px' } as React.CSSProperties}
                                             title="Edit food"
                                         >
-                                            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <svg className="w-2.5 h-2.5 sm:w-3 sm:h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                             </svg>
                                         </button>
                                         <button
                                             onClick={() => handleRemoveFood(food.id)}
                                             className="perfect-circle bg-red-100 hover:bg-red-200 text-red-600 dark:bg-red-900/30 dark:hover:bg-red-900/50 dark:text-red-300 flex items-center justify-center transition-colors"
-                                            style={{ '--circle-size': '24px' } as React.CSSProperties}
+                                            style={{ '--circle-size': '20px' } as React.CSSProperties}
                                             title="Delete food"
                                         >
-                                            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <svg className="w-2.5 h-2.5 sm:w-3 sm:h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                                             </svg>
                                         </button>
