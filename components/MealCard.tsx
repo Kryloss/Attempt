@@ -1,6 +1,7 @@
 'use client'
 
-import { useMemo, useState, memo } from 'react'
+import { useMemo, useState, memo, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 
 interface Food {
     id: string
@@ -50,6 +51,11 @@ function MealCard({ meal, onDelete, onUpdate, onAddFood, onRemoveFood, onMoveFoo
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
     const [editingField, setEditingField] = useState<string | null>(null)
     const [editValue, setEditValue] = useState<string>('')
+    const [isMounted, setIsMounted] = useState(false)
+
+    useEffect(() => {
+        setIsMounted(true)
+    }, [])
 
     // Calculate totals for the meal
     const totals = useMemo(() => {
@@ -351,29 +357,32 @@ function MealCard({ meal, onDelete, onUpdate, onAddFood, onRemoveFood, onMoveFoo
             </div>
 
             {/* Delete Confirmation Modal */}
-            {showDeleteConfirm && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-2 sm:p-4">
-                    <div className="bg-white dark:bg-gray-900 rounded-xl p-4 sm:p-6 w-full max-w-sm shadow-2xl">
-                        <h3 className="text-lg font-bold text-purple-800 dark:text-purple-200 mb-4">Delete Meal</h3>
-                        <p className="text-purple-600 dark:text-purple-300 mb-6 text-sm sm:text-base">
-                            Are you sure you want to delete "{meal.name}"? This action cannot be undone.
-                        </p>
-                        <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-3">
-                            <button
-                                onClick={() => setShowDeleteConfirm(false)}
-                                className="w-full sm:flex-1 bg-purple-100 text-purple-700 dark:bg-gray-800 dark:text-purple-300 py-2 px-4 rounded-lg hover:bg-purple-200 dark:hover:bg-gray-700 transition-colors text-sm sm:text-base"
-                            >
-                                Cancel
-                            </button>
-                            <button
-                                onClick={handleDelete}
-                                className="w-full sm:flex-1 bg-red-500 text-white py-2 px-4 rounded-lg hover:bg-red-600 transition-colors text-sm sm:text-base"
-                            >
-                                Delete
-                            </button>
+            {isMounted && showDeleteConfirm && createPortal(
+                (
+                    <div className="fixed inset-0 bg-black bg-opacity-50 z-[2147483647] flex items-center justify-center p-2 sm:p-4" onClick={() => setShowDeleteConfirm(false)}>
+                        <div className="bg-white dark:bg-gray-900 rounded-xl p-4 sm:p-6 w-full max-w-sm shadow-2xl mt-8 sm:mt-12" onClick={(e) => e.stopPropagation()}>
+                            <h3 className="text-lg font-bold text-purple-800 dark:text-purple-200 mb-4">Delete Meal</h3>
+                            <p className="text-purple-600 dark:text-purple-300 mb-6 text-sm sm:text-base">
+                                Are you sure you want to delete "{meal.name}"? This action cannot be undone.
+                            </p>
+                            <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-3">
+                                <button
+                                    onClick={() => setShowDeleteConfirm(false)}
+                                    className="w-full sm:flex-1 bg-purple-100 text-purple-700 dark:bg-gray-800 dark:text-purple-300 py-2 px-4 rounded-lg hover:bg-purple-200 dark:hover:bg-gray-700 transition-colors text-sm sm:text-base"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    onClick={handleDelete}
+                                    className="w-full sm:flex-1 bg-transparent text-red-600 border-2 border-red-400 py-2 px-4 rounded-lg hover:bg-red-50 transition-all text-sm sm:text-base dark:bg-red-500/10 dark:text-red-300 dark:border-red-400 dark:hover:bg-red-500/15 dark:shadow-[0_0_16px_rgba(239,68,68,0.45)] dark:hover:shadow-[0_0_24px_rgba(239,68,68,0.65)] focus:outline-none focus:ring-2 focus:ring-red-400/50"
+                                >
+                                    Delete
+                                </button>
+                            </div>
                         </div>
                     </div>
-                </div>
+                ),
+                document.body
             )}
         </div>
     )
