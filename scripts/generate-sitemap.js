@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 
 // Configuration
-const domain = 'https://attempt-three.vercel.app'; // Replace 'your-app-name' with your actual Vercel app name
+const domain = 'https://attempt-three.vercel.app'; // Your actual Vercel app domain
 const currentDate = new Date().toISOString().split('T')[0];
 
 // Define your complete site structure
