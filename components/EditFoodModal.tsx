@@ -286,7 +286,7 @@ export default function EditFoodModal({ isOpen, food, onClose, onSaveFood }: Edi
                                     <div className="mt-0.5 space-y-0.5">
                                         <div className="grid grid-cols-2 gap-1">
                                             <div>
-                                                <label className="block text-[10px] font-medium text-blue-500 dark:text-blue-300 mb-0.5">Complete</label>
+                                                <label className="block text-[10px] font-medium text-blue-500 dark:text-blue-500 mb-0.5">Complete</label>
                                                 <input
                                                     type="number"
                                                     value={formData.proteinComplete}
@@ -298,7 +298,7 @@ export default function EditFoodModal({ isOpen, food, onClose, onSaveFood }: Edi
                                                 />
                                             </div>
                                             <div>
-                                                <label className="block text-xs font-medium text-blue-500 dark:text-blue-500 mb-0.5">Incomplete</label>
+                                                <label className="block text-[10px] font-medium text-blue-500 dark:text-blue-500 mb-0.5">Incomplete</label>
                                                 <input
                                                     type="number"
                                                     value={formData.proteinIncomplete}

@@ -254,7 +254,7 @@ function MealCard({ meal, onDelete, onUpdate, onAddFood, onRemoveFood, onMoveFoo
                                     key={food.id}
                                     draggable
                                     onDragStart={(e) => handleFoodDragStart(e, food)}
-                                    className="relative flex items-start bg-purple-50 dark:bg-gray-800 rounded p-1.5 border border-purple-100 dark:border-gray-700 cursor-grab active:cursor-grabbing hover:bg-purple-100 dark:hover:bg-gray-700 transition-colors"
+                                    className="flex items-start bg-purple-50 dark:bg-gray-800 rounded p-1.5 border border-purple-100 dark:border-gray-700 cursor-grab active:cursor-grabbing hover:bg-purple-100 dark:hover:bg-gray-700 transition-colors"
                                 >
                                     <div className="flex-1 min-w-0">
                                         <div className="text-xs font-medium text-purple-500 dark:text-purple-50 break-words text-center">
@@ -264,19 +264,19 @@ function MealCard({ meal, onDelete, onUpdate, onAddFood, onRemoveFood, onMoveFoo
                                         {showAdvanced && (
                                             <div className="mt-0.5">
                                                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-1 text-[10px]">
-                                                    <div className="text-xs text-blue-500 dark:text-blue-500 text-center">
-                                                        <div className="font-medium">Proteins: {Number(food.protein ?? 0).toFixed(1)}g</div>
-                                                        <div className="mt-0.5 flex items-center justify-center gap-2">
-                                                            <span>Complete {Number(food.proteinComplete ?? 0).toFixed(1)}g</span>
-                                                            <span>Incomplete {Number(food.proteinIncomplete ?? 0).toFixed(1)}g</span>
-                                                        </div>
-                                                    </div>
                                                     <div className="text-xs text-green-500 dark:text-green-500 text-center">
                                                         <div className="font-medium">Carbs: {Number(food.carbs ?? 0).toFixed(1)}g</div>
                                                         <div className="mt-0.5 flex items-center justify-center gap-2">
                                                             <span>Simple {Number(food.carbsSimple ?? 0).toFixed(1)}g</span>
                                                             <span>Complex {Number(food.carbsComplex ?? 0).toFixed(1)}g</span>
                                                             <span>Fiber {Number(food.fiber ?? 0).toFixed(1)}g</span>
+                                                        </div>
+                                                    </div>
+                                                    <div className="text-xs text-blue-500 dark:text-blue-500 text-center">
+                                                        <div className="font-medium">Proteins: {Number(food.protein ?? 0).toFixed(1)}g</div>
+                                                        <div className="mt-0.5 flex items-center justify-center gap-2">
+                                                            <span>Complete {Number(food.proteinComplete ?? 0).toFixed(1)}g</span>
+                                                            <span>Incomplete {Number(food.proteinIncomplete ?? 0).toFixed(1)}g</span>
                                                         </div>
                                                     </div>
                                                     <div className="text-xs text-yellow-500 dark:text-yellow-500 text-center">
@@ -294,7 +294,7 @@ function MealCard({ meal, onDelete, onUpdate, onAddFood, onRemoveFood, onMoveFoo
                                             <div className="text-xs text-purple-500 dark:text-purple-300 italic break-words whitespace-normal mt-1 px-2 py-1 rounded border-2 border-purple-400/20 dark:border-purple-500/20 bg-purple-500/5 shadow-[0_0_12px_rgba(168,85,247,0.35)]">{food.notes}</div>
                                         )}
                                     </div>
-                                    <div className="absolute right-1 bottom-1 flex items-center space-x-1 sm:space-x-2 z-10">
+                                    <div className="flex flex-col items-center space-y-1 ml-2 flex-shrink-0">
                                         <button
                                             onClick={() => onEditFood(food)}
                                             className="perfect-circle bg-blue-100 hover:bg-blue-200 text-blue-600 dark:bg-blue-900/30 dark:hover:bg-blue-900/50 dark:text-blue-300 flex items-center justify-center transition-colors"

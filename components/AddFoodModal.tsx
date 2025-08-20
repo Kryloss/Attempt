@@ -442,7 +442,7 @@ export default function AddFoodModal({ isOpen, onClose, onAddFood }: AddFoodModa
             onClick={onClose}
         >
             <div
-                className="bg-white dark:bg-gray-900 rounded-xl w-full max-w-sm shadow-2xl max-h-[75vh] overflow-y-auto neon-surface light-surface"
+                className="bg-white dark:bg-gray-900 rounded-xl w-full max-w-md shadow-2xl max-h-[75vh] overflow-y-auto neon-surface light-surface"
                 onClick={(e) => e.stopPropagation()}
             >
                 <div className="p-1.5">
@@ -648,7 +648,7 @@ export default function AddFoodModal({ isOpen, onClose, onAddFood }: AddFoodModa
                                     <div className="mt-0.5">
                                         <div className="grid grid-cols-2 gap-1">
                                             <div>
-                                                <label className="block text-[10px] font-medium text-blue-500 dark:text-blue-300 mb-0.5">Complete</label>
+                                                <label className="block text-[10px] font-medium text-blue-500 dark:text-blue-500 mb-0.5">Complete</label>
                                                 <input
                                                     type="number"
                                                     value={formData.proteinComplete}
@@ -664,7 +664,7 @@ export default function AddFoodModal({ isOpen, onClose, onAddFood }: AddFoodModa
                                                 />
                                             </div>
                                             <div>
-                                                <label className="block text-[10px] font-medium text-blue-500 dark:text-blue-300 mb-0.5">Incomplete</label>
+                                                <label className="block text-[10px] font-medium text-blue-500 dark:text-blue-500 mb-0.5">Incomplete</label>
                                                 <input
                                                     type="number"
                                                     value={formData.proteinIncomplete}
