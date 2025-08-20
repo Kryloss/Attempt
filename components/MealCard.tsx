@@ -294,7 +294,7 @@ function MealCard({ meal, onDelete, onUpdate, onAddFood, onRemoveFood, onMoveFoo
                                             <div className="text-xs text-purple-500 dark:text-purple-300 italic break-words whitespace-normal mt-1 px-2 py-1 rounded border-2 border-purple-400/20 dark:border-purple-500/20 bg-purple-500/5 shadow-[0_0_12px_rgba(168,85,247,0.35)]">{food.notes}</div>
                                         )}
                                     </div>
-                                    <div className="absolute right-1 top-1 sm:top-1 flex items-center space-x-1 sm:space-x-2 z-10 transform -translate-y-1 sm:translate-y-0">
+                                    <div className="absolute right-1 bottom-1 flex items-center space-x-1 sm:space-x-2 z-10">
                                         <button
                                             onClick={() => onEditFood(food)}
                                             className="perfect-circle bg-blue-100 hover:bg-blue-200 text-blue-600 dark:bg-blue-900/30 dark:hover:bg-blue-900/50 dark:text-blue-300 flex items-center justify-center transition-colors"
