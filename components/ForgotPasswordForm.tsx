@@ -107,7 +107,7 @@ export default function ForgotPasswordForm({ onBackToSignIn }: ForgotPasswordFor
 
                 <form onSubmit={handleResetPassword} className="space-y-3">
                     <div>
-                        <label htmlFor="code" className="block text-sm font-medium text-purple-700 mb-1">
+                        <label htmlFor="code" className="block text-sm font-medium text-purple-700 dark:text-purple-300 mb-1">
                             Verification Code
                         </label>
                         <input
@@ -117,13 +117,13 @@ export default function ForgotPasswordForm({ onBackToSignIn }: ForgotPasswordFor
                             onChange={(e) => setCode(e.target.value)}
                             required
                             maxLength={6}
-                            className="w-full px-3 py-2 border border-purple-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm sm:text-base"
+                            className="w-full px-3 py-2 border border-purple-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700 dark:focus:ring-purple-700"
                             placeholder="Enter 6-digit code"
                         />
                     </div>
 
                     <div>
-                        <label htmlFor="newPassword" className="block text-sm font-medium text-purple-700 mb-1">
+                        <label htmlFor="newPassword" className="block text-sm font-medium text-purple-700 dark:text-purple-300 mb-1">
                             New Password
                         </label>
                         <input
@@ -133,13 +133,13 @@ export default function ForgotPasswordForm({ onBackToSignIn }: ForgotPasswordFor
                             onChange={(e) => setNewPassword(e.target.value)}
                             required
                             minLength={6}
-                            className="w-full px-3 py-2 border border-purple-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm sm:text-base"
+                            className="w-full px-3 py-2 border border-purple-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700 dark:focus:ring-purple-700"
                             placeholder="Enter new password"
                         />
                     </div>
 
                     <div>
-                        <label htmlFor="confirmPassword" className="block text-sm font-medium text-purple-700 mb-1">
+                        <label htmlFor="confirmPassword" className="block text-sm font-medium text-purple-700 dark:text-purple-300 mb-1">
                             Confirm New Password
                         </label>
                         <input
@@ -149,7 +149,7 @@ export default function ForgotPasswordForm({ onBackToSignIn }: ForgotPasswordFor
                             onChange={(e) => setConfirmPassword(e.target.value)}
                             required
                             minLength={6}
-                            className="w-full px-3 py-2 border border-purple-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm sm:text-base"
+                            className="w-full px-3 py-2 border border-purple-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700 dark:focus:ring-purple-700"
                             placeholder="Confirm new password"
                         />
                     </div>
@@ -157,7 +157,7 @@ export default function ForgotPasswordForm({ onBackToSignIn }: ForgotPasswordFor
                     <button
                         type="submit"
                         disabled={isLoading}
-                        className="w-full bg-purple-600 text-white py-2 px-4 rounded-lg hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm sm:text-base"
+                        className="w-full text-purple-500 dark:text-purple-300 py-2 px-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-colors border-2 border-purple-400 hover:border-purple-500 bg-purple-500/30 shadow-[0_0_16px_rgba(168,85,247,0.35)] disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         {isLoading ? 'Resetting Password...' : 'Reset Password'}
                     </button>
@@ -166,7 +166,7 @@ export default function ForgotPasswordForm({ onBackToSignIn }: ForgotPasswordFor
                 <div className="mt-4 text-center">
                     <button
                         onClick={() => setStep('email')}
-                        className="text-sm text-purple-600 hover:underline focus:outline-none"
+                        className=""
                     >
                         ← Back to email input
                     </button>
@@ -177,7 +177,7 @@ export default function ForgotPasswordForm({ onBackToSignIn }: ForgotPasswordFor
 
     return (
         <div className="w-full">
-            <h2 className="text-xl sm:text-2xl font-bold text-purple-800 mb-4 text-center">Forgot Password</h2>
+            <h2 className="text-xl sm:text-2xl font-bold text-purple-600 mb-4 text-center">Forgot Password</h2>
 
             <p className="text-xs sm:text-sm text-gray-600 mb-4 text-center">
                 Enter your email address and we'll send you a verification code to reset your password.
@@ -191,7 +191,7 @@ export default function ForgotPasswordForm({ onBackToSignIn }: ForgotPasswordFor
 
             <form onSubmit={handleSendCode} className="space-y-3">
                 <div>
-                    <label htmlFor="email" className="block text-sm font-medium text-purple-700 mb-1">
+                    <label htmlFor="email" className="block text-sm font-medium text-purple-700 dark:text-purple-300 mb-1">
                         Email Address
                     </label>
                     <input
@@ -200,7 +200,7 @@ export default function ForgotPasswordForm({ onBackToSignIn }: ForgotPasswordFor
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         required
-                        className="w-full px-3 py-2 border border-purple-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm sm:text-base"
+                        className="w-full px-3 py-2 border border-purple-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700 dark:focus:ring-purple-700"
                         placeholder="Enter your email address"
                     />
                 </div>
@@ -208,7 +208,7 @@ export default function ForgotPasswordForm({ onBackToSignIn }: ForgotPasswordFor
                 <button
                     type="submit"
                     disabled={isLoading}
-                    className="w-full bg-purple-600 text-white py-2 px-4 rounded-lg hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm sm:text-base"
+                    className="w-full text-purple-500 dark:text-purple-300 py-2 px-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-colors border-2 border-purple-400 hover:border-purple-500 bg-purple-500/10 shadow-[0_0_16px_rgba(168,85,247,0.35)] disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                     {isLoading ? 'Sending Code...' : 'Send Verification Code'}
                 </button>
@@ -217,7 +217,7 @@ export default function ForgotPasswordForm({ onBackToSignIn }: ForgotPasswordFor
             <div className="mt-4 text-center">
                 <button
                     onClick={onBackToSignIn}
-                    className="text-sm text-purple-600 hover:underline focus:outline-none"
+                    className="text-sm text-purple-500 hover:underline focus:outline-none"
                 >
                     ← Back to Sign In
                 </button>

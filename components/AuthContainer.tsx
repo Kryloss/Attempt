@@ -39,24 +39,26 @@ export default function AuthContainer({ onSuccess }: AuthContainerProps) {
 
     return (
         <div className="w-full">
-            {authMode === 'signup' ? (
-                <SignUpForm
-                    onSuccess={onSuccess}
-                    onSwitchToSignIn={handleSwitchToSignIn}
-                    onGuestMode={handleGuestMode}
-                />
-            ) : authMode === 'forgot-password' ? (
-                <ForgotPasswordForm
-                    onBackToSignIn={handleSwitchToSignIn}
-                />
-            ) : (
-                <SignInForm
-                    onSuccess={onSuccess}
-                    onSwitchToSignUp={handleSwitchToSignUp}
-                    onSwitchToForgotPassword={handleSwitchToForgotPassword}
-                    onGuestMode={handleGuestMode}
-                />
-            )}
+            <div className="bg-white/95 dark:bg-gray-900/90 backdrop-blur-lg rounded-2xl shadow-2xl border border-purple-200 dark:border-gray-800 p-6">
+                {authMode === 'signup' ? (
+                    <SignUpForm
+                        onSuccess={onSuccess}
+                        onSwitchToSignIn={handleSwitchToSignIn}
+                        onGuestMode={handleGuestMode}
+                    />
+                ) : authMode === 'forgot-password' ? (
+                    <ForgotPasswordForm
+                        onBackToSignIn={handleSwitchToSignIn}
+                    />
+                ) : (
+                    <SignInForm
+                        onSuccess={onSuccess}
+                        onSwitchToSignUp={handleSwitchToSignUp}
+                        onSwitchToForgotPassword={handleSwitchToForgotPassword}
+                        onGuestMode={handleGuestMode}
+                    />
+                )}
+            </div>
         </div>
     )
 }
