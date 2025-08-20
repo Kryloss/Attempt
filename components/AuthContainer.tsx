@@ -5,6 +5,7 @@ import SignInForm from './SignInForm'
 import SignUpForm from './SignUpForm'
 import ForgotPasswordForm from './ForgotPasswordForm'
 import { User } from '@/types/auth'
+import { useRouter } from 'next/navigation'
 
 interface AuthContainerProps {
     onSuccess: (user: User) => void
@@ -12,6 +13,7 @@ interface AuthContainerProps {
 
 export default function AuthContainer({ onSuccess }: AuthContainerProps) {
     const [authMode, setAuthMode] = useState<'signin' | 'signup' | 'forgot-password'>('signin')
+    const router = useRouter()
 
     const handleSwitchToSignUp = () => {
         setAuthMode('signup')
@@ -26,15 +28,8 @@ export default function AuthContainer({ onSuccess }: AuthContainerProps) {
     }
 
     const handleGuestMode = () => {
-        const guestUser: User = {
-            _id: 'guest',
-            username: 'Guest User',
-            email: 'guest@example.com',
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-            guest: true
-        }
-        onSuccess(guestUser)
+        // Redirect to guest workouts page
+        router.push('/guest/workouts')
     }
 
     return (

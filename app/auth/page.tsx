@@ -11,14 +11,10 @@ export default function AuthPage() {
 
     const handleAuthSuccess = (authenticatedUser: User) => {
         setUser(authenticatedUser)
-        // Store user data in localStorage
+        // Store user in localStorage
         localStorage.setItem('user', JSON.stringify(authenticatedUser))
-        // Redirect to workouts page after successful authentication
+        // Redirect to workouts page after successful auth
         router.push('/workouts')
-    }
-
-    const handleGuestMode = () => {
-        router.push('/guest/workouts')
     }
 
     // If user is already authenticated, redirect to workouts
@@ -30,9 +26,8 @@ export default function AuthPage() {
                 if (parsedUser && !parsedUser.guest) {
                     router.push('/workouts')
                 }
-            } catch (error) {
-                console.error('Error parsing stored user:', error)
-                localStorage.removeItem('user')
+            } catch (e) {
+                // Invalid stored user, continue to auth
             }
         }
     }, [router])
@@ -51,17 +46,7 @@ export default function AuthPage() {
                         Your Useful Tool for Hard Work
                     </p>
                 </div>
-
                 <AuthContainer onSuccess={handleAuthSuccess} />
-
-                <div className="mt-6 text-center">
-                    <button
-                        onClick={handleGuestMode}
-                        className="text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 text-sm font-medium transition-colors"
-                    >
-                        Continue as Guest
-                    </button>
-                </div>
             </div>
         </div>
     )
