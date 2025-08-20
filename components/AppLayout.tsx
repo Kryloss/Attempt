@@ -112,7 +112,7 @@ export default function AppLayout({ children, user, onSignOut, activeTab, onTabC
             {/* Bottom Tab Navigation */}
             <nav className={`fixed bottom-0 left-0 right-0 bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm border-t border-purple-200 dark:border-gray-800 shadow-lg z-20 transition-transform duration-300 neon-surface light-surface ${isAnyModalOpen ? 'translate-y-full' : 'translate-y-0'
                 }`}>
-                <div className="px-4 sm:px-6 py-0.5">
+                <div className="px-4 sm:px-6 py-0">
                     <div className="flex justify-around">
                         {tabs.map((tab) => {
                             const isActive = pathname === tab.path
@@ -121,15 +121,15 @@ export default function AppLayout({ children, user, onSignOut, activeTab, onTabC
                                     key={tab.id}
                                     href={tab.path}
                                     prefetch
-                                    className={`flex flex-col items-center py-0.5 px-2 sm:px-4 transition-all duration-200 ${isActive
-                                        ? 'text-purple-500 transform scale-110'
-                                        : 'text-purple-400 hover:text-purple-500'
+                                    className={`flex flex-col items-center py-0 px-2 sm:px-3 transition-all duration-300 rounded-lg ${isActive
+                                        ? 'text-purple-400 transform scale-105 bg-purple-500/10 border border-purple-400/50 shadow-[0_0_20px_rgba(168,85,247,0.6)] backdrop-blur-sm neon-tab-active'
+                                        : 'text-purple-400 hover:text-purple-500 hover:bg-purple-500/5'
                                         }`}
                                 >
-                                    <span className="mb-0.5 text-base sm:text-lg">{tab.icon}</span>
-                                    <span className="text-xs font-medium">{tab.label}</span>
+                                    <span className="mb-0 text-sm sm:text-base">{tab.icon}</span>
+                                    <span className="text-[10px] sm:text-xs font-medium">{tab.label}</span>
                                     {isActive && (
-                                        <div className="w-3 sm:w-4 h-0.5 bg-purple-500 rounded-full mt-0.5 animate-pulse"></div>
+                                        <div className="w-12 sm:w-16 h-0.5 bg-gradient-to-r from-purple-400 to-purple-500 rounded-full mt-0 shadow-[0_0_8px_rgba(168,85,247,0.8)] animate-pulse"></div>
                                     )}
                                 </Link>
                             )
