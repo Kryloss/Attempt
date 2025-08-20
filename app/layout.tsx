@@ -14,6 +14,9 @@ export const metadata: Metadata = {
         shortcut: '/favicon.svg',
         apple: '/favicon.svg',
     },
+    verification: {
+        google: 'Ho3GkE1-ntcv9iTz4yNlC2Pe9wQYYVr_6pMql-G_WSM',
+    },
 }
 
 export const viewport: Viewport = {
