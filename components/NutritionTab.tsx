@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useMemo } from 'react'
 import { useDateContext } from './DateContext'
 import DateCard from './DateCard'
 import MealCard from './MealCard'
@@ -100,39 +100,42 @@ export default function NutritionTab({ user }: NutritionTabProps) {
     }, [])
 
     // Calculate daily totals
-    const dailyTotals = (meals || []).reduce((acc, meal) => {
-        // Ensure meal.foods exists and is an array
-        const foods = meal?.foods || []
-        const mealTotals = foods.reduce((mealAcc, food) => ({
-            calories: mealAcc.calories + (food?.calories || 0),
-            carbs: mealAcc.carbs + (food?.carbs || 0),
-            protein: mealAcc.protein + (food?.protein || 0),
-            fat: mealAcc.fat + (food?.fat || 0)
-        }), { calories: 0, carbs: 0, protein: 0, fat: 0 })
+    const dailyTotals = useMemo(() => {
+        return (meals || []).reduce((acc, meal) => {
+            const foods = meal?.foods || []
+            const mealTotals = foods.reduce((mealAcc, food) => ({
+                calories: mealAcc.calories + (food?.calories || 0),
+                carbs: mealAcc.carbs + (food?.carbs || 0),
+                protein: mealAcc.protein + (food?.protein || 0),
+                fat: mealAcc.fat + (food?.fat || 0)
+            }), { calories: 0, carbs: 0, protein: 0, fat: 0 })
 
-        return {
-            calories: acc.calories + mealTotals.calories,
-            carbs: acc.carbs + mealTotals.carbs,
-            protein: acc.protein + mealTotals.protein,
-            fat: acc.fat + mealTotals.fat
-        }
-    }, { calories: 0, carbs: 0, protein: 0, fat: 0 })
+            return {
+                calories: acc.calories + mealTotals.calories,
+                carbs: acc.carbs + mealTotals.carbs,
+                protein: acc.protein + mealTotals.protein,
+                fat: acc.fat + mealTotals.fat
+            }
+        }, { calories: 0, carbs: 0, protein: 0, fat: 0 })
+    }, [meals])
 
     // Advanced totals (optional)
-    const advancedTotals = (meals || []).reduce((acc, meal) => {
-        const foods = meal?.foods || []
-        foods.forEach(food => {
-            acc.proteinComplete += food.proteinComplete || 0
-            acc.proteinIncomplete += food.proteinIncomplete || 0
-            acc.carbsSimple += food.carbsSimple || 0
-            acc.carbsComplex += food.carbsComplex || 0
-            acc.fiber += food.fiber || 0
-            acc.fatsUnsaturated += food.fatsUnsaturated || 0
-            acc.fatsSaturated += food.fatsSaturated || 0
-            acc.fatsTrans += food.fatsTrans || 0
-        })
-        return acc
-    }, { proteinComplete: 0, proteinIncomplete: 0, carbsSimple: 0, carbsComplex: 0, fiber: 0, fatsUnsaturated: 0, fatsSaturated: 0, fatsTrans: 0 })
+    const advancedTotals = useMemo(() => {
+        return (meals || []).reduce((acc, meal) => {
+            const foods = meal?.foods || []
+            foods.forEach(food => {
+                acc.proteinComplete += food.proteinComplete || 0
+                acc.proteinIncomplete += food.proteinIncomplete || 0
+                acc.carbsSimple += food.carbsSimple || 0
+                acc.carbsComplex += food.carbsComplex || 0
+                acc.fiber += food.fiber || 0
+                acc.fatsUnsaturated += food.fatsUnsaturated || 0
+                acc.fatsSaturated += food.fatsSaturated || 0
+                acc.fatsTrans += food.fatsTrans || 0
+            })
+            return acc
+        }, { proteinComplete: 0, proteinIncomplete: 0, carbsSimple: 0, carbsComplex: 0, fiber: 0, fatsUnsaturated: 0, fatsSaturated: 0, fatsTrans: 0 })
+    }, [meals])
 
     // Show summary only when more than one meal has at least one food
     const mealsWithFoodsCount = (meals || []).filter(m => (m?.foods?.length || 0) > 0).length
@@ -257,7 +260,7 @@ export default function NutritionTab({ user }: NutritionTabProps) {
         loadNutritionData()
     }, [currentDate, user])
 
-    // Auto-save nutrition data
+    // Debounced auto-save nutrition data
     useEffect(() => {
         if (!currentNutrition) return
 
@@ -267,36 +270,45 @@ export default function NutritionTab({ user }: NutritionTabProps) {
             foods
         }
 
-        if (user && !user.guest && nutritionServiceRef.current) {
-            if (hasUnsavedChanges) {
-                setAutoSaveStatus('saving')
-                nutritionServiceRef.current.autoSave({
-                    id: updatedNutrition.id,
-                    date: updatedNutrition.date,
-                    meals: updatedNutrition.meals,
-                    foods: updatedNutrition.foods
-                }).then(() => {
-                    setAutoSaveStatus('saved')
-                    setTimeout(() => setAutoSaveStatus('idle'), 2000)
-                }).catch(() => {
-                    setAutoSaveStatus('error')
-                    setTimeout(() => setAutoSaveStatus('idle'), 3000)
-                })
-            }
-        } else {
-            // Guest: save to localStorage
-            const userId = user?._id || 'guest'
-            const storageKey = `nutrition_${userId}_${currentNutrition.date}`
-            localStorage.setItem(storageKey, JSON.stringify(updatedNutrition))
-            if (hasUnsavedChanges) {
-                setAutoSaveStatus('saving')
-                setTimeout(() => {
-                    setAutoSaveStatus('saved')
-                    setTimeout(() => setAutoSaveStatus('idle'), 2000)
-                }, 500)
+        let timeoutId: ReturnType<typeof setTimeout> | null = null
+
+        const triggerSave = () => {
+            if (user && !user.guest && nutritionServiceRef.current) {
+                if (hasUnsavedChanges) {
+                    setAutoSaveStatus('saving')
+                    nutritionServiceRef.current.autoSave({
+                        id: updatedNutrition.id,
+                        date: updatedNutrition.date,
+                        meals: updatedNutrition.meals,
+                        foods: updatedNutrition.foods
+                    }).then(() => {
+                        setAutoSaveStatus('saved')
+                        setTimeout(() => setAutoSaveStatus('idle'), 2000)
+                    }).catch(() => {
+                        setAutoSaveStatus('error')
+                        setTimeout(() => setAutoSaveStatus('idle'), 3000)
+                    })
+                }
+            } else {
+                const userId = user?._id || 'guest'
+                const storageKey = `nutrition_${userId}_${currentNutrition.date}`
+                localStorage.setItem(storageKey, JSON.stringify(updatedNutrition))
+                if (hasUnsavedChanges) {
+                    setAutoSaveStatus('saving')
+                    setTimeout(() => {
+                        setAutoSaveStatus('saved')
+                        setTimeout(() => setAutoSaveStatus('idle'), 2000)
+                    }, 500)
+                }
             }
         }
-    }, [meals, foods, currentNutrition, user])
+
+        timeoutId = setTimeout(triggerSave, 400)
+
+        return () => {
+            if (timeoutId) clearTimeout(timeoutId)
+        }
+    }, [meals, foods, currentNutrition, user, hasUnsavedChanges])
 
     // Update header with auto-save status (match Workout tab behavior)
     useEffect(() => {

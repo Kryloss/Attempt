@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useMemo, useState, memo } from 'react'
 
 interface Food {
     id: string
@@ -46,31 +46,35 @@ interface MealCardProps {
     showTotals?: boolean
 }
 
-export default function MealCard({ meal, onDelete, onUpdate, onAddFood, onRemoveFood, onMoveFood, onEditFood, onOpenAddFood, dragHandleProps, showAdvanced = false, showTotals = true }: MealCardProps) {
+function MealCard({ meal, onDelete, onUpdate, onAddFood, onRemoveFood, onMoveFood, onEditFood, onOpenAddFood, dragHandleProps, showAdvanced = false, showTotals = true }: MealCardProps) {
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
     const [editingField, setEditingField] = useState<string | null>(null)
     const [editValue, setEditValue] = useState<string>('')
 
     // Calculate totals for the meal
-    const totals = (meal?.foods || []).reduce((acc, food) => ({
-        calories: acc.calories + (food?.calories || 0),
-        carbs: acc.carbs + (food?.carbs || 0),
-        protein: acc.protein + (food?.protein || 0),
-        fat: acc.fat + (food?.fat || 0)
-    }), { calories: 0, carbs: 0, protein: 0, fat: 0 })
+    const totals = useMemo(() => {
+        return (meal?.foods || []).reduce((acc, food) => ({
+            calories: acc.calories + (food?.calories || 0),
+            carbs: acc.carbs + (food?.carbs || 0),
+            protein: acc.protein + (food?.protein || 0),
+            fat: acc.fat + (food?.fat || 0)
+        }), { calories: 0, carbs: 0, protein: 0, fat: 0 })
+    }, [meal?.foods])
 
     // Advanced subclass totals for the meal
-    const advancedTotals = (meal?.foods || []).reduce((acc, food) => {
-        acc.proteinComplete += food.proteinComplete || 0
-        acc.proteinIncomplete += food.proteinIncomplete || 0
-        acc.carbsSimple += food.carbsSimple || 0
-        acc.carbsComplex += food.carbsComplex || 0
-        acc.fiber += food.fiber || 0
-        acc.fatsUnsaturated += food.fatsUnsaturated || 0
-        acc.fatsSaturated += food.fatsSaturated || 0
-        acc.fatsTrans += food.fatsTrans || 0
-        return acc
-    }, { proteinComplete: 0, proteinIncomplete: 0, carbsSimple: 0, carbsComplex: 0, fiber: 0, fatsUnsaturated: 0, fatsSaturated: 0, fatsTrans: 0 })
+    const advancedTotals = useMemo(() => {
+        return (meal?.foods || []).reduce((acc, food) => {
+            acc.proteinComplete += food.proteinComplete || 0
+            acc.proteinIncomplete += food.proteinIncomplete || 0
+            acc.carbsSimple += food.carbsSimple || 0
+            acc.carbsComplex += food.carbsComplex || 0
+            acc.fiber += food.fiber || 0
+            acc.fatsUnsaturated += food.fatsUnsaturated || 0
+            acc.fatsSaturated += food.fatsSaturated || 0
+            acc.fatsTrans += food.fatsTrans || 0
+            return acc
+        }, { proteinComplete: 0, proteinIncomplete: 0, carbsSimple: 0, carbsComplex: 0, fiber: 0, fatsUnsaturated: 0, fatsSaturated: 0, fatsTrans: 0 })
+    }, [meal?.foods])
 
     const handleDelete = () => {
         onDelete(meal.id)
@@ -374,3 +378,5 @@ export default function MealCard({ meal, onDelete, onUpdate, onAddFood, onRemove
         </div>
     )
 }
+
+export default memo(MealCard)

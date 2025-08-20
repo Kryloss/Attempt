@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, Suspense, useEffect } from 'react'
+import Image from 'next/image'
 import dynamic from 'next/dynamic'
 import AuthContainer from '@/components/AuthContainer'
 import TrainingDashboard from '@/components/TrainingDashboard'
@@ -64,7 +65,7 @@ export default function Home() {
                 <div className="text-center relative z-10">
                     <div className="icon-container mx-auto mb-6 animate-float glow-purple">
                         <div className="w-16 h-16 bg-purple-600 rounded-full flex items-center justify-center">
-                            <img src="/favicon.svg" alt="gymNote Logo" className="w-10 h-10" />
+                            <Image src="/favicon.svg" alt="gymNote Logo" width={40} height={40} priority />
                         </div>
                     </div>
                     <h1 className="text-4xl sm:text-5xl font-bold text-purple-800 mb-4 font-display gradient-text">
@@ -100,7 +101,7 @@ export default function Home() {
                             {/* Fitness Logo */}
                             <div className="flex justify-center mb-4">
                                 <div className="w-16 h-16 bg-purple-600 rounded-full flex items-center justify-center shadow-lg">
-                                    <img src="/favicon.svg" alt="gymNote Logo" className="w-10 h-10" />
+                                    <Image src="/favicon.svg" alt="gymNote Logo" width={40} height={40} priority />
                                 </div>
                             </div>
                             <h1 className="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-purple-500 to-purple-500 bg-clip-text text-transparent mb-2 leading-tight pb-1">

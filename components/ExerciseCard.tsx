@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { memo, useState } from 'react'
 
 interface Exercise {
     id: string
@@ -17,7 +17,7 @@ interface ExerciseCardProps {
     onUpdate: (id: string, updatedExercise: Partial<Exercise>) => void
 }
 
-export default function ExerciseCard({ exercise, onDelete, onUpdate }: ExerciseCardProps) {
+function ExerciseCard({ exercise, onDelete, onUpdate }: ExerciseCardProps) {
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
     const [editingField, setEditingField] = useState<string | null>(null)
     const [editValue, setEditValue] = useState<string>('')
@@ -266,3 +266,4 @@ export default function ExerciseCard({ exercise, onDelete, onUpdate }: ExerciseC
         </div>
     )
 }
+export default memo(ExerciseCard)

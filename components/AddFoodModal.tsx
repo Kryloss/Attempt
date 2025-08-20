@@ -1,7 +1,10 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { USDAClient, USDAFood } from '@/lib/usda-service'
+import { USDAClient } from '@/lib/usda-service'
+import { CNFClient } from '@/lib/cnf-client'
+import { OFFClient } from '@/lib/off-service'
+import { CombinedSearchClient, CombinedSearchItem } from '@/lib/search-service'
 
 interface Food {
     id: string
@@ -47,14 +50,14 @@ export default function AddFoodModal({ isOpen, onClose, onAddFood }: AddFoodModa
         proteinIncomplete: ''
     })
 
-    // USDA search states
+    // Combined search states
     const [searchQuery, setSearchQuery] = useState('')
-    const [searchResults, setSearchResults] = useState<USDAFood[]>([])
+    const [searchResults, setSearchResults] = useState<CombinedSearchItem[]>([])
     const [isSearching, setIsSearching] = useState(false)
     const [searchError, setSearchError] = useState('')
 
-    const [selectedFood, setSelectedFood] = useState<USDAFood | null>(null)
-    const [detailedFoodData, setDetailedFoodData] = useState<USDAFood | null>(null) // Store detailed nutrition data
+    const [selectedItem, setSelectedItem] = useState<CombinedSearchItem | null>(null)
+    const [detailedFoodData, setDetailedFoodData] = useState<any | null>(null) // Store detailed nutrition data
     const [servingSize, setServingSize] = useState(100) // Default 100g serving
     const [isAutoCalculated, setIsAutoCalculated] = useState(false)
     const [advancedEnabled, setAdvancedEnabled] = useState(false)
@@ -83,7 +86,7 @@ export default function AddFoodModal({ isOpen, onClose, onAddFood }: AddFoodModa
         setFormData(prev => ({ ...prev, [field]: value }))
     }
 
-    // Search for foods using USDA API
+    // Search for foods using the combined API
     const searchFoods = async (query: string) => {
         if (!query.trim()) {
             setSearchResults([])
@@ -94,12 +97,8 @@ export default function AddFoodModal({ isOpen, onClose, onAddFood }: AddFoodModa
         setSearchError('')
 
         try {
-            const response = await USDAClient.searchFoods({
-                query: query.trim(),
-                pageSize: 10,
-                dataType: ['Branded', 'Foundation', 'SR Legacy']
-            })
-            setSearchResults(response.foods)
+            const response = await CombinedSearchClient.search(query.trim(), 10, 1)
+            setSearchResults(response.results)
         } catch (error) {
             console.error('Search error:', error)
             setSearchError('Failed to search foods. Please try again.')
@@ -123,17 +122,17 @@ export default function AddFoodModal({ isOpen, onClose, onAddFood }: AddFoodModa
     }, [searchQuery])
 
     // Get nutrition value by nutrient name
-    const getNutrientValue = (food: USDAFood, nutrientName: string): number => {
+    const getNutrientValue = (food: any, nutrientName: string): number => {
         if (!food.foodNutrients || !Array.isArray(food.foodNutrients)) return 0
 
-        const nutrient = food.foodNutrients.find(n =>
+        const nutrient = food.foodNutrients.find((n: any) =>
             n?.nutrient?.name?.toLowerCase()?.includes(nutrientName.toLowerCase())
         )
         return nutrient?.amount || 0
     }
 
     // Calculate nutrition values based on serving size
-    const calculateNutrition = (food: USDAFood, servingGrams: number) => {
+    const calculateNutrition = (food: any, servingGrams: number) => {
         if (!food || !servingGrams || servingGrams <= 0) {
             return { calories: 0, carbs: 0, protein: 0, fat: 0, fiber: 0, fatsSaturated: 0, fatsTrans: 0, fatsUnsaturated: 0, carbsSimple: 0, carbsComplex: 0, proteinComplete: 0, proteinIncomplete: 0 }
         }
@@ -210,40 +209,48 @@ export default function AddFoodModal({ isOpen, onClose, onAddFood }: AddFoodModa
     }
 
     // Handle food selection from search results
-    const handleFoodSelect = async (food: USDAFood) => {
-        if (!food || !food.fdcId) {
-            console.error('Invalid food data:', food)
+    const handleFoodSelect = async (item: CombinedSearchItem) => {
+        if (!item || !item.id) {
+            console.error('Invalid food item:', item)
             return
         }
 
-        setSelectedFood(food)
+        setSelectedItem(item)
         setSearchResults([])
         setSearchQuery('')
 
         try {
-            // Get detailed nutrition info (try full, then abridged)
-            let detailedFood = await USDAClient.getFoodDetails(food.fdcId, 'full')
-            let nutrition = calculateNutrition(detailedFood, servingSize)
-
-            // If "full" returns no usable macros, fallback to "abridged"
-            if ((nutrition.calories + nutrition.carbs + nutrition.protein + nutrition.fat) === 0) {
-                try {
-                    const abridged = await USDAClient.getFoodDetails(food.fdcId, 'abridged')
-                    detailedFood = abridged
-                    nutrition = calculateNutrition(abridged, servingSize)
-                } catch { /* ignore, we'll fall back to search result below */ }
+            // Get detailed nutrition info
+            let detailed: any = null
+            const numericId = parseInt(item.id)
+            if (item.source === 'OFF') {
+                const barcode = item.barcode || (item.id.startsWith('off:') ? item.id.slice(4) : '')
+                if (barcode) {
+                    detailed = await OFFClient.getProductByBarcode(barcode)
+                }
+            } else if (!isNaN(numericId)) {
+                if (item.source === 'USDA') {
+                    try {
+                        detailed = await USDAClient.getFoodDetails(numericId, 'full')
+                    } catch {
+                        detailed = await USDAClient.getFoodDetails(numericId, 'abridged')
+                    }
+                } else {
+                    detailed = await CNFClient.getFoodDetails(numericId)
+                }
             }
 
-            setDetailedFoodData(detailedFood)
+            if (!detailed) throw new Error('No details available')
 
-            // Update form with food data
+            const nutrition = calculateNutrition(detailed, servingSize)
+            setDetailedFoodData(detailed)
             setFormData({
-                name: food.description || 'Unknown Food',
+                name: (detailed.description as string) || item.name || 'Unknown Food',
                 calories: nutrition.calories.toString(),
                 carbs: nutrition.carbs.toString(),
                 protein: nutrition.protein.toString(),
                 fat: nutrition.fat.toString(),
-                notes: food.brandName ? `Brand: ${food.brandName}` : '',
+                notes: (detailed as any).brandName ? `Brand: ${(detailed as any).brandName}` : '',
                 fiber: nutrition.fiber ? nutrition.fiber.toString() : '',
                 fatsSaturated: nutrition.fatsSaturated ? nutrition.fatsSaturated.toString() : '',
                 fatsTrans: nutrition.fatsTrans ? nutrition.fatsTrans.toString() : '',
@@ -253,40 +260,21 @@ export default function AddFoodModal({ isOpen, onClose, onAddFood }: AddFoodModa
                 proteinComplete: nutrition.proteinComplete ? nutrition.proteinComplete.toString() : '',
                 proteinIncomplete: nutrition.proteinIncomplete ? nutrition.proteinIncomplete.toString() : ''
             })
-            // Mark auto if any values present
             setIsAutoCalculated((nutrition.calories + nutrition.carbs + nutrition.protein + nutrition.fat) > 0)
         } catch (error) {
             console.error('Error getting food details:', error)
-            // Fallback to basic info from search result
-            setDetailedFoodData(food) // Store what we have for serving size calculations
-
-            const nutrition = calculateNutrition(food, servingSize)
-            setFormData({
-                name: food.description || 'Unknown Food',
-                calories: nutrition.calories.toString(),
-                carbs: nutrition.carbs.toString(),
-                protein: nutrition.protein.toString(),
-                fat: nutrition.fat.toString(),
-                notes: food.brandName ? `Brand: ${food.brandName}` : '',
-                fiber: nutrition.fiber ? nutrition.fiber.toString() : '',
-                fatsSaturated: nutrition.fatsSaturated ? nutrition.fatsSaturated.toString() : '',
-                fatsTrans: nutrition.fatsTrans ? nutrition.fatsTrans.toString() : '',
-                fatsUnsaturated: nutrition.fatsUnsaturated ? nutrition.fatsUnsaturated.toString() : '',
-                carbsSimple: nutrition.carbsSimple ? nutrition.carbsSimple.toString() : '',
-                carbsComplex: nutrition.carbsComplex ? nutrition.carbsComplex.toString() : '',
-                proteinComplete: nutrition.proteinComplete ? nutrition.proteinComplete.toString() : '',
-                proteinIncomplete: nutrition.proteinIncomplete ? nutrition.proteinIncomplete.toString() : ''
-            })
-            setIsAutoCalculated((nutrition.calories + nutrition.carbs + nutrition.protein + nutrition.fat) > 0)
+            setDetailedFoodData(null)
+            setFormData(prev => ({ ...prev, name: item.name || prev.name }))
+            setIsAutoCalculated(false)
         }
     }
 
     // Update nutrition when serving size changes
     useEffect(() => {
-        if (detailedFoodData && selectedFood) {
+        if (detailedFoodData && selectedItem) {
             console.log('Recalculating nutrition for serving size:', servingSize)
-            console.log('Using detailed food data:', detailedFoodData.description)
-            console.log('Food nutrients available:', detailedFoodData.foodNutrients?.length || 0)
+            console.log('Using detailed food data:', (detailedFoodData as any).description)
+            console.log('Food nutrients available:', (detailedFoodData as any).foodNutrients?.length || 0)
 
             const nutrition = calculateNutrition(detailedFoodData, servingSize)
             console.log('Calculated nutrition:', nutrition)
@@ -307,7 +295,7 @@ export default function AddFoodModal({ isOpen, onClose, onAddFood }: AddFoodModa
                 proteinIncomplete: nutrition.proteinIncomplete ? nutrition.proteinIncomplete.toString() : prev.proteinIncomplete
             }))
         }
-    }, [servingSize, detailedFoodData, selectedFood])
+    }, [servingSize, detailedFoodData, selectedItem])
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault()
@@ -337,8 +325,8 @@ export default function AddFoodModal({ isOpen, onClose, onAddFood }: AddFoodModa
             notes: formData.notes.trim() || undefined
         }
 
-        // If USDA data exists, enrich with subclasses and FDC id
-        if (selectedFood && detailedFoodData && isAutoCalculated) {
+        // If data exists, enrich with subclasses and FDC id
+        if (selectedItem && detailedFoodData && isAutoCalculated) {
             const nutrition = calculateNutrition(detailedFoodData, servingSize)
                 ; (newFood as any).fiber = nutrition.fiber
                 ; (newFood as any).fatsSaturated = nutrition.fatsSaturated
@@ -348,7 +336,7 @@ export default function AddFoodModal({ isOpen, onClose, onAddFood }: AddFoodModa
                 ; (newFood as any).carbsComplex = nutrition.carbsComplex
                 ; (newFood as any).proteinComplete = nutrition.proteinComplete
                 ; (newFood as any).proteinIncomplete = nutrition.proteinIncomplete
-                ; (newFood as any).fdcId = selectedFood.fdcId
+                ; (newFood as any).fdcId = (detailedFoodData as any).fdcId
         } else if (advancedEnabled) {
             // Use manual inputs if provided
             const parseOrUndefined = (v: string) => v.trim() === '' ? undefined : Math.max(0, parseFloat(v) || 0)
@@ -405,7 +393,7 @@ export default function AddFoodModal({ isOpen, onClose, onAddFood }: AddFoodModa
         })
         setSearchQuery('')
         setSearchResults([])
-        setSelectedFood(null)
+        setSelectedItem(null)
         setDetailedFoodData(null)
 
         setServingSize(100)
@@ -432,7 +420,7 @@ export default function AddFoodModal({ isOpen, onClose, onAddFood }: AddFoodModa
         })
         setSearchQuery('')
         setSearchResults([])
-        setSelectedFood(null)
+        setSelectedItem(null)
         setDetailedFoodData(null)
 
         setServingSize(100)
@@ -490,20 +478,15 @@ export default function AddFoodModal({ isOpen, onClose, onAddFood }: AddFoodModa
                             {/* Search Results */}
                             {searchResults.length > 0 && (
                                 <div className="mt-0.5 max-h-32 overflow-y-auto border border-blue-300 dark:border-gray-700 rounded-lg" style={{ scrollbarColor: '#3b82f6 #dbeafe', scrollbarWidth: 'thin' }}>
-                                    {searchResults.map((food) => (
+                                    {searchResults.map((item) => (
                                         <button
-                                            key={food.fdcId}
+                                            key={`${item.source}:${item.id}`}
                                             type="button"
-                                            onClick={() => handleFoodSelect(food)}
+                                            onClick={() => handleFoodSelect(item)}
                                             className="w-full text-left p-1 hover:bg-blue-100 dark:hover:bg-gray-800 border-b border-blue-100 dark:border-gray-700 last:border-b-0 transition-colors"
                                         >
-                                            <div className="font-medium text-blue-900 dark:text-blue-200 text-xs">{food.description}</div>
-                                            {food.brandName && (
-                                                <div className="text-blue-600 dark:text-blue-300 text-xs mt-0.5">Brand: {food.brandName}</div>
-                                            )}
-                                            <div className="text-blue-500 dark:text-blue-300 text-xs mt-0.5">
-                                                {food.dataType} • FDC ID: {food.fdcId}
-                                            </div>
+                                            <div className="font-medium text-blue-900 dark:text-blue-200 text-xs">{item.name}</div>
+                                            <div className="text-blue-500 dark:text-blue-300 text-xs mt-0.5">{item.source} • ID: {item.id}</div>
                                         </button>
                                     ))}
                                 </div>
@@ -515,7 +498,7 @@ export default function AddFoodModal({ isOpen, onClose, onAddFood }: AddFoodModa
                         </div>
 
                         {/* Selected Food Info & Serving Size */}
-                        {selectedFood && (
+                        {selectedItem && (
                             <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-gray-700 rounded-lg p-0.5">
                                 {/* Serving Size Adjustment */}
                                 <div className="flex items-center space-x-1">
@@ -544,12 +527,12 @@ export default function AddFoodModal({ isOpen, onClose, onAddFood }: AddFoodModa
                                 className="w-full px-2 py-1 border border-purple-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-xs dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700 dark:focus:ring-purple-700"
                                 placeholder="e.g., Grilled Chicken Breast"
                                 required
-                                readOnly={!!selectedFood}
+                                readOnly={!!selectedItem}
                             />
                         </div>
 
                         {/* Nutrition Values Note */}
-                        {selectedFood && (
+                        {selectedItem && (
                             <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-gray-700 rounded-lg p-1">
                                 <p className="text-yellow-800 dark:text-yellow-300 text-xs">
                                     💡 Values auto-calculated for {servingSize}g serving.
@@ -560,20 +543,20 @@ export default function AddFoodModal({ isOpen, onClose, onAddFood }: AddFoodModa
                         {/* Calories */}
                         <div>
                             <label className="block text-xs font-medium text-purple-700 dark:text-purple-300 mb-0.5">
-                                Calories {selectedFood && <span className="text-xs text-purple-500">(auto)</span>}
+                                Calories {selectedItem && <span className="text-xs text-purple-500">(auto)</span>}
                             </label>
                             <input
                                 type="number"
                                 value={formData.calories}
                                 onChange={(e) => handleInputChange('calories', e.target.value)}
-                                className={`w-full px-2 py-1 border rounded-lg focus:outline-none focus:ring-2 focus:border-transparent text-xs ${(selectedFood && isAutoCalculated)
+                                className={`w-full px-2 py-1 border rounded-lg focus:outline-none focus:ring-2 focus:border-transparent text-xs ${(selectedItem && isAutoCalculated)
                                     ? 'border-purple-200 bg-purple-50 text-purple-700 dark:border-purple-700 dark:bg-purple-900/20 dark:text-purple-300'
                                     : 'border-purple-300 focus:ring-purple-500 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:focus:ring-purple-700'
                                     }`}
                                 placeholder="0"
                                 min="0"
                                 step="1"
-                                readOnly={!!selectedFood && isAutoCalculated}
+                                readOnly={!!selectedItem && isAutoCalculated}
                             />
                         </div>
 
@@ -582,20 +565,20 @@ export default function AddFoodModal({ isOpen, onClose, onAddFood }: AddFoodModa
                             {/* Carbs and subclasses */}
                             <div>
                                 <label className="block text-xs font-medium text-green-700 dark:text-green-300 mb-0.5">
-                                    Carbs (g) {selectedFood && <span className="text-xs text-green-500">(auto)</span>}
+                                    Carbs (g) {selectedItem && <span className="text-xs text-green-500">(auto)</span>}
                                 </label>
                                 <input
                                     type="number"
                                     value={formData.carbs}
                                     onChange={(e) => handleInputChange('carbs', e.target.value)}
-                                    className={`w-full px-1.5 py-1 border rounded-lg focus:outline-none focus:ring-2 focus:border-transparent text-xs ${(selectedFood && isAutoCalculated)
+                                    className={`w-full px-1.5 py-1 border rounded-lg focus:outline-none focus:ring-2 focus:border-transparent text-xs ${(selectedItem && isAutoCalculated)
                                         ? 'border-green-200 bg-green-50 text-green-700 dark:border-green-700 dark:bg-green-900/20 dark:text-green-300'
                                         : 'border-green-300 focus:ring-green-500 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:focus:ring-green-700'
                                         }`}
                                     placeholder="0"
                                     min="0"
                                     step="0.1"
-                                    readOnly={!!selectedFood && isAutoCalculated}
+                                    readOnly={!!selectedItem && isAutoCalculated}
                                 />
                                 {advancedEnabled && (
                                     <div className="mt-0.5 space-y-0.5">
@@ -610,7 +593,7 @@ export default function AddFoodModal({ isOpen, onClose, onAddFood }: AddFoodModa
                                                     placeholder="0"
                                                     min="0"
                                                     step="0.1"
-                                                    readOnly={!!selectedFood && isAutoCalculated}
+                                                    readOnly={!!selectedItem && isAutoCalculated}
                                                 />
                                             </div>
                                             <div>
@@ -623,7 +606,7 @@ export default function AddFoodModal({ isOpen, onClose, onAddFood }: AddFoodModa
                                                     placeholder="0"
                                                     min="0"
                                                     step="0.1"
-                                                    readOnly={!!selectedFood && isAutoCalculated}
+                                                    readOnly={!!selectedItem && isAutoCalculated}
                                                 />
                                             </div>
                                             <div>
@@ -636,7 +619,7 @@ export default function AddFoodModal({ isOpen, onClose, onAddFood }: AddFoodModa
                                                     placeholder="0"
                                                     min="0"
                                                     step="0.1"
-                                                    readOnly={!!selectedFood && isAutoCalculated}
+                                                    readOnly={!!selectedItem && isAutoCalculated}
                                                 />
                                             </div>
                                         </div>
@@ -646,20 +629,20 @@ export default function AddFoodModal({ isOpen, onClose, onAddFood }: AddFoodModa
                             {/* Protein and subclasses */}
                             <div>
                                 <label className="block text-xs font-medium text-blue-700 dark:text-blue-300 mb-0.5">
-                                    Protein (g) {selectedFood && <span className="text-xs text-blue-500">(auto)</span>}
+                                    Protein (g) {selectedItem && <span className="text-xs text-blue-500">(auto)</span>}
                                 </label>
                                 <input
                                     type="number"
                                     value={formData.protein}
                                     onChange={(e) => handleInputChange('protein', e.target.value)}
-                                    className={`w-full px-1.5 py-1 border rounded-lg focus:outline-none focus:ring-2 focus:border-transparent text-xs ${(selectedFood && isAutoCalculated)
+                                    className={`w-full px-1.5 py-1 border rounded-lg focus:outline-none focus:ring-2 focus:border-transparent text-xs ${(selectedItem && isAutoCalculated)
                                         ? 'border-blue-200 bg-blue-50 text-blue-700 dark:border-blue-700 dark:bg-blue-900/20 dark:text-blue-300'
                                         : 'border-blue-300 focus:ring-blue-500 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:focus:ring-blue-700'
                                         }`}
                                     placeholder="0"
                                     min="0"
                                     step="0.1"
-                                    readOnly={!!selectedFood && isAutoCalculated}
+                                    readOnly={!!selectedItem && isAutoCalculated}
                                 />
                                 {advancedEnabled && (
                                     <div className="mt-0.5 space-y-0.5">
@@ -674,7 +657,7 @@ export default function AddFoodModal({ isOpen, onClose, onAddFood }: AddFoodModa
                                                     placeholder="0"
                                                     min="0"
                                                     step="0.1"
-                                                    readOnly={!!selectedFood && isAutoCalculated}
+                                                    readOnly={!!selectedItem && isAutoCalculated}
                                                 />
                                             </div>
                                             <div>
@@ -687,7 +670,7 @@ export default function AddFoodModal({ isOpen, onClose, onAddFood }: AddFoodModa
                                                     placeholder="0"
                                                     min="0"
                                                     step="0.1"
-                                                    readOnly={!!selectedFood && isAutoCalculated}
+                                                    readOnly={!!selectedItem && isAutoCalculated}
                                                 />
                                             </div>
                                         </div>
@@ -697,20 +680,20 @@ export default function AddFoodModal({ isOpen, onClose, onAddFood }: AddFoodModa
                             {/* Fats and subclasses */}
                             <div>
                                 <label className="block text-xs font-medium text-yellow-700 dark:text-yellow-300 mb-0.5">
-                                    Fat (g) {selectedFood && <span className="text-xs text-yellow-500">(auto)</span>}
+                                    Fat (g) {selectedItem && <span className="text-xs text-yellow-500">(auto)</span>}
                                 </label>
                                 <input
                                     type="number"
                                     value={formData.fat}
                                     onChange={(e) => handleInputChange('fat', e.target.value)}
-                                    className={`w-full px-1.5 py-1 border rounded-lg focus:outline-none focus:ring-2 focus:border-transparent text-xs ${(selectedFood && isAutoCalculated)
+                                    className={`w-full px-1.5 py-1 border rounded-lg focus:outline-none focus:ring-2 focus:border-transparent text-xs ${(selectedItem && isAutoCalculated)
                                         ? 'border-yellow-200 bg-yellow-50 text-yellow-700 dark:border-yellow-700 dark:bg-yellow-900/20 dark:text-yellow-300'
                                         : 'border-yellow-300 focus:ring-yellow-500 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:focus:ring-yellow-700'
                                         }`}
                                     placeholder="0"
                                     min="0"
                                     step="0.1"
-                                    readOnly={!!selectedFood && isAutoCalculated}
+                                    readOnly={!!selectedItem && isAutoCalculated}
                                 />
                                 {advancedEnabled && (
                                     <div className="mt-0.5">
@@ -725,7 +708,7 @@ export default function AddFoodModal({ isOpen, onClose, onAddFood }: AddFoodModa
                                                     placeholder="0"
                                                     min="0"
                                                     step="0.1"
-                                                    readOnly={!!selectedFood && isAutoCalculated}
+                                                    readOnly={!!selectedItem && isAutoCalculated}
                                                 />
                                             </div>
                                             <div>
@@ -738,7 +721,7 @@ export default function AddFoodModal({ isOpen, onClose, onAddFood }: AddFoodModa
                                                     placeholder="0"
                                                     min="0"
                                                     step="0.1"
-                                                    readOnly={!!selectedFood && isAutoCalculated}
+                                                    readOnly={!!selectedItem && isAutoCalculated}
                                                 />
                                             </div>
                                             <div>
@@ -751,7 +734,7 @@ export default function AddFoodModal({ isOpen, onClose, onAddFood }: AddFoodModa
                                                     placeholder="0"
                                                     min="0"
                                                     step="0.1"
-                                                    readOnly={!!selectedFood && isAutoCalculated}
+                                                    readOnly={!!selectedItem && isAutoCalculated}
                                                 />
                                             </div>
                                         </div>
