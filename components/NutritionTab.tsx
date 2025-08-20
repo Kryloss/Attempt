@@ -589,7 +589,7 @@ export default function NutritionTab({ user }: NutritionTabProps) {
             {/* Daily Summary (visible only when more than one meal has foods) */}
             {showDailySummary && (
                 <div className="bg-white dark:bg-gray-900 rounded-2xl p-2 shadow-lg border border-purple-100 dark:border-gray-700">
-                    <h3 className="text-base font-bold text-purple-800 dark:text-purple-200 mb-1 text-center">Daily Summary</h3>
+                    <h3 className="text-base font-bold text-purple-800 dark:text-purple-200 mb-1 text-center"></h3>
                     <div className="grid grid-cols-4 gap-1">
                         <div className="rounded-lg p-1.5 text-center border-2 border-purple-300 bg-purple-500/5 shadow-[0_0_18px_rgba(168,85,247,0.25)]">
                             <div className="text-xs text-purple-500">Calories</div>

@@ -177,62 +177,62 @@ function MealCard({ meal, onDelete, onUpdate, onAddFood, onRemoveFood, onMoveFoo
 
                         {/* Meal Totals */}
                         {showTotals && (
-                            <div className="grid grid-cols-4 gap-1 text-center">
-                                <div className="bg-purple-50 dark:bg-purple-900/20 rounded px-2 py-1">
-                                    <div className="text-sm font-bold text-purple-500">{totals.calories}</div>
-                                    <div className="text-xs text-purple-500">Cal</div>
+                            <div className="grid grid-cols-4 gap-1">
+                                <div className="rounded-lg p-1.5 text-center border-2 border-purple-300 bg-purple-500/5 shadow-[0_0_18px_rgba(168,85,247,0.25)]">
+                                    <div className="text-xs text-purple-500">Calories</div>
+                                    <div className="text-lg font-bold text-purple-500">{totals.calories}</div>
                                 </div>
-                                <div className="bg-green-50 dark:bg-green-900/20 rounded px-2 py-1">
-                                    <div className="text-sm font-bold text-green-500">{totals.carbs}g</div>
+                                <div className="rounded-lg p-1.5 text-center border-2 border-green-300 bg-green-500/5 shadow-[0_0_18px_rgba(16,185,129,0.25)]">
                                     <div className="text-xs text-green-500">Carbs</div>
+                                    <div className="text-lg font-bold text-green-600">{totals.carbs.toFixed(1)}g</div>
                                     {showAdvanced && (
-                                        <div className="mt-0.5 grid grid-cols-3 gap-0.5 sm:gap-1 text-[9px] sm:text-[10px] text-green-500 leading-3 sm:leading-4 scale-90 sm:scale-100 origin-top">
+                                        <div className="mt-0.5 grid grid-cols-3 gap-0.5 sm:gap-1 text-[9px] sm:text-[10px] text-green-600 leading-3 sm:leading-4 scale-90 sm:scale-100 origin-top">
                                             <div>
-                                                <div className="text-[8px] sm:text-[9px] text-green-500/80">Simple</div>
+                                                <div className="text-[8px] sm:text-[9px] text-green-700/80">Simple</div>
                                                 <div className="font-semibold">{advancedTotals.carbsSimple.toFixed(1)}g</div>
                                             </div>
                                             <div>
-                                                <div className="text-[8px] sm:text-[9px] text-green-500/80">Fiber</div>
+                                                <div className="text-[8px] sm:text-[9px] text-green-700/80">Fiber</div>
                                                 <div className="font-semibold">{advancedTotals.fiber.toFixed(1)}g</div>
                                             </div>
                                             <div>
-                                                <div className="text-[8px] sm:text-[9px] text-green-500/80">Complex</div>
+                                                <div className="text-[8px] sm:text-[9px] text-green-700/80">Complex</div>
                                                 <div className="font-semibold">{advancedTotals.carbsComplex.toFixed(1)}g</div>
                                             </div>
                                         </div>
                                     )}
                                 </div>
-                                <div className="bg-blue-50 dark:bg-blue-900/20 rounded px-2 py-1">
-                                    <div className="text-sm font-bold text-blue-500">{totals.protein}g</div>
+                                <div className="rounded-lg p-1.5 text-center border-2 border-blue-300 bg-blue-500/5 shadow-[0_0_18px_rgba(59,130,246,0.25)]">
                                     <div className="text-xs text-blue-500">Protein</div>
+                                    <div className="text-lg font-bold text-blue-600">{totals.protein.toFixed(1)}g</div>
                                     {showAdvanced && (
-                                        <div className="mt-0.5 grid grid-cols-2 gap-0.5 sm:gap-1 text-[9px] sm:text-[10px] text-blue-500 leading-3 sm:leading-4 scale-90 sm:scale-100 origin-top">
+                                        <div className="mt-0.5 grid grid-cols-2 gap-0.5 sm:gap-1 text-[9px] sm:text-[10px] text-blue-600 leading-3 sm:leading-4 scale-90 sm:scale-100 origin-top">
                                             <div>
-                                                <div className="text-[8px] sm:text-[9px] text-blue-500/80">Complete</div>
+                                                <div className="text-[8px] sm:text-[9px] text-blue-700/80">Complete</div>
                                                 <div className="font-semibold">{advancedTotals.proteinComplete.toFixed(1)}g</div>
                                             </div>
                                             <div>
-                                                <div className="text-[8px] sm:text-[9px] text-blue-500/80">Incomplete</div>
+                                                <div className="text-[8px] sm:text-[9px] text-blue-700/80">Incomplete</div>
                                                 <div className="font-semibold">{advancedTotals.proteinIncomplete.toFixed(1)}g</div>
                                             </div>
                                         </div>
                                     )}
                                 </div>
-                                <div className="bg-yellow-50 dark:bg-yellow-900/20 rounded px-2 py-1">
-                                    <div className="text-sm font-bold text-yellow-500">{totals.fat}g</div>
+                                <div className="rounded-lg p-1.5 text-center border-2 border-yellow-300 bg-yellow-500/5 shadow-[0_0_18px_rgba(234,179,8,0.25)]">
                                     <div className="text-xs text-yellow-500">Fat</div>
+                                    <div className="text-lg font-bold text-yellow-600">{totals.fat.toFixed(1)}g</div>
                                     {showAdvanced && (
-                                        <div className="mt-0.5 grid grid-cols-3 gap-0.5 sm:gap-1 text-[9px] sm:text-[10px] text-yellow-500 leading-3 sm:leading-4 scale-90 sm:scale-100 origin-top">
+                                        <div className="mt-0.5 grid grid-cols-3 gap-0.5 sm:gap-1 text-[9px] sm:text-[10px] text-yellow-600 leading-3 sm:leading-4 scale-90 sm:scale-100 origin-top">
                                             <div>
-                                                <div className="text-[8px] sm:text-[9px] text-yellow-500/80">Unsat</div>
+                                                <div className="text-[8px] sm:text-[9px] text-yellow-700/80">Unsat</div>
                                                 <div className="font-semibold">{advancedTotals.fatsUnsaturated.toFixed(1)}g</div>
                                             </div>
                                             <div>
-                                                <div className="text-[8px] sm:text-[9px] text-yellow-500/80">Sat</div>
+                                                <div className="text-[8px] sm:text-[9px] text-yellow-700/80">Sat</div>
                                                 <div className="font-semibold">{advancedTotals.fatsSaturated.toFixed(1)}g</div>
                                             </div>
                                             <div>
-                                                <div className="text-[8px] sm:text-[9px] text-yellow-500/80">Trans</div>
+                                                <div className="text-[8px] sm:text-[9px] text-yellow-700/80">Trans</div>
                                                 <div className="font-semibold">{advancedTotals.fatsTrans.toFixed(1)}g</div>
                                             </div>
                                         </div>
@@ -257,7 +257,9 @@ function MealCard({ meal, onDelete, onUpdate, onAddFood, onRemoveFood, onMoveFoo
                                     className="relative flex items-start bg-purple-50 dark:bg-gray-800 rounded p-1.5 border border-purple-100 dark:border-gray-700 cursor-grab active:cursor-grabbing hover:bg-purple-100 dark:hover:bg-gray-700 transition-colors"
                                 >
                                     <div className="flex-1 min-w-0">
-                                        <div className="text-xs font-medium text-purple-500 dark:text-purple-50 truncate text-center">{food.name}</div>
+                                        <div className="text-xs font-medium text-purple-500 dark:text-purple-50 truncate text-center">
+                                            {food.name} <span className="text-purple-400 dark:text-purple-300">• {food.calories} cal</span>
+                                        </div>
                                         {/* per-food inline macros removed per request */}
                                         {showAdvanced && (
                                             <div className="mt-0.5">
@@ -324,7 +326,7 @@ function MealCard({ meal, onDelete, onUpdate, onAddFood, onRemoveFood, onMoveFoo
                     <button
                         onClick={() => onOpenAddFood && onOpenAddFood(meal.id)}
                         className="perfect-circle bg-purple-100 hover:bg-purple-200 text-purple-600 dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-purple-300 flex items-center justify-center transition-colors"
-                        style={{ '--circle-size': '28px' } as React.CSSProperties}
+                        style={{ '--circle-size': '24px' } as React.CSSProperties}
                         title="Add food"
                     >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -334,7 +336,7 @@ function MealCard({ meal, onDelete, onUpdate, onAddFood, onRemoveFood, onMoveFoo
                     <button
                         onClick={() => setShowDeleteConfirm(true)}
                         className="perfect-circle bg-red-100 hover:bg-red-200 text-red-600 dark:bg-red-900/30 dark:hover:bg-red-900/50 dark:text-red-300 flex items-center justify-center transition-colors"
-                        style={{ '--circle-size': '28px' } as React.CSSProperties}
+                        style={{ '--circle-size': '24px' } as React.CSSProperties}
                     >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
