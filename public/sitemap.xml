@@ -8,14 +8,6 @@
     <priority>1.0</priority>
   </url>
   
-  <!-- Authentication page -->
-  <url>
-    <loc>https://attempt-three.vercel.app/auth</loc>
-    <lastmod>2024-12-19</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  
   <!-- Public guest pages -->
   <url>
     <loc>https://attempt-three.vercel.app/guest/nutrition</loc>

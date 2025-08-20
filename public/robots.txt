@@ -1,17 +1,17 @@
 User-agent: *
 Allow: /
 
-# Allow public pages
-Allow: /auth
-Allow: /guest/
-Allow: /favicon.svg
-Allow: /sitemap.xml
-
-# Block authenticated pages that require login
+# Block authentication and private pages
+Disallow: /auth
 Disallow: /nutrition
 Disallow: /workouts
 Disallow: /progress
 Disallow: /api/
+
+# Allow public pages
+Allow: /guest/
+Allow: /favicon.svg
+Allow: /sitemap.xml
 
 # Sitemap location
 Sitemap: https://attempt-three.vercel.app/sitemap.xml
