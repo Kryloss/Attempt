@@ -7,8 +7,22 @@ import { ModalProvider } from '@/components/ModalContext'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-    title: 'gymNote - Email Confirmation',
-    description: 'Your Usefull Tull for Hard Work',
+    title: 'gymNote - Your Fitness Companion',
+    description: 'Track workouts, monitor nutrition, and achieve your fitness goals with gymNote. Your comprehensive tool for hard work and progress tracking.',
+    keywords: 'fitness, workout tracker, nutrition tracker, progress tracking, gym, exercise',
+    authors: [{ name: 'gymNote Team' }],
+    creator: 'gymNote',
+    openGraph: {
+        title: 'gymNote - Your Fitness Companion',
+        description: 'Track workouts, monitor nutrition, and achieve your fitness goals with gymNote.',
+        type: 'website',
+        locale: 'en_US',
+    },
+    twitter: {
+        card: 'summary_large_image',
+        title: 'gymNote - Your Fitness Companion',
+        description: 'Track workouts, monitor nutrition, and achieve your fitness goals with gymNote.',
+    },
     icons: {
         icon: '/favicon.svg',
         shortcut: '/favicon.svg',
@@ -22,8 +36,8 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
     width: 'device-width',
     initialScale: 1,
-    maximumScale: 1,
-    userScalable: false,
+    maximumScale: 5,
+    userScalable: true,
 }
 
 export default function RootLayout({

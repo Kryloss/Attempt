@@ -1,35 +1,11 @@
-'use client'
+import type { Metadata } from 'next'
+import GuestNutritionPageClient from './GuestNutritionPageClient'
 
-import { useState } from 'react'
-import AppLayout from '@/components/AppLayout'
-import NutritionTab from '@/components/NutritionTab'
+export const metadata: Metadata = {
+    title: 'Nutrition Tracker - gymNote Guest',
+    description: 'Track your nutrition and food intake with gymNote. Monitor calories, macros, and nutrients to support your fitness goals.',
+}
 
 export default function GuestNutritionPage() {
-    const [guestUser] = useState({
-        _id: 'guest',
-        id: 'guest',
-        username: 'Guest',
-        email: 'guest@example.com',
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        guest: true
-    })
-
-    const handleSignOut = () => {
-        // For guest users, redirect to auth page
-        window.location.href = '/auth'
-    }
-
-    return (
-        <AppLayout
-            user={guestUser}
-            onSignOut={handleSignOut}
-            activeTab="nutrition"
-            onTabChange={() => { }}
-        >
-            <div className="container mx-auto px-4 sm:px-6">
-                <NutritionTab user={guestUser} />
-            </div>
-        </AppLayout>
-    )
+    return <GuestNutritionPageClient />
 }

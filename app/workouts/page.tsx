@@ -1,61 +1,11 @@
-'use client'
+import type { Metadata } from 'next'
+import WorkoutsPageClient from './WorkoutsPageClient'
 
-import { useState, useEffect } from 'react'
-import { User } from '@/types/auth'
-import AppLayout from '@/components/AppLayout'
-import TrainingTab from '@/components/TrainingTab'
-import LoadingSpinner from '@/components/LoadingSpinner'
-import { useRouter } from 'next/navigation'
+export const metadata: Metadata = {
+    title: 'Workout Dashboard - gymNote',
+    description: 'Track and manage your workouts with gymNote. Log exercises, monitor progress, and optimize your training routine for better results.',
+}
 
 export default function WorkoutsPage() {
-    const [user, setUser] = useState<User | null>(null)
-    const [loading, setLoading] = useState(true)
-    const router = useRouter()
-
-    useEffect(() => {
-        // Check if user is authenticated
-        const storedUser = localStorage.getItem('user')
-        if (storedUser) {
-            try {
-                const parsedUser = JSON.parse(storedUser)
-                if (parsedUser && !parsedUser.guest) {
-                    setUser(parsedUser)
-                } else {
-                    router.push('/auth')
-                }
-            } catch (e) {
-                router.push('/auth')
-            }
-        } else {
-            router.push('/auth')
-        }
-        setLoading(false)
-    }, [router])
-
-    const handleSignOut = () => {
-        localStorage.removeItem('user')
-        setUser(null)
-        router.push('/auth')
-    }
-
-    if (loading) {
-        return <LoadingSpinner />
-    }
-
-    if (!user) {
-        return null
-    }
-
-    return (
-        <AppLayout
-            user={user}
-            onSignOut={handleSignOut}
-            activeTab="workouts"
-            onTabChange={() => { }}
-        >
-            <div className="container mx-auto px-4 sm:px-6">
-                <TrainingTab user={user} />
-            </div>
-        </AppLayout>
-    )
+    return <WorkoutsPageClient />
 }
