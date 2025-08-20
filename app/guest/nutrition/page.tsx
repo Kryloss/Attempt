@@ -6,9 +6,12 @@ import NutritionTab from '@/components/NutritionTab'
 
 export default function GuestNutritionPage() {
     const [guestUser] = useState({
+        _id: 'guest',
         id: 'guest',
         username: 'Guest',
         email: 'guest@example.com',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
         guest: true
     })
 

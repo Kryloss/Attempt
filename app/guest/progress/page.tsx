@@ -6,9 +6,12 @@ import ProgressTab from '@/components/ProgressTab'
 
 export default function GuestProgressPage() {
     const [guestUser] = useState({
+        _id: 'guest',
         id: 'guest',
         username: 'Guest',
         email: 'guest@example.com',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
         guest: true
     })
 
