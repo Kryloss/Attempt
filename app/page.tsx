@@ -63,10 +63,8 @@ export default function Home() {
                 </div>
 
                 <div className="text-center relative z-10">
-                    <div className="icon-container mx-auto mb-6 animate-float glow-purple">
-                        <div className="w-16 h-16 bg-purple-600 rounded-full flex items-center justify-center">
-                            <Image src="/favicon.svg" alt="gymNote Logo" width={40} height={40} priority />
-                        </div>
+                    <div className="w-16 h-16 bg-purple-600 rounded-full flex items-center justify-center mx-auto mb-6 animate-float glow-purple">
+                        <Image src="/favicon.svg" alt="gymNote Logo" width={40} height={40} priority />
                     </div>
                     <h1 className="text-4xl sm:text-5xl font-bold text-purple-800 mb-4 font-display gradient-text">
                         gymNote
