@@ -796,15 +796,15 @@ export default function NutritionTab({ user }: NutritionTabProps) {
                         <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 border-2 border-purple-300 bg-purple-500/5 shadow-[0_0_16px_rgba(168,85,247,0.25)]">
                             <div className="w-6 h-6 border-4 border-purple-300 border-t-purple-600 rounded-full animate-spin"></div>
                         </div>
-                        <p className="text-purple-600 text-base">Loading nutrition data...</p>
+                        <p className="text-purple-300 text-base">Loading nutrition data...</p>
                     </div>
                 ) : meals.length === 0 ? (
                     <div className="bg-white dark:bg-gray-900 rounded-2xl p-8 shadow-lg border border-purple-100 dark:border-gray-700 text-center neon-surface light-surface">
                         <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 border-2 border-purple-300 bg-purple-500/5 shadow-[0_0_16px_rgba(168,85,247,0.25)]">
                             <span className="text-2xl">🥗</span>
                         </div>
-                        <h3 className="text-xl font-bold text-purple-800 dark:text-purple-200 mb-2">No Meals Added Yet</h3>
-                        <p className="text-purple-600 dark:text-purple-300 mb-4 text-sm">
+                        <h3 className="text-xl font-bold text-purple-500 dark:text-purple-200 mb-2">No Meals Added Yet</h3>
+                        <p className="text-purple-500 dark:text-purple-300 mb-4 text-sm">
                             Start by adding meals to track your daily nutrition and calories.
                         </p>
                         <button
