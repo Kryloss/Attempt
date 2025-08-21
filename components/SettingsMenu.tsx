@@ -16,6 +16,7 @@ export default function SettingsMenu({ user, onSignOut, onSignIn, onClose }: Set
     const [headerOffset, setHeaderOffset] = useState<number>(64)
     const [advancedNutrition, setAdvancedNutrition] = useState(false)
     const [darkMode, setDarkMode] = useState(false)
+    const [twoColumnExercises, setTwoColumnExercises] = useState(false)
     const { weightUnit, setWeightUnit } = useWeightUnit()
 
     // Load and persist Advanced Nutrition setting
@@ -24,6 +25,10 @@ export default function SettingsMenu({ user, onSignOut, onSignIn, onClose }: Set
             const stored = typeof window !== 'undefined' ? localStorage.getItem('advanced_nutrition_enabled') : null
             if (stored !== null) {
                 setAdvancedNutrition(stored === 'true')
+            }
+            const storedTwoCol = typeof window !== 'undefined' ? localStorage.getItem('two_column_exercises') : null
+            if (storedTwoCol !== null) {
+                setTwoColumnExercises(storedTwoCol === 'true')
             }
             const storedTheme = typeof window !== 'undefined' ? localStorage.getItem('theme') : null
             if (storedTheme) {
@@ -110,6 +115,19 @@ export default function SettingsMenu({ user, onSignOut, onSignIn, onClose }: Set
         })
     }
 
+    const toggleTwoColumnExercises = () => {
+        setTwoColumnExercises(prev => {
+            const next = !prev
+            try {
+                if (typeof window !== 'undefined') {
+                    localStorage.setItem('two_column_exercises', String(next))
+                    window.dispatchEvent(new Event('exerciseLayoutSettingChanged'))
+                }
+            } catch { }
+            return next
+        })
+    }
+
     return (
         <div className="fixed inset-0 z-[99999] flex items-center justify-center p-4 pointer-events-none">
             {/* Backdrop (do not cover top navigation area) */}
@@ -181,6 +199,23 @@ export default function SettingsMenu({ user, onSignOut, onSignIn, onClose }: Set
                             />
                             <span className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${advancedNutrition ? 'bg-purple-500' : 'bg-purple-200'}`}>
                                 <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${advancedNutrition ? 'translate-x-6' : 'translate-x-1'}`} />
+                            </span>
+                        </label>
+                    </div>
+                    <div className="hidden sm:flex items-center justify-between mt-2">
+                        <div>
+                            <h4 className="font-semibold text-purple-800 dark:text-purple-200 text-xs sm:text-sm">Two-column layout (desktop)</h4>
+                            <p className="text-purple-500 dark:text-purple-300 text-[11px] sm:text-xs">Split exercises and foods into 2 columns on desktop</p>
+                        </div>
+                        <label className="relative inline-flex items-center cursor-pointer">
+                            <input
+                                type="checkbox"
+                                checked={twoColumnExercises}
+                                onChange={toggleTwoColumnExercises}
+                                className="sr-only"
+                            />
+                            <span className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${twoColumnExercises ? 'bg-purple-500' : 'bg-purple-200'}`}>
+                                <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${twoColumnExercises ? 'translate-x-6' : 'translate-x-1'}`} />
                             </span>
                         </label>
                     </div>

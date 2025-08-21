@@ -16,9 +16,11 @@ interface ExerciseCardProps {
     exercise: Exercise
     onDelete: (id: string) => void
     onUpdate: (id: string, updatedExercise: Partial<Exercise>) => void
+    orderIndex?: number
+    showOrderBadge?: boolean
 }
 
-function ExerciseCard({ exercise, onDelete, onUpdate }: ExerciseCardProps) {
+function ExerciseCard({ exercise, onDelete, onUpdate, orderIndex, showOrderBadge = false }: ExerciseCardProps) {
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
     const [editingField, setEditingField] = useState<string | null>(null)
     const [editValue, setEditValue] = useState<string>('')
@@ -211,7 +213,12 @@ function ExerciseCard({ exercise, onDelete, onUpdate }: ExerciseCardProps) {
         <div className="bg-white dark:bg-gray-900 border border-purple-200 dark:border-gray-700 rounded-lg p-0 shadow-sm hover:shadow-md transition-all duration-200 hover:border-purple-300 dark:hover:border-gray-600 group relative neon-surface light-surface">
             <div className="flex items-start justify-between">
                 <div className="flex-1 min-w-0">
-                    <div className="pl-2 pr-1">
+                    <div className="pl-2 pr-1 relative">
+                        {showOrderBadge && typeof orderIndex === 'number' && (
+                            <div className="absolute left-0.5 top-0.5 w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold z-10 select-none border-2 border-purple-400 text-purple-600 bg-transparent shadow-[0_0_10px_rgba(168,85,247,0.45)] dark:text-purple-300 dark:border-purple-400">
+                                {orderIndex}
+                            </div>
+                        )}
                         {editingField === 'name' ? (
                             <input
                                 type="text"
@@ -224,7 +231,7 @@ function ExerciseCard({ exercise, onDelete, onUpdate }: ExerciseCardProps) {
                             />
                         ) : (
                             <h4
-                                className="text-sm font-bold text-purple-800 dark:text-purple-200 mb-0 break-words cursor-text"
+                                className={`text-sm font-bold text-purple-800 dark:text-purple-200 mb-0 break-words cursor-text ${showOrderBadge ? 'pl-6' : ''}`}
                                 onClick={() => startEditing('name', exercise.name)}
                                 title="Click to edit name"
                             >

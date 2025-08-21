@@ -92,6 +92,20 @@ export class NutritionService {
         };
     }
 
+    // Load nutrition history (dates with meals/foods)
+    async loadNutritionHistory(): Promise<NutritionData[]> {
+        const response = await fetch(`/api/nutrition/get-history?userId=${this.userId}`)
+        if (!response.ok) {
+            const error = await response.json().catch(() => ({}))
+            throw new Error(error.error || 'Failed to load nutrition history')
+        }
+        const result = await response.json()
+        if (!result.success) {
+            throw new Error(result.error || 'Failed to load nutrition history')
+        }
+        return result.nutritions || []
+    }
+
     clearAutoSaveTimeout(): void {
         if (this.autoSaveTimeout) {
             clearTimeout(this.autoSaveTimeout);

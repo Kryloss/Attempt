@@ -50,7 +50,7 @@ interface NutritionTabProps {
 }
 
 export default function NutritionTab({ user }: NutritionTabProps) {
-    const { currentDate } = useDateContext()
+    const { currentDate, calendarMonth } = useDateContext()
     const { openModal, closeModal, openModals } = useModal()
 
     const [currentNutrition, setCurrentNutrition] = useState<NutritionData | null>(null)
@@ -581,15 +581,144 @@ export default function NutritionTab({ user }: NutritionTabProps) {
         setHasUnsavedChanges(true)
     }
 
+    // Build highlight dates: days having at least one meal with at least one food
+    const [nutritionHighlightDates, setNutritionHighlightDates] = useState<Set<string>>(new Set())
+
+    useEffect(() => {
+        const loadDates = async () => {
+            const dates = new Set<string>()
+            const getCache = (): Set<string> => {
+                try {
+                    const userId = user?._id || user?.id || 'guest'
+                    const raw = typeof window !== 'undefined' ? localStorage.getItem(`nutrition_highlight_dates_${userId}`) : null
+                    if (raw) {
+                        return new Set<string>(JSON.parse(raw))
+                    }
+                } catch { }
+                return new Set<string>()
+            }
+            const saveCache = (set: Set<string>) => {
+                try {
+                    const userId = user?._id || user?.id || 'guest'
+                    localStorage.setItem(`nutrition_highlight_dates_${userId}`, JSON.stringify(Array.from(set)))
+                } catch { }
+            }
+            try {
+                if (user && !user.guest && nutritionServiceRef.current) {
+                    // Fetch entire nutrition history and mark dates that contain at least one food
+                    try {
+                        const history = await nutritionServiceRef.current.loadNutritionHistory()
+                        for (const n of history) {
+                            const meals = n.meals || []
+                            const hasFoods = meals.some((m: any) => (m?.foods?.length || 0) > 0)
+                            if (hasFoods && n.date) dates.add(n.date)
+                        }
+                    } catch {
+                        // Fallback: scan localStorage for any cached nutrition entries
+                        const uid = user?._id || user?.id || 'guest'
+                        const keyPrefix = `nutrition_${uid}_`
+                        for (let i = 0; i < (typeof window !== 'undefined' ? localStorage.length : 0); i++) {
+                            const key = localStorage.key(i)
+                            if (key && key.startsWith(keyPrefix)) {
+                                const dateKey = key.replace(keyPrefix, '')
+                                try {
+                                    const data = JSON.parse(localStorage.getItem(key) || '{}')
+                                    const meals = data.meals || []
+                                    const hasFoods = meals.some((m: any) => (m?.foods?.length || 0) > 0)
+                                    if (hasFoods) dates.add(dateKey)
+                                } catch { }
+                            }
+                        }
+                        if (currentNutrition && (currentNutrition.meals || []).some(m => (m.foods || []).length > 0)) {
+                            dates.add(currentNutrition.date)
+                        }
+                    }
+                } else {
+                    const userId = user?._id || 'guest'
+                    const keyPrefix = `nutrition_${userId}_`
+                    for (let i = 0; i < (typeof window !== 'undefined' ? localStorage.length : 0); i++) {
+                        const key = localStorage.key(i)
+                        if (key && key.startsWith(keyPrefix)) {
+                            const dateKey = key.replace(keyPrefix, '')
+                            try {
+                                const data = JSON.parse(localStorage.getItem(key) || '{}')
+                                const meals = data.meals || []
+                                const hasFoods = meals.some((m: any) => (m?.foods?.length || 0) > 0)
+                                if (hasFoods) dates.add(dateKey)
+                            } catch { }
+                        }
+                    }
+                }
+            } catch { }
+            // Merge with local cache and include current day if applicable
+            const cache = getCache()
+            const merged = new Set<string>([...Array.from(cache), ...Array.from(dates)])
+            if (currentNutrition && (currentNutrition.meals || []).some(m => (m.foods || []).length > 0)) {
+                merged.add(currentNutrition.date)
+            }
+            saveCache(merged)
+            setNutritionHighlightDates(merged)
+        }
+        loadDates()
+    }, [user, currentNutrition])
+
+    // Prefetch highlights for the visible calendar month for logged-in users
+    useEffect(() => {
+        const prefetchMonth = async () => {
+            if (!(user && !user.guest && nutritionServiceRef.current)) return
+            try {
+                const year = calendarMonth.getFullYear()
+                const month = calendarMonth.getMonth()
+                const lastDay = new Date(year, month + 1, 0).getDate()
+                const dates = new Set<string>(nutritionHighlightDates)
+                const tasks: Promise<void>[] = []
+                for (let day = 1; day <= lastDay; day++) {
+                    const dateString = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`
+                    if (dates.has(dateString)) continue
+                    tasks.push(
+                        nutritionServiceRef.current!.loadNutrition(dateString)
+                            .then(n => {
+                                if (!n) return
+                                const meals = n.meals || []
+                                const hasFoods = meals.some(m => (m?.foods?.length || 0) > 0)
+                                if (hasFoods) dates.add(dateString)
+                            })
+                            .catch(() => { })
+                    )
+                }
+                await Promise.all(tasks)
+                setNutritionHighlightDates(new Set<string>(dates))
+            } catch { }
+        }
+        prefetchMonth()
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [calendarMonth, user])
+
+    // Keep cache up-to-date when meals change on current date
+    useEffect(() => {
+        try {
+            if (!currentNutrition) return
+            const userId = user?._id || user?.id || 'guest'
+            const key = `nutrition_highlight_dates_${userId}`
+            const raw = typeof window !== 'undefined' ? localStorage.getItem(key) : null
+            const set = new Set<string>(raw ? JSON.parse(raw) : [])
+            const hasFoods = (meals || []).some(m => (m?.foods?.length || 0) > 0)
+            if (hasFoods) set.add(currentNutrition.date)
+            else set.delete(currentNutrition.date)
+            localStorage.setItem(key, JSON.stringify(Array.from(set)))
+            setNutritionHighlightDates(new Set<string>(set))
+        } catch { }
+    }, [meals, currentNutrition, user])
+
     return (
         <div className="space-y-2 sm:space-y-3">
-            {/* Date Navigation */}
-            <DateCard user={user} />
-
-            {/* Daily Summary (visible only when more than one meal has foods) */}
-            {showDailySummary && (
-                <div className="bg-white dark:bg-gray-900 rounded-2xl p-2 shadow-lg border border-purple-100 dark:border-gray-700">
-                    <h3 className="text-base font-bold text-purple-800 dark:text-purple-200 mb-1 text-center"></h3>
+            {/* Date Navigation + Inline Daily Summary */}
+            <DateCard
+                user={user}
+                highlightDates={nutritionHighlightDates}
+                highlightDotClassName="bg-green-500 border-2 border-green-500 shadow-[0_0_16px_rgba(34,197,94,0.95)]"
+            >
+                {showDailySummary && (
                     <div className="grid grid-cols-4 gap-1">
                         <div className="rounded-lg p-1.5 text-center border-2 border-purple-300 bg-purple-500/5 shadow-[0_0_18px_rgba(168,85,247,0.25)]">
                             <div className="text-xs text-purple-500">Calories</div>
@@ -652,8 +781,9 @@ export default function NutritionTab({ user }: NutritionTabProps) {
                             )}
                         </div>
                     </div>
-                </div>
-            )}
+                )}
+            </DateCard>
+
 
             {/* Action Buttons moved under Existing Meals */}
 

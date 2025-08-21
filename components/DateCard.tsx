@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, type ReactNode } from 'react'
 import { useDateContext } from './DateContext'
 import TrainingNameDropdown from './TrainingNameDropdown'
 import { TrainingService, TrainingData, TrainingPresetData } from '@/lib/training-service'
@@ -33,6 +33,10 @@ interface DateCardProps {
     trainingService?: TrainingService | null
     exercises?: Exercise[]
     workoutDate?: string
+    // Optional external highlights for calendar dots (e.g., nutrition)
+    highlightDates?: Set<string>
+    highlightDotClassName?: string
+    children?: ReactNode
 }
 
 export default function DateCard({
@@ -45,7 +49,10 @@ export default function DateCard({
     onSaveAsPreset,
     trainingService,
     exercises = [],
-    workoutDate
+    workoutDate,
+    highlightDates,
+    highlightDotClassName,
+    children
 }: DateCardProps) {
     const {
         currentDate,
@@ -193,7 +200,11 @@ export default function DateCard({
         const day = String(date.getDate()).padStart(2, '0')
         const dateString = `${year}-${month}-${day}`
 
-        // Check if this date has workouts
+        // Prefer external highlights when provided (e.g., nutrition dates)
+        if (highlightDates) {
+            return highlightDates.has(dateString)
+        }
+        // Fallback to context workout dates
         return workoutDates.has(dateString)
     }
 
@@ -247,7 +258,7 @@ export default function DateCard({
     }
 
     return (
-        <div className="bg-white dark:bg-gray-900 rounded-2xl p-2 sm:p-3 shadow-lg border border-purple-100 dark:border-gray-700">
+        <div className="bg-white dark:bg-gray-900 rounded-2xl p-2 sm:p-3 shadow-lg border border-purple-100 dark:border-gray-700 relative z-10">
             {/* Date Navigation */}
             <div className="flex items-center justify-between mb-0">
                 <button
@@ -255,7 +266,7 @@ export default function DateCard({
                     disabled={isDateSwitchBlocked || isDateSwitchBlockedLocal}
                     className={`perfect-circle circle-md flex items-center justify-center transition-colors ${(isDateSwitchBlocked || isDateSwitchBlockedLocal)
                         ? 'bg-gray-50 text-gray-400 cursor-not-allowed border border-gray-200'
-                        : 'text-purple-600 border-2 border-purple-400 hover:border-purple-500 bg-purple-500/10 shadow-[0_0_18px_rgba(168,85,247,0.35)]'
+                        : 'text-purple-500 border-2 border-purple-400 hover:border-purple-500 bg-purple-500/10 shadow-[0_0_18px_rgba(168,85,247,0.35)]'
                         }`}
                 >
                     {(isDateSwitchBlocked || isDateSwitchBlockedLocal) && dateSwitchDelayLocal >= 3000 ? (
@@ -294,7 +305,7 @@ export default function DateCard({
                     {showCalendar && (
                         <div
                             ref={calendarRef}
-                            className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 z-50 bg-white dark:bg-gray-900 rounded-lg shadow-xl border border-purple-200 dark:border-gray-700 p-4 min-w-[280px]"
+                            className="fixed left-1/2 top-24 sm:top-28 transform -translate-x-1/2 z-30 isolate pointer-events-auto bg-white dark:bg-gray-900 rounded-lg shadow-xl border border-purple-200 dark:border-gray-700 p-4 min-w-[280px]"
                         >
                             <div className="flex items-center justify-center mb-3">
                                 <div className="flex items-center space-x-2">
@@ -306,7 +317,7 @@ export default function DateCard({
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                                         </svg>
                                     </button>
-                                    <h3 className="text-sm font-semibold text-purple-800">{getMonthName(calendarMonth)}</h3>
+                                    <h3 className="text-sm font-semibold text-purple-500">{getMonthName(calendarMonth)}</h3>
                                     <button
                                         onClick={() => navigateCalendarMonth('next')}
                                         className="p-1 hover:bg-purple-50 rounded transition-colors"
@@ -328,27 +339,34 @@ export default function DateCard({
                             </div>
 
                             <div className="grid grid-cols-7 gap-1">
-                                {generateCalendarDays().map((date, index) => (
-                                    <div key={index} className="relative">
-                                        <button
-                                            onClick={() => handleDateSelect(date)}
-                                            className={`w-8 h-8 text-xs rounded-full transition-colors flex items-center justify-center min-w-[32px] min-h-[32px] max-w-[32px] max-h-[32px] ${isSameDay(date, currentDate)
-                                                ? 'bg-purple-500 text-white'
-                                                : isSameDay(date, new Date())
-                                                    ? 'bg-purple-100 text-purple-800 border-2 border-purple-300'
-                                                    : isCurrentMonth(date)
-                                                        ? 'text-gray-800 dark:text-gray-200 hover:bg-purple-50 dark:hover:bg-gray-800'
-                                                        : 'text-gray-400 dark:text-gray-500 hover:bg-gray-50 dark:hover:bg-gray-800'
-                                                }`}
-                                        >
-                                            {date.getDate()}
-                                        </button>
-                                        {/* Purple dot indicator for dates with workouts */}
-                                        {hasWorkoutOnDate(date) && (
-                                            <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-purple-500 rounded-full shadow-sm border border-white dark:border-gray-900"></div>
-                                        )}
-                                    </div>
-                                ))}
+                                {generateCalendarDays().map((date, index) => {
+                                    const year = date.getFullYear()
+                                    const month = String(date.getMonth() + 1).padStart(2, '0')
+                                    const day = String(date.getDate()).padStart(2, '0')
+                                    const dateString = `${year}-${month}-${day}`
+                                    const showDot = highlightDates ? highlightDates.has(dateString) : workoutDates.has(dateString)
+                                    return (
+                                        <div key={index} className="relative">
+                                            <button
+                                                onClick={() => handleDateSelect(date)}
+                                                className={`w-8 h-8 text-xs rounded-full transition-colors flex items-center justify-center min-w-[32px] min-h-[32px] max-w-[32px] max-h-[32px] ${isSameDay(date, currentDate)
+                                                    ? 'bg-transparent text-purple-600 dark:text-purple-300 border-2 border-purple-500 shadow-[0_0_10px_rgba(168,85,247,0.8)]'
+                                                    : isSameDay(date, new Date())
+                                                        ? 'bg-transparent text-gray-900 dark:text-white border-2 border-gray-400 dark:border-white/90 shadow-[0_0_10px_rgba(156,163,175,0.75)] dark:shadow-[0_0_10px_rgba(255,255,255,0.85)]'
+                                                        : isCurrentMonth(date)
+                                                            ? 'text-gray-800 dark:text-gray-200 hover:bg-purple-50 dark:hover:bg-gray-800'
+                                                            : 'text-gray-400 dark:text-gray-500 hover:bg-gray-50 dark:hover:bg-gray-800'
+                                                    }`}
+                                            >
+                                                {date.getDate()}
+                                            </button>
+                                            {/* Always compute dot visibility based on workoutDates */}
+                                            {showDot && (
+                                                <div className={`absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-2 h-2 rounded-full z-10 pointer-events-none ${highlightDotClassName ? highlightDotClassName : 'bg-purple-600/70 border-2 border-purple-600 shadow-[0_0_16px_rgba(168,85,247,1)]'}`}></div>
+                                            )}
+                                        </div>
+                                    )
+                                })}
                             </div>
                         </div>
                     )}
@@ -361,7 +379,7 @@ export default function DateCard({
                     disabled={isDateSwitchBlocked || isDateSwitchBlockedLocal}
                     className={`perfect-circle circle-md flex items-center justify-center transition-colors ${(isDateSwitchBlocked || isDateSwitchBlockedLocal)
                         ? 'bg-gray-50 text-gray-400 cursor-not-allowed border border-gray-200'
-                        : 'text-purple-600 border-2 border-purple-400 hover:border-purple-500 bg-purple-500/10 shadow-[0_0_18px_rgba(168,85,247,0.35)]'
+                        : 'text-purple-500 border-2 border-purple-400 hover:border-purple-500 bg-purple-500/10 shadow-[0_0_18px_rgba(168,85,247,0.35)]'
                         }`}
                 >
                     {(isDateSwitchBlocked || isDateSwitchBlockedLocal) && dateSwitchDelayLocal >= 3000 ? (
@@ -392,6 +410,11 @@ export default function DateCard({
                         exercises={exercises}
                         workoutDate={workoutDate}
                     />
+                </div>
+            )}
+            {children && (
+                <div className="mt-3">
+                    {children}
                 </div>
             )}
         </div>

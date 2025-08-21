@@ -56,6 +56,7 @@ export default function TrainingTab({ user }: TrainingTabProps) {
     const [presetName, setPresetName] = useState('')
     const [dropdownRefreshKey, setDropdownRefreshKey] = useState(0)
     const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
+    const [twoColumnExercises, setTwoColumnExercises] = useState(false)
 
     // Date switching delay state
     const [isDateSwitchBlocked, setIsDateSwitchBlocked] = useState(false)
@@ -113,6 +114,33 @@ export default function TrainingTab({ user }: TrainingTabProps) {
             }
         }
     }, [user])
+
+    // Listen to exercise layout setting and initialize from localStorage
+    useEffect(() => {
+        try {
+            const storedTwoCol = typeof window !== 'undefined' ? localStorage.getItem('two_column_exercises') : null
+            if (storedTwoCol !== null) {
+                setTwoColumnExercises(storedTwoCol === 'true')
+            }
+        } catch { }
+
+        const handler = () => {
+            try {
+                const stored = localStorage.getItem('two_column_exercises')
+                if (stored !== null) {
+                    setTwoColumnExercises(stored === 'true')
+                }
+            } catch { }
+        }
+        if (typeof window !== 'undefined') {
+            window.addEventListener('exerciseLayoutSettingChanged', handler)
+        }
+        return () => {
+            if (typeof window !== 'undefined') {
+                window.removeEventListener('exerciseLayoutSettingChanged', handler)
+            }
+        }
+    }, [])
 
     // Initialize training for current date
     useEffect(() => {
@@ -365,9 +393,7 @@ export default function TrainingTab({ user }: TrainingTabProps) {
         if (!openModals.has('savePreset') && showSavePresetModal) {
             setShowSavePresetModal(false)
         }
-        if (!openModals.has('calendar') && showCalendar) {
-            setShowCalendar(false)
-        }
+        // Calendar is not a modal; do not sync with modal context
     }, [openModals])
 
     const navigateDate = (direction: 'prev' | 'next') => {
@@ -864,11 +890,7 @@ export default function TrainingTab({ user }: TrainingTabProps) {
     const handleDateClick = () => {
         const newShowCalendar = !showCalendar
         setShowCalendar(newShowCalendar)
-        if (newShowCalendar) {
-            openModal('calendar')
-        } else {
-            closeModal('calendar')
-        }
+        // Do not use modal context for calendar; keep bottom nav visible
     }
 
     const handleDateSelect = (date: Date) => {
@@ -942,7 +964,6 @@ export default function TrainingTab({ user }: TrainingTabProps) {
         const handleClickOutside = (event: MouseEvent) => {
             if (calendarRef.current && !calendarRef.current.contains(event.target as Node)) {
                 setShowCalendar(false)
-                closeModal('calendar')
             }
         }
 
@@ -984,10 +1005,19 @@ export default function TrainingTab({ user }: TrainingTabProps) {
                     }
                 }
             } else if (trainingServiceRef.current) {
-                // For logged-in users, we could fetch workout dates from the database
-                // For now, we'll just add the current training date if it has exercises
-                if (currentTraining && currentTraining.exercises.length > 0) {
-                    dates.add(currentTraining.date)
+                // Logged-in users: fetch full training history and mark all dates with exercises
+                try {
+                    const history = await trainingServiceRef.current.loadTrainingHistory()
+                    for (const t of history) {
+                        if (t.exercises && t.exercises.length > 0 && t.date) {
+                            dates.add(t.date)
+                        }
+                    }
+                } catch (e) {
+                    // Fallback: include current training date if available
+                    if (currentTraining && currentTraining.exercises.length > 0) {
+                        dates.add(currentTraining.date)
+                    }
                 }
             }
 
@@ -1006,14 +1036,14 @@ export default function TrainingTab({ user }: TrainingTabProps) {
     return (
         <div className="space-y-2 sm:space-y-3">
             {/* Date Navigation */}
-            <div className="bg-white dark:bg-gray-900 rounded-2xl p-1 sm:p-2 shadow-lg border border-purple-100 dark:border-gray-700 neon-surface light-surface">
+            <div className="bg-white dark:bg-gray-900 rounded-2xl p-1 sm:p-2 shadow-lg border border-purple-100 dark:border-gray-700 neon-surface light-surface relative z-[3000]">
                 <div className="flex items-center justify-between mb-0">
                     <button
                         onClick={() => navigateDate('prev')}
                         disabled={isDateSwitchBlocked}
                         className={`perfect-circle circle-md flex items-center justify-center transition-colors ${isDateSwitchBlocked
                             ? 'bg-gray-50 text-gray-400 cursor-not-allowed border border-gray-200'
-                            : 'text-purple-600 border-2 border-purple-400 hover:border-purple-500 bg-purple-500/10 shadow-[0_0_18px_rgba(168,85,247,0.35)]'
+                            : 'text-purple-500 border-2 border-purple-400 hover:border-purple-500 bg-purple-500/10 shadow-[0_0_18px_rgba(168,85,247,0.35)]'
                             }`}
                     >
                         {isDateSwitchBlocked && dateSwitchDelay >= 3000 ? (
@@ -1030,7 +1060,7 @@ export default function TrainingTab({ user }: TrainingTabProps) {
                     <div className="text-center flex-1 px-2 relative">
                         <button
                             onClick={handleDateClick}
-                            className="hover:bg-purple-50 rounded-lg px-2 py-0.5 transition-colors cursor-pointer group"
+                            className="hover:bg-purple-50 dark:hover:bg-gray-800 rounded-lg px-2 py-0.5 transition-colors cursor-pointer group"
                         >
                             <div className="flex items-center justify-center space-x-1">
                                 <h2 className={`text-sm sm:text-base font-bold ${isToday(currentDate) ? 'text-purple-500/80 dark:text-purple-300/80' : 'text-purple-800/60 dark:text-purple-200/60'}`}>
@@ -1053,7 +1083,7 @@ export default function TrainingTab({ user }: TrainingTabProps) {
                         {showCalendar && (
                             <div
                                 ref={calendarRef}
-                                className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 z-50 bg-white dark:bg-gray-900 rounded-lg shadow-xl border border-purple-200 dark:border-gray-700 p-4 min-w-[280px]"
+                                className="fixed left-1/2 top-24 sm:top-28 transform -translate-x-1/2 z-[10000] isolate pointer-events-auto bg-white dark:bg-gray-900 rounded-lg shadow-xl border border-purple-200 dark:border-gray-700 p-4 min-w-[280px]"
                             >
                                 <div className="flex items-center justify-center mb-3">
                                     <div className="flex items-center space-x-2">
@@ -1065,7 +1095,7 @@ export default function TrainingTab({ user }: TrainingTabProps) {
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                                             </svg>
                                         </button>
-                                        <h3 className="text-sm font-semibold text-purple-800">{getMonthName(calendarMonth)}</h3>
+                                        <h3 className="text-sm font-semibold text-purple-500">{getMonthName(calendarMonth)}</h3>
                                         <button
                                             onClick={() => navigateCalendarMonth('next')}
                                             className="p-1 hover:bg-purple-50 rounded transition-colors"
@@ -1087,27 +1117,34 @@ export default function TrainingTab({ user }: TrainingTabProps) {
                                 </div>
 
                                 <div className="grid grid-cols-7 gap-1">
-                                    {generateCalendarDays().map((date, index) => (
-                                        <div key={index} className="relative">
-                                            <button
-                                                onClick={() => handleDateSelect(date)}
-                                                className={`w-8 h-8 text-xs rounded-full transition-colors flex items-center justify-center min-w-[32px] min-h-[32px] max-w-[32px] max-h-[32px] ${isSameDay(date, currentDate)
-                                                    ? 'bg-purple-500 text-white'
-                                                    : isSameDay(date, new Date())
-                                                        ? 'bg-purple-100 text-purple-800 border-2 border-purple-300'
-                                                        : isCurrentMonth(date)
-                                                            ? 'text-gray-800 dark:text-gray-200 hover:bg-purple-50 dark:hover:bg-gray-800'
-                                                            : 'text-gray-400 dark:text-gray-500 hover:bg-gray-50 dark:hover:bg-gray-800'
-                                                    }`}
-                                            >
-                                                {date.getDate()}
-                                            </button>
-                                            {/* Purple dot indicator for dates with workouts */}
-                                            {hasWorkoutOnDate(date) && (
-                                                <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-purple-500 rounded-full shadow-sm border border-white dark:border-gray-900"></div>
-                                            )}
-                                        </div>
-                                    ))}
+                                    {generateCalendarDays().map((date, index) => {
+                                        const year = date.getFullYear()
+                                        const month = String(date.getMonth() + 1).padStart(2, '0')
+                                        const day = String(date.getDate()).padStart(2, '0')
+                                        const dateString = `${year}-${month}-${day}`
+                                        const showDot = workoutDates.has(dateString)
+                                        return (
+                                            <div key={index} className="relative">
+                                                <button
+                                                    onClick={() => handleDateSelect(date)}
+                                                    className={`w-8 h-8 text-xs rounded-full transition-colors flex items-center justify-center min-w-[32px] min-h-[32px] max-w-[32px] max-h-[32px] ${isSameDay(date, currentDate)
+                                                        ? 'bg-transparent text-purple-600 dark:text-purple-300 border-2 border-purple-500 shadow-[0_0_10px_rgba(168,85,247,0.8)]'
+                                                        : isSameDay(date, new Date())
+                                                            ? 'bg-transparent text-gray-900 dark:text-white border-2 border-gray-400 dark:border-white/90 shadow-[0_0_10px_rgba(156,163,175,0.75)] dark:shadow-[0_0_10px_rgba(255,255,255,0.85)]'
+                                                            : isCurrentMonth(date)
+                                                                ? 'text-gray-800 dark:text-gray-200 hover:bg-purple-50 dark:hover:bg-gray-800'
+                                                                : 'text-gray-400 dark:text-gray-500 hover:bg-gray-50 dark:hover:bg-gray-800'
+                                                        }`}
+                                                >
+                                                    {date.getDate()}
+                                                </button>
+                                                {/* Always compute dot visibility based on workoutDates */}
+                                                {showDot && (
+                                                    <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-2 h-2 rounded-full bg-purple-600/70 border-2 border-purple-600 shadow-[0_0_16px_rgba(168,85,247,1)] z-10 pointer-events-none"></div>
+                                                )}
+                                            </div>
+                                        )
+                                    })}
                                 </div>
                             </div>
                         )}
@@ -1137,7 +1174,7 @@ export default function TrainingTab({ user }: TrainingTabProps) {
                         disabled={isDateSwitchBlocked}
                         className={`perfect-circle circle-md flex items-center justify-center transition-colors ${isDateSwitchBlocked
                             ? 'bg-gray-50 text-gray-400 cursor-not-allowed border border-gray-200'
-                            : 'text-purple-600 border-2 border-purple-400 hover:border-purple-500 bg-purple-500/10 shadow-[0_0_18px_rgba(168,85,247,0.35)]'
+                            : 'text-purple-500 border-2 border-purple-400 hover:border-purple-500 bg-purple-500/10 shadow-[0_0_18px_rgba(168,85,247,0.35)]'
                             }`}
                     >
                         {isDateSwitchBlocked && dateSwitchDelay >= 3000 ? (
@@ -1224,7 +1261,7 @@ export default function TrainingTab({ user }: TrainingTabProps) {
                                 <p className="text-purple-400 dark:text-purple-300/70 text-sm sm:text-base">Add your first exercise to get started!</p>
                             </div>
                         ) : (
-                            <div className="space-y-1 sm:space-y-1">
+                            <div className={`${twoColumnExercises ? 'grid grid-cols-1 sm:grid-cols-2 gap-1 sm:gap-2' : 'space-y-1 sm:space-y-1'}`}>
                                 {currentTraining?.exercises.map((exercise, index) => (
                                     <div
                                         key={exercise.id}
@@ -1238,7 +1275,6 @@ export default function TrainingTab({ user }: TrainingTabProps) {
                                         onTouchCancel={handleTouchCancel}
                                         onContextMenu={(e) => e.preventDefault()}
                                         onTouchStartCapture={(e) => {
-                                            // Immediately prevent scrolling when touching the exercise area
                                             e.preventDefault()
                                             document.body.style.overflow = 'hidden'
                                             document.body.style.touchAction = 'none'
@@ -1261,6 +1297,8 @@ export default function TrainingTab({ user }: TrainingTabProps) {
                                     >
                                         <ExerciseCard
                                             exercise={exercise}
+                                            orderIndex={index + 1}
+                                            showOrderBadge={twoColumnExercises}
                                             onDelete={handleDeleteExercise}
                                             onUpdate={handleUpdateExercise}
                                         />
